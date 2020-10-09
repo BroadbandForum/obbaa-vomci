@@ -1,0 +1,199 @@
+# Copyright 2020 Broadband Forum
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# This template is used to generate omci_me_types.py
+#
+# Created by I.Ternovsky (Broadcom) on 17 July 2020
+#
+
+#
+# OMCI types and classes
+#
+
+from omci_types import *
+from database.omci_me import *
+
+""" OMCI message type """
+omci_msg_type = EnumDatum(1,
+   (('CREATE', 4),
+    ('DELETE', 6),
+    ('SET', 8),
+    ('GET', 9),
+    ('GET_ALL_ALARMS', 11),
+    ('GET_ALL_ALARMS_NEXT', 12),
+    ('MIB_UPLOAD', 13),
+    ('MIB_UPLOAD_NEXT', 14),
+    ('MIB_RESET', 15),
+    ('ALARM', 16),
+    ('AVC', 17),
+    ('TEST', 18),
+    ('START_SW_DOWNLOAD', 19),
+    ('DOWNLOAD_SECTION', 20),
+    ('END_SW_DOWNLOAD', 21),
+    ('ACTIVATE_SW', 22),
+    ('COMMIT_SW', 23),
+    ('SYNC_TIME', 24),
+    ('REBOOT', 25),
+    ('GET_NEXT', 26),
+    ('TEST_RESULT', 27),
+    ('GET_CURRENT_DATA', 28),
+    ('SET_TABLE', 29)))
+
+""" OMCI Message Set type (device identifier) """
+omci_msg_set_type = EnumDatum(1,
+  (('BASELINE', 0xA),
+   ('EXTENDED', 0xB)))
+
+""" OMCI Message status """
+omci_status = EnumDatum(1,
+  (('OK', 0),
+   ('COMMAND_PROCESSING_ERROR', 1),
+   ('COMMAND_NOT_SUPPORTED', 2),
+   ('PARAMETER_ERROR', 3),
+   ('UNKNOWN_MANAGED_ENTITY', 4),
+   ('UNKNOWN_MANAGED_ENTITY_INSTANCE', 5),
+   ('DEVICE_BUSY', 6),
+   ('INSTANCE_EXISTS', 7),
+   ('ATTRIBUTES_FAILED_OR_UNKNOWN', 9)))
+
+""" OMCI NULL pointer """
+OMCI_NULL_PTR = 0xffff
+
+""" All ME class Ids """
+omci_me_class = EnumDatum(
+    1,
+    (
+        $begin_foreach(me)$
+        ('$toupper(me.name)$', $me.class_id$),
+        $end_foreach(me)$
+    ))
+
+$begin_foreach(me)$
+
+#################
+# $me.name$: $me.description$
+#################
+
+$begin_foreach(me.attr,enum)$
+$prefix$$me.name$_$me.attr.name$ = EnumDatum(
+    $me.attr.sizeof$,
+    (
+        $begin_foreach(me.attr.value)$
+        ('$toupper(me.attr.value.name)$', $me.attr.value.value$),
+        $end_foreach(me.attr.value)$
+    )
+)
+
+$end_foreach(me.attr,enum)$
+
+$begin_foreach(me.attr)$
+$begin_foreach(me.attr.field,enum)$
+$prefix$$me.name$_$me.attr.name$_$me.attr.field.name$ = EnumDatum(
+    $me.attr.field.sizeof$,
+    (
+        $begin_foreach(me.attr.field.value)$
+        ('$toupper(me.attr.field.value.name)$', $me.attr.field.value.value$),
+        $end_foreach(me.attr.field.value)$
+    )
+)
+
+$end_foreach(me.attr.field,enum)$
+$end_foreach(me.attr)$
+
+$begin_foreach(me.attr,struct)$
+$begin_foreach(me.attr.field,struct)$
+class $prefix$$me.name$_$me.attr.field.name$(BitStructDatum):
+    fields = (
+        $begin_foreach(me.attr.field.subfield)$
+        BitField('$me.attr.field.subfield.name$', '$me.attr.field.subfield.description$', width=$me.attr.field.subfield.sizeof$),
+        $end_foreach(me.attr.field.subfield)$
+    )
+    def __init__(self, default: AttrValue = None, fixed: AttrValue = None, size = $me.attr.field.sizeof$):
+        super().__init__(size, default=default, fixed=fixed)
+
+$end_foreach(me.attr.field,struct)$
+
+class $prefix$$me.name$_$me.attr.name$(StructDatum):
+    fields = (
+        $begin_foreach(me.attr.field)$
+        $if(me.attr.field, me.attr.field.c_type, struct)$
+        StructField('$me.attr.field.name$', '$me.attr.field.description$', field_type=$prefix$$me.name$_$me.attr.field.name$()),
+        $endif(me.attr.field)$
+        $if(me.attr.field, me.attr.field.c_type, !struct)$
+        StructField('$me.attr.field.name$', '$me.attr.field.description$', field_type=$c_type(me.attr.field)$),
+        $endif(me.attr.field)$
+        $end_foreach(me.attr.field)$
+    )
+    def __init__(self, default: AttrValue = None, fixed: AttrValue = None, size = $me.attr.sizeof$):
+        super().__init__(size, default=default, fixed=fixed)
+
+$end_foreach(me.attr,struct)$
+class $prefix$$me.name$_me(ME):
+    """ $toupper(me.name)$ ($me.class_id$) - $me.description$. """
+    me_class = $me.class_id$
+    name = '$toupper(me.name)$'
+    description = '$me.description$'
+    attrs = (
+        Attr(0, 'me_inst', 'Managed entity instance', 'R', 'M', NumberDatum(2, fixed=0)),
+        $begin_foreach(me.attr)$
+        Attr($me.attr.index$, '$me.attr.name$', '$me.attr.description$', '$enum(me.attr.permissions)$', '$enum(me.attr.is_mandatory)$', $c_type(me.attr)$),
+        $end_foreach(me.attr)$
+    )
+    num_attrs = len(attrs)
+    actions = ($enum(me.operations,',')$)
+
+    def __init__(self,
+            inst : int,
+            $begin_foreach(me.attr)$
+            $if(me.attr, writeable)$
+            $me.attr.name$ = None$if_not_last(me.attr,\,)$
+            $endif(me.attr)$
+            $end_foreach(me.attr)$
+        ):
+        """ $toupper(me.name)$ ME Constructor.
+
+        Args:
+            inst : ME instance.
+            $begin_foreach(me.attr)$
+            $if(me.attr, writeable)$
+            $me.attr.name$ : Attribute #$me.attr.index$. $me.attr.description$.
+            $endif(me.attr)$
+            $end_foreach(me.attr)$
+        """
+        super($prefix$$me.name$_me, self).__init__(inst)
+        $begin_foreach(me.attr)$
+        $if(me.attr, writeable)$
+        if $me.attr.name$ is not None:
+            self.set_attr_value($me.attr.index$, $me.attr.name$)
+        $endif(me.attr)$
+        $end_foreach(me.attr)$
+
+$end_foreach(me)$
+
+class $prefix$MeClassMapper:
+
+    me_dict = {
+$begin_foreach(me)$
+        $me.class_id$: $prefix$$me.name$_me$if_not_last(me,\,)$
+$end_foreach(me)$
+    }
+
+    @classmethod
+    def me_by_class(cls, me_class: int) -> ME:
+        if me_class not in cls.me_dict:
+            return None
+        return cls.me_dict[me_class]
+
+#endif

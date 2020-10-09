@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5. Test Programs &#8212; vomci  documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="4. OMH NBI" href="../omh_nbi/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../omh_nbi/index.html" title="4. OMH NBI"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">5. </span>Test Programs</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="test-programs">
+<h1><span class="section-number">5. </span>Test Programs<a class="headerlink" href="#test-programs" title="Permalink to this headline">¶</a></h1>
+<p>The following optional parameters are common for all test programs:<br>
+<strong>Common Optional Parameters</strong><br>
+
+  -a POLT_HOST, &ndash;polt-host POLT_HOST; pOLT DNS name or IP address; default: &lsquo;localhost&rsquo;<br>
+
+  -p POLT_PORT, &ndash;polt-port POLT_PORT; pOLT UDP port number; default: 50000<br>
+
+  -l LOGLEVEL, &ndash;loglevel LOGLEVEL; logging level (0=errors+warnings, 1=info, 2=debug); default: 1<br>
+
+  -v VOMCI_NAME, &ndash;vomci-name VOMCI_NAME;  vOMCI name; default: &lsquo;vomci1&rsquo;<br>
+
+  -c CTERM_NAME, &ndash;cterm-name CTERM_NAME; channel-termination name; default: &lsquo;channeltermination.1&rsquo;<br>
+
+  -o ONU_ID, &ndash;onu-id ONU_ID. ONU id; default: 2<br>
+
+  -t TCI, &ndash;tci TCI     Starting TCI value; default: 1<br>
+
+  -b BACKGROUND, &ndash;background BACKGROUND; Run FSM in the background: False<br>
+
+  -i ITERS, &ndash;iters ITERS; Number of times to execute the FSM: 1<br>
+
+  -d DUMP_MIB, &ndash;dump-mib DUMP_MIB&rsquo; Dump ONU MIB: False<br>
+
+  &ndash;timeout TIMEOUT     Message timeout (s): 2.0<br>
+
+  &ndash;retries RETRIES     Max number of retries: 2<br></p>
+<div class="section" id="bintest_onu_fsm-invoke-any-onu-fsm">
+<h2><span class="section-number">5.1. </span>bin/test_onu_fsm: Invoke any ONU FSM<a class="headerlink" href="#bintest_onu_fsm-invoke-any-onu-fsm" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage</strong><br>
+
+bin/test_onu_fsm [-h] [-f FSM] [-a POLT_HOST] [-p POLT_PORT] [-l LOGLEVEL]
+
+                    [-v VOMCI_NAME] [-c CTERM_NAME] [-o ONU_ID] [-t TCI]
+
+                    [-b BACKGROUND] [-i ITERS] [-d DUMP_MIB]</p>
+<p><strong>Mandatory Parameters</strong><br>
+
+  -f FSM, &ndash;fsm FSM     FSM to execute: MIB_RESET MIB_UPLOAD ACTIVATE_ONU<br></p>
+<p><strong>Extra Optional Parameters</strong><br>
+
+None</p>
+</div>
+<div class="section" id="bintest_activate_onu-invoke-onu-activation-fsm">
+<h2><span class="section-number">5.2. </span>bin.test_activate_onu: Invoke ONU activation FSM<a class="headerlink" href="#bintest_activate_onu-invoke-onu-activation-fsm" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage</strong><br>
+
+bin/test_activate_onu [-h] [-a POLT_HOST] [-p POLT_PORT] [-l LOGLEVEL]
+
+                         [-v VOMCI_NAME] [-c CTERM_NAME] [-o ONU_ID] [-t TCI]
+
+                         [-b BACKGROUND] [-i ITERS] [-d DUMP_MIB]
+
+                         [-r FORCE_RESET]</p>
+<p><strong>Extra Optional Parameters:</strong><br>
+
+  -r FORCE_RESET, &ndash;force-reset FORCE_RESET; Force ONU reset and re-sync: False<br></p>
+</div>
+<div class="section" id="bintest_uni_tcont_gem-activate-onu-and-configure-uni-tcont-and-gem-port">
+<h2><span class="section-number">5.3. </span>bin.test_uni_tcont_gem: Activate ONU and configure UNI, TCONT and GEM port<a class="headerlink" href="#bintest_uni_tcont_gem-activate-onu-and-configure-uni-tcont-and-gem-port" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage</strong><br>
+
+bin/test_uni_tcont_gem [-h] [-a POLT_HOST] [-p POLT_PORT] [-l LOGLEVEL]
+
+                          [-v VOMCI_NAME] [-c CTERM_NAME] [-o ONU_ID] [-t TCI]
+
+                          [-b BACKGROUND] [-i ITERS] [-d DUMP_MIB]
+
+                          [&ndash;uni-name UNI_NAME] [&ndash;uni-id UNI_ID]
+
+                          [&ndash;tcont-name TCONT_NAME] [&ndash;alloc-id ALLOC_ID]
+
+                          [&ndash;gemport-name GEMPORT_NAME]
+
+                          [&ndash;gemport-id GEMPORT_ID] [&ndash;tc TC]
+
+                          [&ndash;direction DIRECTION] [&ndash;encryption ENCRYPTION]</p>
+<p><strong>Extra Optional Parameters:</strong><br>
+
+  &ndash;uni-name UNI_NAME   UNI name: &lsquo;uni.1&rsquo;<br>
+
+  &ndash;uni-id UNI_ID       UNI id: 0<br>
+
+  &ndash;tcont-name TCONT_NAME; TCONT name: &lsquo;tcont.1&rsquo;<br>
+
+  &ndash;alloc-id ALLOC_ID   ALLOC Id: 1024<br>
+
+  &ndash;gemport-name GEMPORT_NAME; GEM port name: &lsquo;gem.1&rsquo;<br>
+
+  &ndash;gemport-id GEMPORT_ID; GEMPORT Id: 1025<br>
+
+  &ndash;tc TC               Traffic Class: 1<br>
+
+  &ndash;direction DIRECTION; GEM port direction: &lsquo;BIDIRECTIONAL&rsquo;<br>
+
+  &ndash;encryption ENCRYPTION; GEM port encryption: &lsquo;NO_ENCRYPTION&rsquo;<br></p>
+</div>
+<div class="section" id="bintest_qos_policy_profile-create-qos-policy-profile">
+<h2><span class="section-number">5.4. </span>bin.test_qos_policy_profile: Create QoS Policy Profile<a class="headerlink" href="#bintest_qos_policy_profile-create-qos-policy-profile" title="Permalink to this headline">¶</a></h2>
+<p>This test performs the following sequence:<br>
+
+- Activate ONU<br>
+
+- Set UNI<br>
+
+- For each traffic class<br>
+
+    &ndash; Set TCONT<br>
+
+    &ndash; Create GEM port<br>
+
+- Create Qos Policy Profile<br>
+
+    &ndash; Create 802.1p Service Mapper<br>
+
+    &ndash; For each traffic class create GEM PORT IW TP ME<br>
+
+    &ndash; Set 802.1p Service Mapper<br></p>
+<p><strong>Usage</strong><br>
+
+bin/test_qos_policy_profile [-h] [-a POLT_HOST] [-p POLT_PORT]
+
+                               [-l LOGLEVEL] [-v VOMCI_NAME] [-c CTERM_NAME]
+
+                               [-o ONU_ID] [-t TCI] [-b BACKGROUND] [-i ITERS]
+
+                               [-d DUMP_MIB] [&ndash;timeout TIMEOUT]
+
+                               [&ndash;retries RETRIES]
+
+                               [&ndash;profile-name PROFILE_NAME]
+
+                               [&ndash;uni-name UNI_NAME] [&ndash;uni-id UNI_ID]
+
+                               [&ndash;tcont-name TCONT_NAME] [&ndash;alloc-id ALLOC_ID]
+
+                               [&ndash;gemport-name GEMPORT_NAME]
+
+                               [&ndash;gemport-id GEMPORT_ID]
+
+                               [&ndash;num_pbits_per_tc NUM_PBITS_PER_TC]
+
+                               [&ndash;num_tcs NUM_TCS] [&ndash;encryption ENCRYPTION]</p>
+<p><strong>Extra Optional Parameters:</strong><br>
+
+  &ndash;profile-name PROFILE_NAME; QoS policy profile name: &lsquo;qos_profile.1&rsquo;<br>
+
+  &ndash;uni-name UNI_NAME   UNI name: &lsquo;uni.1&rsquo;<br>
+
+  &ndash;uni-id UNI_ID       UNI id: 0<br>
+
+  &ndash;tcont-name TCONT_NAME; TCONT base name: &lsquo;tcont&rsquo;<br>
+
+  &ndash;alloc-id ALLOC_ID   Base ALLOC Id: 1024<br>
+
+  &ndash;gemport-name GEMPORT_NAME;  GEM port base name: &lsquo;gem&rsquo;<br>
+
+  &ndash;gemport-id GEMPORT_ID; GEMPORT Id: 1025<br>
+
+  &ndash;num_pbits_per_tc NUM_PBITS_PER_TC; Number of PBIts that map to the same Traffic Class: 2<br>
+
+  &ndash;num_tcs NUM_TCS     Number of Traffic Classes: 2<br>
+
+  &ndash;encryption ENCRYPTION; GEM port encryption: &lsquo;NO_ENCRYPTION&rsquo;<br></p>
+</div>
+<div class="section" id="bintest_vlan_subinterface-create-a-vlan-sub-interface">
+<h2><span class="section-number">5.5. </span>bin.test_vlan_subinterface: Create a VLAN Sub-Interface<a class="headerlink" href="#bintest_vlan_subinterface-create-a-vlan-sub-interface" title="Permalink to this headline">¶</a></h2>
+<p>This test performs the following sequence:<br>
+
+- Activate ONU<br>
+
+- Set UNI<br>
+
+- For each traffic class<br>
+
+    &ndash; Set TCONT<br>
+
+    &ndash; Create GEM port<br>
+
+- Create Qos Policy Profile<br>
+
+    &ndash; Create 802.1p Service Mapper<br>
+
+    &ndash; For each traffic class create GEM PORT IW TP ME<br>
+
+    &ndash; Set 802.1p Service Mapper<br>
+
+- Create VLAN Tagging Filter ME<br>
+
+- Create EXT VLAN Tag Operation ME<br></p>
+<p><strong>Usage</strong><br>
+
+bin/test_vlan_subinterface [-h] [-a POLT_HOST] [-p POLT_PORT] [-l LOGLEVEL]
+
+                              [-v VOMCI_NAME] [-c CTERM_NAME] [-o ONU_ID]
+
+                              [-t TCI] [-b BACKGROUND] [-i ITERS]
+
+                              [-d DUMP_MIB] [&ndash;timeout TIMEOUT]
+
+                              [&ndash;retries RETRIES] [&ndash;subif-name SUBIF_NAME]
+
+                              [&ndash;ingress-o-vid INGRESS_O_VID]
+
+                              [&ndash;ingress-o-pbit INGRESS_O_PBIT]
+
+                              [&ndash;ingress-i-vid INGRESS_I_VID]
+
+                              [&ndash;ingress-i-pbit INGRESS_I_PBIT]
+
+                              [&ndash;egress-o-vid EGRESS_O_VID]
+
+                              [&ndash;egress-o-pbit EGRESS_O_PBIT]
+
+                              [&ndash;vlan-action VLAN_ACTION]
+
+                              [&ndash;profile-name PROFILE_NAME]
+
+                              [&ndash;uni-name UNI_NAME] [&ndash;uni-id UNI_ID]
+
+                              [&ndash;tcont-name TCONT_NAME] [&ndash;alloc-id ALLOC_ID]
+
+                              [&ndash;gemport-name GEMPORT_NAME]
+
+                              [&ndash;gemport-id GEMPORT_ID]
+
+                              [&ndash;num_pbits_per_tc NUM_PBITS_PER_TC]
+
+                              [&ndash;num_tcs NUM_TCS] [&ndash;encryption ENCRYPTION]</p>
+<p><strong>Extra Optional Parameters:</strong><br>
+
+  &ndash;subif-name SUBIF_NAME; VLAN Sub-interface name: &lsquo;vlan-subif.1&rsquo;<br>
+
+  &ndash;ingress-o-vid INGRESS_O_VID; Ingress O-VID. -1=untagged: -1<br>
+
+  &ndash;ingress-o-pbit INGRESS_O_PBIT; Ingress O-PBIT. -1=any: -1<br>
+
+  &ndash;ingress-i-vid INGRESS_I_VID; Ingress I-VID. -1=not used: -1<br>
+
+  &ndash;ingress-i-pbit INGRESS_I_PBIT; Ingress I-PBIT. -1=any: -1<br>
+
+  &ndash;egress-o-vid EGRESS_O_VID; Egress VID. : 100<br>
+
+  &ndash;egress-o-pbit EGRESS_O_PBIT; Egress PBIT. : 0<br>
+
+  &ndash;vlan-action VLAN_ACTION; VLAN Action (PUSH, POP, TRANSLATE). : &lsquo;PUSH&rsquo;<br>
+
+  &ndash;profile-name PROFILE_NAME; QoS policy profile name: &lsquo;qos_profile.1&rsquo;<br>
+
+  &ndash;uni-name UNI_NAME   UNI name: &lsquo;uni.1&rsquo;<br>
+
+  &ndash;uni-id UNI_ID       UNI id: 0<br>
+
+  &ndash;tcont-name TCONT_NAME; TCONT base name: &lsquo;tcont&rsquo;<br>
+
+  &ndash;alloc-id ALLOC_ID   Base ALLOC Id: 1024<br>
+
+  &ndash;gemport-name GEMPORT_NAME;  GEM port base name: &lsquo;gem&rsquo;<br>
+
+  &ndash;gemport-id GEMPORT_ID; GEMPORT Id: 1025<br>
+
+  &ndash;num_pbits_per_tc NUM_PBITS_PER_TC; Number of PBIts that map to the same Traffic Class: 2<br>
+
+  &ndash;num_tcs NUM_TCS     Number of Traffic Classes: 2<br>
+
+  &ndash;encryption ENCRYPTION; GEM port encryption: &lsquo;NO_ENCRYPTION&rsquo;<br></p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. Test Programs</a><ul>
+<li><a class="reference internal" href="#bintest_onu_fsm-invoke-any-onu-fsm">5.1. bin/test_onu_fsm: Invoke any ONU FSM</a></li>
+<li><a class="reference internal" href="#bintest_activate_onu-invoke-onu-activation-fsm">5.2. bin.test_activate_onu: Invoke ONU activation FSM</a></li>
+<li><a class="reference internal" href="#bintest_uni_tcont_gem-activate-onu-and-configure-uni-tcont-and-gem-port">5.3. bin.test_uni_tcont_gem: Activate ONU and configure UNI, TCONT and GEM port</a></li>
+<li><a class="reference internal" href="#bintest_qos_policy_profile-create-qos-policy-profile">5.4. bin.test_qos_policy_profile: Create QoS Policy Profile</a></li>
+<li><a class="reference internal" href="#bintest_vlan_subinterface-create-a-vlan-sub-interface">5.5. bin.test_vlan_subinterface: Create a VLAN Sub-Interface</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../omh_nbi/index.html"
+                        title="previous chapter"><span class="section-number">4. </span>OMH NBI</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/bin/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../omh_nbi/index.html" title="4. OMH NBI"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">5. </span>Test Programs</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Broadband Forum.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0+.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,723 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. OMCI Message Encode / Decode Service &#8212; vomci  documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. OMCC Service (OMH SBI)" href="../omcc/index.html" />
+    <link rel="prev" title="1. Database Service" href="../database/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../omcc/index.html" title="3. OMCC Service (OMH SBI)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../database/index.html" title="1. Database Service"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">2. </span>OMCI Message Encode / Decode Service</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-encode_decode.omci_action">
+<span id="omci-message-encode-decode-service"></span><h1><span class="section-number">2. </span>OMCI Message Encode / Decode Service<a class="headerlink" href="#module-encode_decode.omci_action" title="Permalink to this headline">¶</a></h1>
+<p>OMCI Action encoding/decoding</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action.OmciAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action.</code><code class="sig-name descname">OmciAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em>, <em class="sig-param"><span class="n">me</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ar</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">ak</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">owner</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omci_types.AutoGetter</span></code></p>
+<p>Helper class for OMCI message encode/decode</p>
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em>, <em class="sig-param"><span class="n">me</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ar</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">ak</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">owner</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.reinit">
+<code class="sig-name descname">reinit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.reinit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Re-initialize action, prepare for reuse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.is_configuration">
+<em class="property">property </em><code class="sig-name descname">is_configuration</code><a class="headerlink" href="#encode_decode.omci_action.OmciAction.is_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return TRUE for configuration handlers that affect mib_sync</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.rollback">
+<code class="sig-name descname">rollback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a roll-back action
+:type onu: OnuDriver
+:param onu: OnuDriver containing the current ONU MIB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction">OmciAction</a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An action that rolls-back ‘this’ action, or None if not applicable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit action results top ONU MIB
+:type onu: OnuDriver
+:param onu: OnuDriver containing the current ONU MIB</p>
+<p>Raises an exception in case of commit failure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.decode_attributes">
+<code class="sig-name descname">decode_attributes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">offset</span></em>, <em class="sig-param"><span class="n">attr_mask</span></em>, <em class="sig-param"><span class="n">table_length</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">decode_me</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.decode_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode message attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.decode_key_fields">
+<em class="property">static </em><code class="sig-name descname">decode_key_fields</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.decode_key_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode key fields of the raw message
+:type msg: <code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>
+:param msg: raw OMCI message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tci, ak, action</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.encode">
+<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tci</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode raw OMCI message
+:type tci: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:param tci: TCID to encode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Raw OMCI message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.decode">
+<em class="property">static </em><code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">action_msg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode raw OMCI message
+:type msg: <code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>
+:param msg: raw OMCI message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmciAction</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>OmciAction control block or None in case of error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">content_offset</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode message content</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action.OmciAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action.OmciAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode message content</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="module-encode_decode.omci_action_create">
+<span id="create-action"></span><h2><span class="section-number">2.1. </span>Create Action<a class="headerlink" href="#module-encode_decode.omci_action_create" title="Permalink to this headline">¶</a></h2>
+<p>CREATE action</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action_create.CreateAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action_create.</code><code class="sig-name descname">CreateAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">me</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">encode_decode.omci_action.OmciAction</span></code></a></p>
+<p>SetRequest: CREATE Request control block.</p>
+<p>When OMCI request-response transaction is completed, the message block
+contains the following attributes:</p>
+<blockquote>
+<div><p>me
+omci_result: 0=good, otherwise bad (see omci_result_code Enum)
+attr_exec_mask: Attribute execution mask: 1 for every failed attribute.</p>
+<blockquote>
+<div><p>contains a valid value only if omci_result=9</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="py method">
+<dt id="encode_decode.omci_action_create.CreateAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">me</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>owner</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request owner</p></li>
+<li><p><strong>me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME to be sent</p></li>
+<li><p><strong>extended</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – pass True to generate an extended OMCI message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_create.CreateAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode CREATE request message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>raw OMCI message content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_create.CreateAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode CREATE response message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>result</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_create.CreateAction.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit action results top ONU MIB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – OnuDriver containing the current ONU MIB</p>
+</dd>
+</dl>
+<p>Raises: an exception in case of commit failure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_create.CreateAction.rollback">
+<code class="sig-name descname">rollback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a roll-back action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – OnuDriver containing the current ONU MIB</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction">OmciAction</a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An action that rolls-back ‘this’ action, or None if not applicable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_create.CreateAction.is_configuration">
+<em class="property">property </em><code class="sig-name descname">is_configuration</code><a class="headerlink" href="#encode_decode.omci_action_create.CreateAction.is_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>TRUE for configuration handlers that affect mib_sync</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Returns</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encode_decode.omci_action_delete">
+<span id="delete-action"></span><h2><span class="section-number">2.2. </span>Delete Action<a class="headerlink" href="#module-encode_decode.omci_action_delete" title="Permalink to this headline">¶</a></h2>
+<p>DELETE action</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action_delete.DeleteAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action_delete.</code><code class="sig-name descname">DeleteAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">me</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_delete.DeleteAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">encode_decode.omci_action.OmciAction</span></code></a></p>
+<p>SetRequest: DELETE Request control block.</p>
+<p>When OMCI request-response transaction is completed, the message block
+contains the following attributes:</p>
+<blockquote>
+<div><p>me
+omci_result: 0=good, otherwise bad (see omci_result_code Enum)</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="encode_decode.omci_action_delete.DeleteAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">me</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_delete.DeleteAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>owner</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request owner</p></li>
+<li><p><strong>me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME to be sent</p></li>
+<li><p><strong>extended</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – pass True to generate an extended OMCI message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_delete.DeleteAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_delete.DeleteAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode CREATE request message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>raw OMCI message content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_delete.DeleteAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_delete.DeleteAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode CREATE response message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>result</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_delete.DeleteAction.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_delete.DeleteAction.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit action results top ONU MIB/</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – OnuDriver containing the current ONU MIB</p>
+</dd>
+</dl>
+<p>Raises: an exception in case of commit failure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_delete.DeleteAction.is_configuration">
+<em class="property">property </em><code class="sig-name descname">is_configuration</code><a class="headerlink" href="#encode_decode.omci_action_delete.DeleteAction.is_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return TRUE for configuration handlers that affect mib_sync</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encode_decode.omci_action_set">
+<span id="set-action"></span><h2><span class="section-number">2.3. </span>Set Action<a class="headerlink" href="#module-encode_decode.omci_action_set" title="Permalink to this headline">¶</a></h2>
+<p>SET action</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action_set.SetAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action_set.</code><code class="sig-name descname">SetAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">me</span></em>, <em class="sig-param"><span class="n">attr_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_set.SetAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">encode_decode.omci_action.OmciAction</span></code></a></p>
+<p>SetAction: SET control block.</p>
+<p>When OMCI request-response transaction is completed, the message block
+contains the following attributes:</p>
+<blockquote>
+<div><p>me
+omci_result: 0=good, otherwise bad (see omci_result_code Enum)
+opt_attr_mask: Optional-attribute mask: 1 for unsupported optional attributes.</p>
+<blockquote>
+<div><p>contains a valid value only if omci_result=9</p>
+</div></blockquote>
+<dl class="simple">
+<dt>attr_exec_mask: Attribute execution mask: 1 for every failed attribute.</dt><dd><p>contains a valid value only if omci_result=9</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py method">
+<dt id="encode_decode.omci_action_set.SetAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">me</span></em>, <em class="sig-param"><span class="n">attr_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_set.SetAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>owner</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request owner</p></li>
+<li><p><strong>me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME to be sent</p></li>
+<li><p><strong>extended</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – pass True to generate an extended OMCI message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_set.SetAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_set.SetAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode SET request message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>raw OMCI message content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_set.SetAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_set.SetAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode SET message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>result</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_set.SetAction.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_set.SetAction.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit action results top ONU MIB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – OnuDriver containing the current ONU MIB</p>
+</dd>
+</dl>
+<p>Raises: an exception in case of commit failure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_set.SetAction.rollback">
+<code class="sig-name descname">rollback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_set.SetAction.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a roll-back action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – OnuDriver containing the current ONU MIB</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction">OmciAction</a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An action that rolls-back ‘this’ action, or None if not applicable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_set.SetAction.is_configuration">
+<em class="property">property </em><code class="sig-name descname">is_configuration</code><a class="headerlink" href="#encode_decode.omci_action_set.SetAction.is_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>TRUE for configuration handlers that affect mib_sync</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Returns</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encode_decode.omci_action_get">
+<span id="get-action"></span><h2><span class="section-number">2.4. </span>Get Action<a class="headerlink" href="#module-encode_decode.omci_action_get" title="Permalink to this headline">¶</a></h2>
+<p>GET action</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action_get.GetAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action_get.</code><code class="sig-name descname">GetAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">me</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attr_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_get.GetAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">encode_decode.omci_action.OmciAction</span></code></a></p>
+<p>GetAction: GET control block
+When OMCI request-response transaction is completed, the message block.</p>
+<dl>
+<dt>contains the following attributes:</dt><dd><p>me containing the requested attribute values
+omci_result: 0=good, otherwise bad (see omci_result_code Enum)
+opt_attr_mask: Optional-attribute mask: 1 for unsupported optional attributes.</p>
+<blockquote>
+<div><p>contains a valid value only if omci_result=9</p>
+</div></blockquote>
+<dl class="simple">
+<dt>attr_exec_mask: Attribute execution mask: 1 for every failed attribute.</dt><dd><p>contains a valid value only if omci_result=9</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="encode_decode.omci_action_get.GetAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">me</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attr_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_get.GetAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>owner</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request owner</p></li>
+<li><p><strong>me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME to be sent</p></li>
+<li><p><strong>attr_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]]) – optional list of arguments to be set. If None, all assigned me attributes will be set</p></li>
+<li><p><strong>extended</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – pass True to generate an extended OMCI message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_get.GetAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_get.GetAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode GET request message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>raw OMCI message content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_get.GetAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_get.GetAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode GET message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>result</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encode_decode.omci_action_mib_reset">
+<span id="mib-reset-action"></span><h2><span class="section-number">2.5. </span>MIB Reset Action<a class="headerlink" href="#module-encode_decode.omci_action_mib_reset" title="Permalink to this headline">¶</a></h2>
+<p>MIB_RESET action</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action_mib_reset.MibResetAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action_mib_reset.</code><code class="sig-name descname">MibResetAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_reset.MibResetAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">encode_decode.omci_action.OmciAction</span></code></a></p>
+<p>MibReset: MIB_RESET control block.</p>
+<p>When OMCI request-response transaction is completed, the message block
+contains the following attributes:</p>
+<blockquote>
+<div><p>me
+omci_result: 0=good, otherwise bad (see omci_result_code Enum)</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="encode_decode.omci_action_mib_reset.MibResetAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_reset.MibResetAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>owner</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request owner</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_mib_reset.MibResetAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_reset.MibResetAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode MIB_RESET message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>raw OMCI message content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_mib_reset.MibResetAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_reset.MibResetAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode MIB_RESET message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>result</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encode_decode.omci_action_mib_upload">
+<span id="mib-upload-action"></span><h2><span class="section-number">2.6. </span>MIB Upload Action<a class="headerlink" href="#module-encode_decode.omci_action_mib_upload" title="Permalink to this headline">¶</a></h2>
+<p>MIB_UPLOAD action</p>
+<dl class="py class">
+<dt id="encode_decode.omci_action_mib_upload.MibUploadAction">
+<em class="property">class </em><code class="sig-prename descclassname">encode_decode.omci_action_mib_upload.</code><code class="sig-name descname">MibUploadAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_upload.MibUploadAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">encode_decode.omci_action.OmciAction</span></code></a></p>
+<p>MibUpload: MIB_UPLOAD control block.</p>
+<p>When OMCI request-response transaction is completed, the message block
+contains the following attributes:</p>
+<blockquote>
+<div><p>me
+num_of_upload_next: number of subsequent MIB upload next commands</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="encode_decode.omci_action_mib_upload.MibUploadAction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_upload.MibUploadAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>owner</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request owner</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_mib_upload.MibUploadAction.encode_content">
+<code class="sig-name descname">encode_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_upload.MibUploadAction.encode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode MIB_UPLOAD message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>raw OMCI message content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="encode_decode.omci_action_mib_upload.MibUploadAction.decode_content">
+<code class="sig-name descname">decode_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#encode_decode.omci_action_mib_upload.MibUploadAction.decode_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode MIB_UPLOAD message content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>result</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="mib-upload-next-action">
+<h2><span class="section-number">2.7. </span>MIB Upload Next Action<a class="headerlink" href="#mib-upload-next-action" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. OMCI Message Encode / Decode Service</a><ul>
+<li><a class="reference internal" href="#module-encode_decode.omci_action_create">2.1. Create Action</a></li>
+<li><a class="reference internal" href="#module-encode_decode.omci_action_delete">2.2. Delete Action</a></li>
+<li><a class="reference internal" href="#module-encode_decode.omci_action_set">2.3. Set Action</a></li>
+<li><a class="reference internal" href="#module-encode_decode.omci_action_get">2.4. Get Action</a></li>
+<li><a class="reference internal" href="#module-encode_decode.omci_action_mib_reset">2.5. MIB Reset Action</a></li>
+<li><a class="reference internal" href="#module-encode_decode.omci_action_mib_upload">2.6. MIB Upload Action</a></li>
+<li><a class="reference internal" href="#mib-upload-next-action">2.7. MIB Upload Next Action</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../database/index.html"
+                        title="previous chapter"><span class="section-number">1. </span>Database Service</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../omcc/index.html"
+                        title="next chapter"><span class="section-number">3. </span>OMCC Service (OMH SBI)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/encode_decode/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../omcc/index.html" title="3. OMCC Service (OMH SBI)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../database/index.html" title="1. Database Service"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">2. </span>OMCI Message Encode / Decode Service</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Broadband Forum.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0+.
+    </div>
+  </body>
+</html>

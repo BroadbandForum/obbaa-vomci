@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3. OMCC Service (OMH SBI) &#8212; vomci  documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. OMH NBI" href="../omh_nbi/index.html" />
+    <link rel="prev" title="2. OMCI Message Encode / Decode Service" href="../encode_decode/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../omh_nbi/index.html" title="4. OMH NBI"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../encode_decode/index.html" title="2. OMCI Message Encode / Decode Service"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">3. </span>OMCC Service (OMH SBI)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-omcc.omci_channel">
+<span id="omcc-service-omh-sbi"></span><h1><span class="section-number">3. </span>OMCC Service (OMH SBI)<a class="headerlink" href="#module-omcc.omci_channel" title="Permalink to this headline">¶</a></h1>
+<p>OMCI Communication channel</p>
+<dl class="py class">
+<dt id="omcc.omci_channel.OltCommChannel">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.omci_channel.</code><code class="sig-name descname">OltCommChannel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omci_types.Name</span></code></p>
+<dl class="py method">
+<dt id="omcc.omci_channel.OltCommChannel.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.omci_channel.OltCommChannel.connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span></em>, <em class="sig-param"><span class="n">port</span></em>, <em class="sig-param"><span class="n">auth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect with pOlt (client mode))</p>
+<p>The function must be implemented in derived classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – host to connect to</p></li>
+<li><p><strong>port</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – port to connect to</p></li>
+<li><p><strong>auth</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ForwardRef</span></code>]) – authentication parameters (TBD)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_olt.Olt" title="database.omci_olt.Olt">Olt</a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>‘Olt’ object it is connected to or None if failed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.omci_channel.OltCommChannel.disconnect">
+<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the peer pOlt</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.omci_channel.OltCommChannel.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message to ONU
+The function must be implemented in derived classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU identification</p></li>
+<li><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message without MIC</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.omci_channel.OltCommChannel.connected">
+<code class="sig-name descname">connected</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">olt_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connected indication
+This function is called by the derived class after successful
+completion of Hello exchange.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>olt_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – OLT Id reported by the peer pOLT</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_olt.Olt" title="database.omci_olt.Olt">Olt</a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Olt object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.omci_channel.OltCommChannel.disconnected">
+<code class="sig-name descname">disconnected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.disconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnected indication</p>
+<p>This function is called by the derived class when connection with
+pOLT is broken.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="module-omcc.grpc.omci_channel_grpc">
+<span id="grpc-channel"></span><h2><span class="section-number">3.1. </span>gRPC Channel<a class="headerlink" href="#module-omcc.grpc.omci_channel_grpc" title="Permalink to this headline">¶</a></h2>
+<p>gRPC Communication channel
+This module should be implemented properly.
+Implementation below is just for testing</p>
+<dl class="py class">
+<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.omci_channel_grpc.</code><code class="sig-name descname">GrpcChannel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omcc.omci_channel.OltCommChannel" title="omcc.omci_channel.OltCommChannel"><code class="xref py py-class docutils literal notranslate"><span class="pre">omcc.omci_channel.OltCommChannel</span></code></a></p>
+<p>gRPC channel based on service specification in WT-451 working text</p>
+<dl class="py method">
+<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class contructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – vOMCI endpoint name</p></li>
+<li><p><strong>description</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – optional description</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span></em>, <em class="sig-param"><span class="n">port</span></em>, <em class="sig-param"><span class="n">auth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect with pOlt (client mode)).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – host to connect to</p></li>
+<li><p><strong>port</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – port to connect to</p></li>
+<li><p><strong>auth</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ForwardRef</span></code>]) – authentication parameters (TBD)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_olt.Olt" title="database.omci_olt.Olt">Olt</a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.disconnect">
+<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the peer pOlt.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message to ONU</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU identification</p></li>
+<li><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message without MIC</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3. OMCC Service (OMH SBI)</a><ul>
+<li><a class="reference internal" href="#module-omcc.grpc.omci_channel_grpc">3.1. gRPC Channel</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../encode_decode/index.html"
+                        title="previous chapter"><span class="section-number">2. </span>OMCI Message Encode / Decode Service</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../omh_nbi/index.html"
+                        title="next chapter"><span class="section-number">4. </span>OMH NBI</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/omcc/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../omh_nbi/index.html" title="4. OMH NBI"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../encode_decode/index.html" title="2. OMCI Message Encode / Decode Service"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">3. </span>OMCC Service (OMH SBI)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Broadband Forum.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0+.
+    </div>
+  </body>
+</html>

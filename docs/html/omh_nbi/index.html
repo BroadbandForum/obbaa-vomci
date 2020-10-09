@@ -1,0 +1,1276 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4. OMH NBI &#8212; vomci  documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/extra.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Test Programs" href="../bin/index.html" />
+    <link rel="prev" title="3. OMCC Service (OMH SBI)" href="../omcc/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../bin/index.html" title="5. Test Programs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../omcc/index.html" title="3. OMCC Service (OMH SBI)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4. </span>OMH NBI</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="omh-nbi">
+<h1><span class="section-number">4. </span>OMH NBI<a class="headerlink" href="#omh-nbi" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-omh_nbi.onu_driver">
+<span id="onu-driver"></span><h2><span class="section-number">4.1. </span>ONU Driver<a class="headerlink" href="#module-omh_nbi.onu_driver" title="Permalink to this headline">¶</a></h2>
+<p>This module implements ONU driver class that includes ONU MIB
+and additional functions and properties for request-response correlation.</p>
+<dl class="py class">
+<dt id="omh_nbi.onu_driver.OnuDriver">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.onu_driver.</code><code class="sig-name descname">OnuDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">olt</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Per-ONU driver.
+This object is created by Olt.OnuAdd() factory.</p>
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">olt</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU Id</p></li>
+<li><p><strong>olt</strong> (<a class="reference internal" href="../database/index.html#database.omci_olt.Olt" title="database.omci_olt.Olt"><em>Olt</em></a>) – OLT this ONU belongs to</p></li>
+<li><p><strong>tci</strong> – initial TCI value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.register">
+<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message_type</span></em>, <em class="sig-param"><span class="n">handler</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register unsolicited message handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mt</strong> – OMCI message type (5 bit action value)</p></li>
+<li><p><strong>handler</strong> – a callable handler(OnuDriver instance, raw_message)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.olt">
+<em class="property">property </em><code class="sig-name descname">olt</code><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.olt" title="Permalink to this definition">¶</a></dt>
+<dd><p>OLT this ONU belongs to</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.next_tci">
+<em class="property">property </em><code class="sig-name descname">next_tci</code><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.next_tci" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function resturns the next TCI value to be transmitted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.max_retries">
+<em class="property">property </em><code class="sig-name descname">max_retries</code><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.max_retries" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the max number of retransmissions allowed for this ONU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.ack_timeout">
+<em class="property">property </em><code class="sig-name descname">ack_timeout</code><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.ack_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Response timeout value (s).</p>
+<p>OMH handler waits for response for ack_timeout (s) before retransmitting
+or reporting a TIMEOUT failure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.set_flow_control">
+<code class="sig-name descname">set_flow_control</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_retries</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">ack_timeout</span><span class="o">=</span><span class="default_value">2.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.set_flow_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set flow control parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_retries</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – max number of retransmissions. Set =0 to disable retransmissions</p></li>
+<li><p><strong>ack_timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – max time waiting for acknowledge (in seconds and fractions of a second)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">ar</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message to ONU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sender</strong> (<a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><em>OmhHandler</em></a>) – request sender OMH handler</p></li>
+<li><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message (without MIC)</p></li>
+<li><p><strong>ar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – TRUE (default) if acknowledge is required. In this case when Ack is received
+the driver will notify the ‘sender’ by calling ‘sender-&gt;recv(raw_message)’</p></li>
+<li><p><strong>tci</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – TCI for Request/Ack correlation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>TRUE if message was sent successfully</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.remove_pending">
+<code class="sig-name descname">remove_pending</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.remove_pending" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove pending request(s) by the ‘sender’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sender</strong> – request sender, the same as passed to send() method</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.recv">
+<code class="sig-name descname">recv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message received from ONU.</p>
+<p>This function is called by communication layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- Raw OMCI message</strong> (<em>msg</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.increment_mib_sync">
+<code class="sig-name descname">increment_mib_sync</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.increment_mib_sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment MIB sync counter</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.clear_candidate">
+<code class="sig-name descname">clear_candidate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.clear_candidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear candidate MIB</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the candidate MIB and the main MIB</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit candidate MIB into the main MIB</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">me</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add ME to the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful, False if [me_class, me_inst] already exists in the MIB</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">me</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.set" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Update an existing ME in the candidate database.</dt><dd><p>The values in me stored in the MIB are merged with values passed in parameters</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful, False if [me_class, me_inst] doesn’t exists in the MIB</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">me_class</span></em>, <em class="sig-param"><span class="n">inst</span></em>, <em class="sig-param"><span class="n">log_error</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">clone</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ME from the database. Look in the candidate first, then in the main MIB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>me_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ME object class</p></li>
+<li><p><strong>inst</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ME object instance</p></li>
+<li><p><strong>clone</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – True-return a deep copy of the ME stored in the MIB,
+False-return the original ME</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ME if successful, None if [me_class, me_inst] doesn’t exist in the MIB</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.get_by_name">
+<code class="sig-name descname">get_by_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">clone</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.get_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ME by name. Look in the candidate first, then in the main MIB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name associated with an ME using me.user_name</p></li>
+<li><p><strong>clone</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – True-return a deep copy of the ME stored in the MIB,
+False-return the original ME</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ME instance or None if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.get_first">
+<code class="sig-name descname">get_first</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">me_class</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.get_first" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get first ME with specific ME class. Look in the candidate MIB first, then the main MIB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>me_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ME object class</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ME if successful, None if there are no instances of me_class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.get_all_instance_ids">
+<code class="sig-name descname">get_all_instance_ids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">me_class</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.get_all_instance_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get tuple including all instance ids of the specified me_class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>me_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ME object class</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, …]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple of all instance ids of the specified me_class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.get_all_instances">
+<code class="sig-name descname">get_all_instances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">me_class</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.get_all_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get tuple including all MEs of the specified ma_class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>me_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – ME object class</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>, …]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple of all MEs of the specified me_class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.get_all_me_classes">
+<code class="sig-name descname">get_all_me_classes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.get_all_me_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get tuple including all ME classes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, …]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple of all ME classes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.onu_driver.OnuDriver.dump_mib">
+<code class="sig-name descname">dump_mib</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.dump_mib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump the main MIB to the screen</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.omh_handler">
+<span id="omh-request-handler-base-class"></span><h2><span class="section-number">4.2. </span>OMH Request Handler Base Class<a class="headerlink" href="#module-omh_nbi.omh_handler" title="Permalink to this headline">¶</a></h2>
+<p>The base class for OMH handlers implementing OMCI sequences for different scenarios</p>
+<dl class="py class">
+<dt id="omh_nbi.omh_handler.OMHStatus">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.omh_handler.</code><code class="sig-name descname">OMHStatus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OMHStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>OMH Handler completion status</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="omh_nbi.omh_handler.OmhHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.omh_handler.</code><code class="sig-name descname">OmhHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omci_types.Name</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">omci_types.AutoGetter</span></code></p>
+<p>OmhHandler base class. Thius class is never used by itself.
+Derived classes must define ‘run_to_completion’ function that runs the
+entire OMH handler to completion in caller’s context</p>
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>!OmhHandler</cite> constructor.
+:type name: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param name: OMH handler name. This is only used for documentation purposes.
+:type description: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param description: OMH handler description. This is only used for</p>
+<blockquote>
+<div><p>documentation purposes.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – OnuDriver instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.status">
+<em class="property">property </em><code class="sig-name descname">status</code><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get OMH handler status</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.num_transactions">
+<em class="property">property </em><code class="sig-name descname">num_transactions</code><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.num_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of transactions executed by the OMH handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.num_messages">
+<em class="property">property </em><code class="sig-name descname">num_messages</code><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.num_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of messages sent by the OMH handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.num_retries">
+<em class="property">property </em><code class="sig-name descname">num_retries</code><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.num_retries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of times OMCI message had to be retransmitted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.stats">
+<code class="sig-name descname">stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get statistics string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.duration">
+<code class="sig-name descname">duration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+execution time (s)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">notify_done</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the OMH handler in the background.</p>
+<p>This function spawns a new thread and executes the OMH handler to completion
+in this dedicated thread’s context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>notify_done</strong> – OMH handler completed notification handler.
+notify_done(this_handler) is called upon completion and the
+background thread is destroyed.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>self.completion_status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the OMH handler and run it to completion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>self.completion_status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.wait_for_completion">
+<code class="sig-name descname">wait_for_completion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.wait_for_completion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for completion of an OMH handler running in its own thread</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.cancel">
+<code class="sig-name descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel running OMH handler</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.run_subsidiary">
+<code class="sig-name descname">run_subsidiary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subsidiary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.run_subsidiary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a subsidiary OMH handler in the context of the ‘self’ OMH handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>subsidiary</strong> (<a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmhHandler</span></code></a>) – subsidiary OMH handler to run to completion</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>subsidiary OMH handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.transaction">
+<code class="sig-name descname">transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform request-response transaction.</p>
+<p>The transaction can involve multiple request-response exchanges if
+action has to be split to fit in a BASELINE OMCI message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="../encode_decode/index.html#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmciAction</span></code></a>]) – Action to execute. In most cases this parameter is set (not None).
+It might be None only if the previous transaction has to be continued
+with the same ME, for example, for get-next or mib-upload-next</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Transaction completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.last_action">
+<em class="property">property </em><code class="sig-name descname">last_action</code><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.last_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the last action executed by the OMH handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../encode_decode/index.html#encode_decode.omci_action.OmciAction" title="encode_decode.omci_action.OmciAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmciAction</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.recv">
+<code class="sig-name descname">recv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is called by OnuDriver when an Ack
+for an outstanding request is received.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.rollback">
+<code class="sig-name descname">rollback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rollback all handlers performed by the OMH handler.</p>
+<p>Returns: rollback status</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.omh_handler.OmhHandler.logerr_and_return">
+<code class="sig-name descname">logerr_and_return</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">status</span></em>, <em class="sig-param"><span class="n">text</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.omh_handler.OmhHandler.logerr_and_return" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log error and return the error status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a>) – OMH handler completion status</p></li>
+<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Error text</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: status</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.omh_handler_utils">
+<span id="omh-handler-utilities"></span><h2><span class="section-number">4.3. </span>OMH Handler Utilities<a class="headerlink" href="#module-omh_nbi.handlers.omh_handler_utils" title="Permalink to this headline">¶</a></h2>
+<p>OMH Handler utilities</p>
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.create_8021p_svc_mapper">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">create_8021p_svc_mapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.create_8021p_svc_mapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create 802.1p Service Mapper</p>
+<blockquote>
+<div><p>handler: OMH handler that requested this service
+name: QoS profile name</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.create_mac_bridge_port">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">create_mac_bridge_port</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em>, <em class="sig-param"><span class="n">tp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.create_mac_bridge_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create MAC Bridge Port Config Data for an interface</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handler</strong> (<a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmhHandler</span></code></a>) – OMH handler that requested this service</p></li>
+<li><p><strong>tp</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – Bridge port Termination Point</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.create_ext_vlan_tag_oper_config_data">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">create_ext_vlan_tag_oper_config_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em>, <em class="sig-param"><span class="n">iface</span></em>, <em class="sig-param"><span class="n">input_tpid</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">output_tpid</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.create_ext_vlan_tag_oper_config_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create MAC Bridge Port Config Data for an interface
+Requires user attribute iface.bridge_port_num to be set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.create_vlan_tagging_filter_data">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">create_vlan_tagging_filter_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em>, <em class="sig-param"><span class="n">inst</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">vlan_action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.create_vlan_tagging_filter_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and configure VLAN Tagging Filter Data ME</p>
+<p>Please note that vlan tagging filter is applied BEFORE vlan_action in the ingress
+and AFTER vlan_action in the egress. Therefore, need to take ‘action’ into account.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handler</strong> (<a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmhHandler</span></code></a>) – OMH handler that requested this service</p></li>
+<li><p><strong>inst</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – instance id. Must be equal to the instance of the associated MAC Bridge Port Data ME</p></li>
+<li><p><strong>classifier</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PacketClassifier</span></code>) – Packet classifier</p></li>
+<li><p><strong>vlan_action</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">VlanAction</span></code>) – Packet VLAN action</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.set_ext_vlan_tag_op">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">set_ext_vlan_tag_op</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em>, <em class="sig-param"><span class="n">ext_vlan_tag_op</span></em>, <em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">vlan_action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.set_ext_vlan_tag_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add entry to set_ext_vlan_tagging_op ME based on the requested PacketAction</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>handler: OMH handler that requested this service
+ext_vlan_tag_op: EXT VLAN TAG OP ME
+vlan_action: VLAN action</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.get_uni">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">get_uni</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">uni</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.get_uni" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get UNI ME by name or index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a>) – OnuDriver</p></li>
+<li><p><strong>uni</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – UNI name assigned using me.user_name or 0-based index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>UNI ME or None if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.get_queue_by_owner_tc">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">get_queue_by_owner_tc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">is_upstream</span></em>, <em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">tc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.get_queue_by_owner_tc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get PRIORITY_QUEUE_G ME by ME that owns it and a traffic class.</p>
+<p>TODO: requires more work</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a>) – OnuDriver</p></li>
+<li><p><strong>owner</strong> (<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>) – ME that owns the priority queue</p></li>
+<li><p><strong>tc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – traffic class</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Priority queue ME or None if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.get_gem_ports_by_uni">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">get_gem_ports_by_uni</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">uni_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.get_gem_ports_by_uni" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all GEM ports associated with UNI port</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a>, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.get_gem_port_by_uni_tc">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">get_gem_port_by_uni_tc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">uni_name</span></em>, <em class="sig-param"><span class="n">tc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.get_gem_port_by_uni_tc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get GEM port by UNI it is associated with and traffic class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../database/index.html#database.omci_me.ME" title="database.omci_me.ME"><code class="xref py py-class docutils literal notranslate"><span class="pre">ME</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="omh_nbi.handlers.omh_handler_utils.set_8021p_mapper">
+<code class="sig-prename descclassname">omh_nbi.handlers.omh_handler_utils.</code><code class="sig-name descname">set_8021p_mapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em>, <em class="sig-param"><span class="n">mapper_me</span></em>, <em class="sig-param"><span class="n">pbit_to_tc</span></em>, <em class="sig-param"><span class="n">uni_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.omh_handler_utils.set_8021p_mapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up 802_1p mapper ME.</p>
+<blockquote>
+<div><p>Go over all unassigned priorities and try to find GEM_PORT_NET_CTP ME
+by UNI and TC that maps to this priority.
+If fount, create GEM_IW_TP ME and plug it into the priority slots for
+all PBITs that map to the same TC.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handler</strong> (<a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OmhHandler</span></code></a>) – OMH handler that called this service</p></li>
+<li><p><strong>mapper_me</strong> (<a class="reference internal" href="../database/index.html#database.omci_me_types.ieee_8021_p_mapper_svc_prof_me" title="database.omci_me_types.ieee_8021_p_mapper_svc_prof_me"><code class="xref py py-class docutils literal notranslate"><span class="pre">ieee_8021_p_mapper_svc_prof_me</span></code></a>) – 802.1p Mapper SVC Profile ME</p></li>
+<li><p><strong>pbit_to_tc</strong> (<em>PbitToTCMapper</em>) – PBIT to TC mapper</p></li>
+<li><p><strong>uni_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – UNI interface name</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: transaction status</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omh_nbi.omh_handler.OMHStatus" title="omh_nbi.omh_handler.OMHStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">OMHStatus</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="omh-request-handlers">
+<h2><span class="section-number">4.4. </span>OMH Request Handlers<a class="headerlink" href="#omh-request-handlers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-omh_nbi.handlers.onu_mib_reset">
+<span id="reset-onu-mib"></span><h3>Reset ONU MIB<a class="headerlink" href="#module-omh_nbi.handlers.onu_mib_reset" title="Permalink to this headline">¶</a></h3>
+<p>Reset ONU MIB.</p>
+<p>Usually this handler is executed as a part of ONU activation when a new ONU is discovered</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.onu_mib_reset.OnuMibResetHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.onu_mib_reset.</code><code class="sig-name descname">OnuMibResetHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_mib_reset.OnuMibResetHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.onu_mib_reset.OnuMibResetHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_mib_reset.OnuMibResetHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>!OmhHandler</cite> constructor.
+:param name: OMH handler name. This is only used for documentation purposes.
+:param description: OMH handler description. This is only used for</p>
+<blockquote>
+<div><p>documentation purposes.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a>) – OnuDriver instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.onu_mib_upload">
+<span id="upload-onu-mib"></span><h3>Upload ONU MIB<a class="headerlink" href="#module-omh_nbi.handlers.onu_mib_upload" title="Permalink to this headline">¶</a></h3>
+<p>Upload ONU MIB,</p>
+<p>Usually this handler is executed as a part of ONU activation when a new ONU is discovered</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.onu_mib_upload.OnuMibUploadHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.onu_mib_upload.</code><code class="sig-name descname">OnuMibUploadHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_mib_upload.OnuMibUploadHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.onu_mib_upload.OnuMibUploadHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_mib_upload.OnuMibUploadHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>!OmhHandler</cite> constructor.
+:param name: OMH handler name. This is only used for documentation purposes.
+:param description: OMH handler description. This is only used for</p>
+<blockquote>
+<div><p>documentation purposes.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a>) – OnuDriver instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.handlers.onu_mib_upload.OnuMibUploadHandler.stats">
+<code class="sig-name descname">stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_mib_upload.OnuMibUploadHandler.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get statistics string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.onu_activate">
+<span id="activate-onu"></span><h3>Activate ONU<a class="headerlink" href="#module-omh_nbi.handlers.onu_activate" title="Permalink to this headline">¶</a></h3>
+<p>Activate ONU.</p>
+<p>This handler is triggered by ONU discovery event</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.onu_activate.OnuActivateHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.onu_activate.</code><code class="sig-name descname">OnuActivateHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">force_reset</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_activate.OnuActivateHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.onu_activate.OnuActivateHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">force_reset</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.onu_activate.OnuActivateHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>ONU activation sequence.</p>
+<blockquote>
+<div><dl>
+<dt>if not force_reset:</dt><dd><p>GET onu_data.mib_sync
+if stored_onu_data.mib_sync == onu_data.mib_sync:</p>
+<blockquote>
+<div><p>return OK</p>
+</div></blockquote>
+</dd>
+<dt>Activate a new ONU:</dt><dd><ul class="simple">
+<li><p>MIB_RESET</p></li>
+<li><p>MIB_UPLOAD</p></li>
+<li><p>Create default GAL Ethernet Profile</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a>) – OnuDriver instance, that includes stored ONU MIB</p></li>
+<li><p><strong>force_reset</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Force MIB reset if True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.uni_set">
+<span id="setup-onu-uni"></span><h3>Setup ONU UNI<a class="headerlink" href="#module-omh_nbi.handlers.uni_set" title="Permalink to this headline">¶</a></h3>
+<p>Set up UNI port handler.</p>
+<p>This handler is triggered by creation of YANG object representing ONU UNI.
+It performs the following sequence:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Enable UNI</p></li>
+<li><p>Create MAC Bridge Port Config Data</p></li>
+<li><p>Create EXT_VLAN_TAG_OPER_CFG</p></li>
+<li><p>Set EXT_VLAN_TAG_OPER_CFG</p></li>
+<li><p>Create Multicast Operations Profile</p></li>
+<li><p>Create Multicast Subscriber Config Info</p></li>
+</ul>
+</div></blockquote>
+<dl class="py class">
+<dt id="omh_nbi.handlers.uni_set.UniSetHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.uni_set.</code><code class="sig-name descname">UniSetHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">uni_name</span></em>, <em class="sig-param"><span class="n">uni_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.uni_set.UniSetHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.uni_set.UniSetHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">uni_name</span></em>, <em class="sig-param"><span class="n">uni_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.uni_set.UniSetHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set UNI port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uni_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – UNI interface name in the YANG model</p></li>
+<li><p><strong>uni_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – 0-based UNI index. Usually it is determined by parent-rel-pos attribute in the
+parent hardware component. Note that unlike parent-rel-pos, uni_id is 0-based.
+The corresponding ME of type PPTP_Eth_UNI=11, VEIP_InterfacePoint=329 must exist
+in the ONU MIB.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.tcont_create">
+<span id="create-a-tcont"></span><h3>Create a TCONT<a class="headerlink" href="#module-omh_nbi.handlers.tcont_create" title="Permalink to this headline">¶</a></h3>
+<p>Create a TCONT.</p>
+<p>This handler is triggered by creation /bbf-xpongemtcont:xpongemtcont YANG object.</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.tcont_create.TcontCreateHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.tcont_create.</code><code class="sig-name descname">TcontCreateHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">tcont_name</span></em>, <em class="sig-param"><span class="n">alloc_id</span></em>, <em class="sig-param"><span class="n">policy</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.tcont_create.TcontCreateHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<p>Create a TCONT</p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.tcont_create.TcontCreateHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">tcont_name</span></em>, <em class="sig-param"><span class="n">alloc_id</span></em>, <em class="sig-param"><span class="n">policy</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.tcont_create.TcontCreateHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a TCONT ME</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU driver</p></li>
+<li><p><strong>tcont_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – GEM port object name</p></li>
+<li><p><strong>alloc_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Alloc Id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.gem_port_create">
+<span id="create-a-gem-port"></span><h3>Create a GEM Port<a class="headerlink" href="#module-omh_nbi.handlers.gem_port_create" title="Permalink to this headline">¶</a></h3>
+<p>Create a GEM port,</p>
+<p>This handler is triggered by creation /bbf-xpongemtcont:xpongemtcont or
+/bbf-xpon:xpon/multicast-gemports YANG object.</p>
+<p>TODO: need more work for multicast
+TODO: need more work for non TR-156 case, when a single GEM port goes to multiple UNIs</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.gem_port_create.GemPortCreateHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.gem_port_create.</code><code class="sig-name descname">GemPortCreateHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">gem_port_name</span></em>, <em class="sig-param"><span class="n">uni_name</span></em>, <em class="sig-param"><span class="n">tcont_name</span></em>, <em class="sig-param"><span class="n">gem_port_id</span></em>, <em class="sig-param"><span class="n">tc</span></em>, <em class="sig-param"><span class="n">direction</span><span class="o">=</span><span class="default_value">'BIDIRECTIONAL'</span></em>, <em class="sig-param"><span class="n">encryption</span><span class="o">=</span><span class="default_value">'NO_ENCRYPTION'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.gem_port_create.GemPortCreateHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<p>Create a GEM Port</p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.gem_port_create.GemPortCreateHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">gem_port_name</span></em>, <em class="sig-param"><span class="n">uni_name</span></em>, <em class="sig-param"><span class="n">tcont_name</span></em>, <em class="sig-param"><span class="n">gem_port_id</span></em>, <em class="sig-param"><span class="n">tc</span></em>, <em class="sig-param"><span class="n">direction</span><span class="o">=</span><span class="default_value">'BIDIRECTIONAL'</span></em>, <em class="sig-param"><span class="n">encryption</span><span class="o">=</span><span class="default_value">'NO_ENCRYPTION'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.gem_port_create.GemPortCreateHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a GEM Port Network CTP ME</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU driver</p></li>
+<li><p><strong>gem_port_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – GEM port object name</p></li>
+<li><p><strong>uni</strong> – UNI port name or index</p></li>
+<li><p><strong>tcont_name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – TCONT object name</p></li>
+<li><p><strong>gem_port_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – GEM port id</p></li>
+<li><p><strong>tc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Traffic class</p></li>
+<li><p><strong>direction</strong> – one of the values of gem_port_net_ctp_direction enum</p></li>
+<li><p><strong>encryption</strong> – one of the values of gem_port_net_ctp_encryption_key_ring enum</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.qos_policy_profile_set">
+<span id="create-a-qos-policy-profile-8021p-mapper-svc-profile-me-and-gem-iw-tp-mes"></span><h3>Create a QoS Policy Profile (802.1p Mapper SVC Profile ME and GEM IW TP MEs)<a class="headerlink" href="#module-omh_nbi.handlers.qos_policy_profile_set" title="Permalink to this headline">¶</a></h3>
+<p>Create a QoS policy profile.</p>
+<p>This handler is triggered by creation a UNI or VLAN sub-interface
+containing ingress-qos-policy-profile attribute.</p>
+<p>It creates Create a IEEE 802.1p mapper service profile ME and
+GEM Interworking TP MEs for every GEM port associated with the
+interface.</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.qos_policy_profile_set.</code><code class="sig-name descname">QosPolicyProfile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>QoS Policy profile</p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.tc">
+<code class="sig-name descname">tc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.tc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a Traffic Class (TC) value for a pbit
+Args: pbit
+Returns: tc. Can be an integer [0..7] or None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.tc_set">
+<code class="sig-name descname">tc_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pbit</span></em>, <em class="sig-param"><span class="n">tc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.tc_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set Traffic Class (TC) value for a pbit
+:type pbit: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:param pbit: 0..7
+:type tc: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:param tc: 0..7</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.pbits_by_tc">
+<code class="sig-name descname">pbits_by_tc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile.pbits_by_tc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all PBITS that map to the specified TC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfileSetHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.qos_policy_profile_set.</code><code class="sig-name descname">QosPolicyProfileSetHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">profile</span></em>, <em class="sig-param"><span class="n">iface_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfileSetHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<p>Create/Update a IEEE 802.1p mapper service profile and
+0..8 GEM Port Interworking TP MEs, depending on the number
+of pre-provisioned GEM ports</p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfileSetHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">profile</span></em>, <em class="sig-param"><span class="n">iface_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfileSetHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a QoS policy profile.
+This handler creates a IEEE 802.1p mapper service profile referring to GEM port IW TP entries
+per traffic class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU driver</p></li>
+<li><p><strong>profile</strong> (<a class="reference internal" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile" title="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">QosPolicyProfile</span></code></a>) – QoS policy profile</p></li>
+<li><p><strong>iface_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – a UNI or a VLAN sub-interface name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.vlan_subinterface_set">
+<span id="create-a-vlan-sub-interface"></span><h3>Create a VLAN Sub-Interface<a class="headerlink" href="#module-omh_nbi.handlers.vlan_subinterface_set" title="Permalink to this headline">¶</a></h3>
+<p>Create a VLAN Sub-Interface.</p>
+<p>This handler is triggered by creation a vlan-subif at ONU UNI.</p>
+<dl class="simple">
+<dt>It performs the following sequence:</dt><dd><ul class="simple">
+<li><p>Trigger QoS policy profile sequence if ingress-qos-policy-profile is set</p></li>
+<li><p>Create Bridge Port Configuration Data ME</p></li>
+<li><p>Create and configure VLAN Tagging Filter ME</p></li>
+<li><p>Add entry in Extended VLAN Tagging Operation ME</p></li>
+</ul>
+</dd>
+</dl>
+<p>Once this sequence is provisioned, it will be possible to pass data between ONU UNI and ANI
+based on the specified VLAN classification and modification rules.</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.vlan_subinterface_set.VlanSubInterfaceSetHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.vlan_subinterface_set.</code><code class="sig-name descname">VlanSubInterfaceSetHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">iface_name</span></em>, <em class="sig-param"><span class="n">lower_name</span></em>, <em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">packet_action</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">qos_profile</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.vlan_subinterface_set.VlanSubInterfaceSetHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<p>Create/Update a VLAN Sub-Interface</p>
+<dl class="py method">
+<dt id="omh_nbi.handlers.vlan_subinterface_set.VlanSubInterfaceSetHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">iface_name</span></em>, <em class="sig-param"><span class="n">lower_name</span></em>, <em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">packet_action</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">qos_profile</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.vlan_subinterface_set.VlanSubInterfaceSetHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a VLAN Sub-Interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU driver</p></li>
+<li><p><strong>iface_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – a unique sub-interface name name</p></li>
+<li><p><strong>lower_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – a ‘lower’ interface name. The interface must exist</p></li>
+<li><p><strong>classifier</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PacketClassifier</span></code>) – packet classifier</p></li>
+<li><p><strong>packet_action</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PacketAction</span></code>]) – optional packet action</p></li>
+<li><p><strong>qos_profile</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile" title="omh_nbi.handlers.qos_policy_profile_set.QosPolicyProfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">QosPolicyProfile</span></code></a>]) – optional QoS policy profile</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omh_nbi.handlers.ip_host_config_set">
+<span id="set-ip_host_config_data"></span><h3>Set IP_HOST_CONFIG_DATA<a class="headerlink" href="#module-omh_nbi.handlers.ip_host_config_set" title="Permalink to this headline">¶</a></h3>
+<p>Update ip_host_config ME (9.4.1).</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.ip_host_config_set.IpHostConfigSetHandler">
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.handlers.ip_host_config_set.</code><code class="sig-name descname">IpHostConfigSetHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ip_options</span><span class="o">=</span><span class="default_value">9</span></em>, <em class="sig-param"><span class="n">ip_address</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">primary_dns</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">secondary_dns</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.ip_host_config_set.IpHostConfigSetHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omh_nbi.omh_handler.OmhHandler" title="omh_nbi.omh_handler.OmhHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">omh_nbi.omh_handler.OmhHandler</span></code></a></p>
+<p>Set an ip_host_config ME</p>
+<dl class="py class">
+<dt id="omh_nbi.handlers.ip_host_config_set.IpHostConfigSetHandler.IpHostOptions">
+<em class="property">class </em><code class="sig-name descname">IpHostOptions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.ip_host_config_set.IpHostConfigSetHandler.IpHostOptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntFlag</span></code></p>
+<p>OP options. Can be used in combination</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omh_nbi.handlers.ip_host_config_set.IpHostConfigSetHandler.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ip_options</span><span class="o">=</span><span class="default_value">9</span></em>, <em class="sig-param"><span class="n">ip_address</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">primary_dns</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">secondary_dns</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.handlers.ip_host_config_set.IpHostConfigSetHandler.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a IP Host Config ME</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu</strong> (<a class="reference internal" href="#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU driver</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Relative IP_HOST_CONFIG index. 0=first, 1=second, etc.</p></li>
+<li><p><strong>ip_address</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – IP address (if DHCP is not used)</p></li>
+<li><p><strong>mask</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – subnet mask (if DHCP is not used)</p></li>
+<li><p><strong>gateway</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Default gateway</p></li>
+<li><p><strong>primary_dns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Primary DNS address</p></li>
+<li><p><strong>secondary_dns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Secondary DNS address</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>handler completion status</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. OMH NBI</a><ul>
+<li><a class="reference internal" href="#module-omh_nbi.onu_driver">4.1. ONU Driver</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.omh_handler">4.2. OMH Request Handler Base Class</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.omh_handler_utils">4.3. OMH Handler Utilities</a></li>
+<li><a class="reference internal" href="#omh-request-handlers">4.4. OMH Request Handlers</a><ul>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.onu_mib_reset">Reset ONU MIB</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.onu_mib_upload">Upload ONU MIB</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.onu_activate">Activate ONU</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.uni_set">Setup ONU UNI</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.tcont_create">Create a TCONT</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.gem_port_create">Create a GEM Port</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.qos_policy_profile_set">Create a QoS Policy Profile (802.1p Mapper SVC Profile ME and GEM IW TP MEs)</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.vlan_subinterface_set">Create a VLAN Sub-Interface</a></li>
+<li><a class="reference internal" href="#module-omh_nbi.handlers.ip_host_config_set">Set IP_HOST_CONFIG_DATA</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../omcc/index.html"
+                        title="previous chapter"><span class="section-number">3. </span>OMCC Service (OMH SBI)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../bin/index.html"
+                        title="next chapter"><span class="section-number">5. </span>Test Programs</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/omh_nbi/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../bin/index.html" title="5. Test Programs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../omcc/index.html" title="3. OMCC Service (OMH SBI)"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vomci  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4. </span>OMH NBI</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Broadband Forum.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0+.
+    </div>
+  </body>
+</html>
