@@ -1,0 +1,15 @@
+version: '3.5'
+networks:
+    baadist_default:
+        driver: bridge
+        name: baadist_default
+services:
+    kakfa-gpb-tester:
+        image: kafka-gpb-tester:latest
+        container_name: kafka-gpb-tester
+        volumes:
+           - "~/obbaa-vomci/kafka-gpb-tester:/kafka-gpb-tester"
+        networks:
+            - baadist_default
+        stdin_open: true
+        tty: true

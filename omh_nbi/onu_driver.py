@@ -33,8 +33,8 @@ import threading
 
 logger = OmciLogger.getLogger(__name__)
 
-DEFAULT_MAX_RETRIES = 2         # Default number of message retransmissions in case of timeout
-DEFAULT_ACK_TIMEOUT = 2.0       # Default ack timeout
+DEFAULT_MAX_RETRIES = 3         # Default number of message retransmissions in case of timeout
+DEFAULT_ACK_TIMEOUT = 3.0       # Default ack timeout
 
 class OnuDriver():
     """ Per-ONU driver.
@@ -60,12 +60,15 @@ class OnuDriver():
         self._lock = threading.Lock()
         self._max_retries = DEFAULT_MAX_RETRIES
         self._ack_timeout = DEFAULT_ACK_TIMEOUT
-        self._main_mib = OnuMib(onu_id)
+        self._main_mib = OnuMib(onu_id) # TODO maybe should onu_name instead of onu_id?
         self._candidate_mib = OnuMib(onu_id)
 
     @property
     def onu_id(self):
         return self._onu_id
+
+    def set_onu_id(self, onu_id: OnuSbiId):
+        self._onu_id = onu_id
 
     @property
     def onu_name(self):
@@ -187,8 +190,16 @@ class OnuDriver():
     def increment_mib_sync(self):
         """ Increment MIB sync counter """
         onu_data = self._main_mib.get(omci_me_class['ONU_DATA'], 0, False)
+        cand_onu_data = self._candidate_mib.get(omci_me_class['ONU_DATA'], 0, False)
+        if onu_data is None and cand_onu_data is None:
+            logger.error("Can't increment mib_sync. onu_data ME doesn't exist in the local MIB")
+            return
         if onu_data is not None:
-            onu_data.mib_data_sync += 1
+            onu_data.mib_data_sync = 1 if onu_data.mib_data_sync >= 255 else onu_data.mib_data_sync + 1
+            if cand_onu_data is not None:
+                cand_onu_data.mib_data_sync = onu_data.mib_data_sync
+        else:
+            cand_onu_data.mib_data_sync = 1 if cand_onu_data.mib_data_sync >= 255 else cand_onu_data.mib_data_sync + 1
 
     def clear_candidate(self):
         """ Clear candidate MIB """

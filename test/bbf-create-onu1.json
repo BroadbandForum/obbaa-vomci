@@ -1,0 +1,73 @@
+{
+  "create": {
+    "sender-name": "voltmf-1",
+    "onu-name": "OnuName1",
+    "event": "create",
+    "payload": {
+      "identifier": 0,
+      "operation": "create"
+    }
+  },
+
+  "set": {
+    "sender-name": "voltmf-1",
+    "onu-name": "OnuName1",
+    "event": "detect",
+    "olt-name": "OLT:1",
+    "ct-ref": "1",
+    "onu-id": 1,
+    "payload": {
+      "onu-communication-available": "True",
+      "olt-remote-endpoint-name": "obbaa-vproxy-grpc-client-1",
+      "voltmf-remote-endpoint-name": "voltmf-kafka:1"
+    }
+  },
+  "create1": {
+    "sender-name": "voltmf-1",
+    "onu-name": "OnuName2",
+    "event": "create",
+    "payload": {
+      "identifier": 0,
+      "operation": "create"
+    }
+  },
+
+  "set1": {
+    "sender-name": "voltmf-1",
+    "onu-name": "OnuName2",
+    "event": "detect",
+    "olt-name": "OLT:1",
+    "ct-ref": "2",
+    "onu-id": 1,
+    "payload": {
+      "onu-communication-available": "True",
+      "olt-remote-endpoint-name": "obbaa-vproxy-grpc-client-1",
+      "voltmf-remote-endpoint-name": "voltmf-kafka:1"
+    }
+  },
+  "unset1": {
+      "sender-name": "voltmf-1",
+      "onu-name": "OnuName2",
+      "event": "detect",
+      "olt-name": "OLT:1",
+      "ct-ref": "2",
+      "onu-id": 1,
+      "payload": {
+        "onu-communication-available": "False",
+        "olt-remote-endpoint-name": "obbaa-vproxy-grpc-client-1",
+        "voltmf-remote-endpoint-name": "voltmf-kafka:1"
+    }
+  },
+
+  "delete1": {
+    "sender-name": "voltmf-1",
+    "onu-name": "OnuName2",
+    "event": "undetect",
+    "olt-name": "OLT:1",
+    "ct-ref": "2",
+    "onu-id": 1,
+    "payload": {
+      "operation": "undetect"
+    }
+  }
+}

@@ -75,7 +75,9 @@ class OnuActivateHandler(OmhHandler):
             status = self.transaction(action)
             if status != OMHStatus.OK:
                 return status
-            if action.me.mib_data_sync == onu_data.mib_data_sync:
+            # Mib Sync would have happened already during the set_onu_comminication
+            # Just have to trigger MIB Reset,Upload and Intial Config for the ONU
+            if action.me.mib_data_sync == onu_data.mib_data_sync and onu_data.mib_data_sync != 0:
                 logger.info('ONU {} is already in sync'.format(self.onu.onu_id))
                 return OMHStatus.OK
 

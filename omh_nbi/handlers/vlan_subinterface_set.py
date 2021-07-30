@@ -87,10 +87,10 @@ class VlanSubInterfaceSetHandler(OmhHandler):
                 return self.logerr_and_return(OMHStatus.ERROR_IN_PARAMETERS,
                     "ingress-qos-policy-profile must be set on the sub-interface or it's lower UNI")
 
-                qos_profile_me = self._onu.get_by_name(qos_profile_name)
-                if qos_profile_me is None:
-                    return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
-                        "qos-policy-profile {} is not found".format(qos_profile_name))
+            qos_profile_me = self._onu.get_by_name(qos_profile_name)
+            if qos_profile_me is None:
+                return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
+                    "qos-policy-profile {} is not found".format(qos_profile_name))
 
         else:
             # Create 802.1p mapper first, finish creating QoS service profile a bit later

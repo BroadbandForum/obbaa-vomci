@@ -26,13 +26,16 @@ import logging
 import os
 import sys
 import threading
+import time
 from typing import Optional, Tuple, Any, Union
-from omcc.grpc.omci_channel_grpc import GrpcChannel
+from omcc.grpc.grpc_client import GrpcClientChannel
+from omcc.grpc.grpc_server import GrpcServer
 from omh_nbi.omh_handler import OmhHandler, OMHStatus
 from omh_nbi.onu_driver import OnuDriver
 from omh_nbi.handlers.onu_mib_reset import OnuMibResetHandler
 from omh_nbi.handlers.onu_mib_upload import OnuMibUploadHandler
 from omh_nbi.handlers.onu_activate import OnuActivateHandler
+from database.omci_olt import OltDatabase
 from omci_logger import OmciLogger
 
 logger = OmciLogger.getLogger(__name__)
@@ -51,6 +54,7 @@ class TestOmhDriver:
         self._sem = threading.Semaphore(value=0)
         self._name = name
         self._status = OMHStatus.OK
+        self._server = None
 
         valid_handler_names = ''
         for item in self.handler_map.items():
@@ -65,7 +69,8 @@ class TestOmhDriver:
         # Initialize command line parameter parser
         # Default command line argument values
         default_polt_host = 'localhost'
-        default_polt_port = 50000
+        default_port = 50000
+        default_server_mode = False
         default_log_level = 2 # debug 
         default_vomci_name = 'vomci1'
         default_onu_name = "onu.1.2"
@@ -83,8 +88,10 @@ class TestOmhDriver:
                 help='OMH handler to execute: ' + valid_handler_names)
         self._parser.add_argument('-a', '--polt-host', type=str, default=default_polt_host,
             help='pOLT DNS name or IP address; default: %r' % default_polt_host)
-        self._parser.add_argument('-p', '--polt-port', type=int, default=default_polt_port,
-            help='pOLT UDP port number; default: %r' % default_polt_port)
+        self._parser.add_argument('-p', '--port', type=int, default=default_port,
+            help='pOLT/Server port number; default: %r' % default_port)
+        self._parser.add_argument('-s', '--server-mode', type=bool, default=default_server_mode,
+            help='Server Mode: %r' % default_server_mode)
         self._parser.add_argument('-l', '--loglevel', type=int, default=default_log_level,
             help='logging level (0=errors+warnings, 1=info, 2=debug); default: %r' % default_log_level)
         self._parser.add_argument('-v', '--vomci-name', type=str, default=default_vomci_name,
@@ -154,15 +161,30 @@ class TestOmhDriver:
             Returns: OnuDriver or None of connection failed
         """
         # Create gRPC channel and try to connect
-        logger.info("Test {}: connecting to {}:{}..".format(self._name, self._args.polt_host, self._args.polt_port))
-        channel = GrpcChannel(name=self._args.vomci_name)
-        olt = channel.connect(host=self._args.polt_host, port=self._args.polt_port)
-        if olt is None:
-            logger.warning("Test {}: connection failed".format(self._name))
-            return None
-        logger.info("Test {}: connected".format(self._name))
-        # Add ONU to the database
-        return olt.OnuAdd(self._args.onu_name, (self._args.cterm_name, self._args.onu_id), tci=self._args.tci)
+        if (self._args.server_mode):
+            logger.info("Test {}: waiting for connection on port {}:{}..".
+                format(self._name, self._args.polt_host, self._args.port))
+            self._server = GrpcServer(port=self._args.port, name=self._args.vomci_name)
+            connections = self._server.connections()
+            while len(connections.values()) == 0:
+                time.sleep(1)
+            connection = list(connections.values())[0];
+            connection.connected(connection.remote_endpoint_name)
+            olt = OltDatabase.OltGetFirst()
+            # Add ONU to the database
+            onu = olt.OnuAdd(self._args.onu_name, (self._args.cterm_name, self._args.onu_id), tci=self._args.tci)
+        else:
+            logger.info("Test {}: connecting to {}:{}..".format(self._name, self._args.polt_host, self._args.port))
+            channel = GrpcClientChannel(name=self._args.vomci_name)
+            ret_val = channel.connect(host=self._args.polt_host, port=self._args.port)
+            if not ret_val:
+                logger.warning("Test {}: connection failed".format(self._name))
+                return None
+            olt = channel.add_managed_onu(channel.remote_endpoint_name, self._args.onu_name, (self._args.cterm_name, self._args.onu_id), tci=self._args.tci)
+            logger.info("test_YangtoOmciMapper: connected to the pOLT: {}".format(olt.id))
+            onu = olt.OnuGet((self._args.cterm_name, self._args.onu_id))
+        logger.info("Test {}: connected to {}".format(self._name, olt.id))
+        return onu
 
     def _update_status(self, status: OMHStatus):
         """ Update status. Preserve failure """
@@ -229,6 +251,8 @@ class TestOmhDriver:
 
         if self._onu.olt.channel is not None:
             self._onu.olt.channel.disconnect()
+        if self._server is not None:
+            self._server.stop()
         if self._args.dump_mib:
             self._onu.dump_mib()
 

@@ -50,7 +50,7 @@ class OMHStatus(Enum):
     ONU_NOT_FOUND = auto()
 
 class OmhHandler(Name, AutoGetter):
-    """ OmhHandler base class. Thius class is never used by itself.
+    """ OmhHandler base class. This class is never used by itself.
         Derived classes must define 'run_to_completion' function that runs the
         entire OMH handler to completion in caller's context
     """

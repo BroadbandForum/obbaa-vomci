@@ -87,13 +87,13 @@
 
 <dl class="py method">
 <dt id="omcc.omci_channel.OltCommChannel.send">
-<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.send" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.omci_channel.OltCommChannel.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send message to ONU
 The function must be implemented in derived classes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU identification</p></li>
+<li><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU object</p></li>
 <li><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message without MIC</p></li>
 </ul>
 </dd>
@@ -135,19 +135,19 @@ pOLT is broken.</p>
 
 </dd></dl>
 
-<div class="section" id="module-omcc.grpc.omci_channel_grpc">
-<span id="grpc-channel"></span><h2><span class="section-number">3.1. </span>gRPC Channel<a class="headerlink" href="#module-omcc.grpc.omci_channel_grpc" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-omcc.grpc.grpc_client">
+<span id="grpc-client"></span><h2><span class="section-number">3.1. </span>gRPC Client<a class="headerlink" href="#module-omcc.grpc.grpc_client" title="Permalink to this headline">¶</a></h2>
 <p>gRPC Communication channel
 This module should be implemented properly.
 Implementation below is just for testing</p>
 <dl class="py class">
-<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel">
-<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.omci_channel_grpc.</code><code class="sig-name descname">GrpcChannel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel" title="Permalink to this definition">¶</a></dt>
+<dt id="omcc.grpc.grpc_client.GrpcClientChannel">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.grpc_client.</code><code class="sig-name descname">GrpcClientChannel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_client.GrpcClientChannel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#omcc.omci_channel.OltCommChannel" title="omcc.omci_channel.OltCommChannel"><code class="xref py py-class docutils literal notranslate"><span class="pre">omcc.omci_channel.OltCommChannel</span></code></a></p>
 <p>gRPC channel based on service specification in WT-451 working text</p>
 <dl class="py method">
-<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="omcc.grpc.grpc_client.GrpcClientChannel.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_client.GrpcClientChannel.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class contructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -160,8 +160,8 @@ Implementation below is just for testing</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.connect">
-<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span></em>, <em class="sig-param"><span class="n">port</span></em>, <em class="sig-param"><span class="n">auth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.connect" title="Permalink to this definition">¶</a></dt>
+<dt id="omcc.grpc.grpc_client.GrpcClientChannel.connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span></em>, <em class="sig-param"><span class="n">port</span></em>, <em class="sig-param"><span class="n">auth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_client.GrpcClientChannel.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect with pOlt (client mode)).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -181,19 +181,19 @@ Implementation below is just for testing</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.disconnect">
-<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.disconnect" title="Permalink to this definition">¶</a></dt>
+<dt id="omcc.grpc.grpc_client.GrpcClientChannel.disconnect">
+<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_client.GrpcClientChannel.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the peer pOlt.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="omcc.grpc.omci_channel_grpc.GrpcChannel.send">
-<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.omci_channel_grpc.GrpcChannel.send" title="Permalink to this definition">¶</a></dt>
+<dt id="omcc.grpc.grpc_client.GrpcClientChannel.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_client.GrpcClientChannel.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send message to ONU</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU identification</p></li>
+<li><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><em>OnuDriver</em></a>) – ONU object</p></li>
 <li><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message without MIC</p></li>
 </ul>
 </dd>
@@ -204,6 +204,113 @@ Implementation below is just for testing</p>
 <dd class="field-odd"><p>True if successful</p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-omcc.grpc.grpc_server">
+<span id="grpc-server"></span><h2><span class="section-number">3.2. </span>gRPC Server<a class="headerlink" href="#module-omcc.grpc.grpc_server" title="Permalink to this headline">¶</a></h2>
+<p>gRPC Server</p>
+<dl class="py class">
+<dt id="omcc.grpc.grpc_server.GrpcServerChannel">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.grpc_server.</code><code class="sig-name descname">GrpcServerChannel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">server</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.GrpcServerChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#omcc.omci_channel.OltCommChannel" title="omcc.omci_channel.OltCommChannel"><code class="xref py py-class docutils literal notranslate"><span class="pre">omcc.omci_channel.OltCommChannel</span></code></a></p>
+<p>gRPC channel based on service specification in WT-451 working text</p>
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.GrpcServerChannel.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">server</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.GrpcServerChannel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.GrpcServerChannel.disconnect">
+<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.GrpcServerChannel.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the peer pOlt.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.GrpcServerChannel.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.GrpcServerChannel.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message to ONU
+:type onu: OnuDriver
+:param onu: ONU object
+:type msg: <code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>
+:param msg: raw OMCI message without MIC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if successful</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="omcc.grpc.grpc_server.GrpcServer">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.grpc_server.</code><code class="sig-name descname">GrpcServer</code><span class="sig-paren">(</span><em class="sig-param">port</em>, <em class="sig-param">name</em>, <em class="sig-param">connection_type=&lt;class 'omcc.grpc.grpc_server.GrpcServerChannel'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.GrpcServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>gRPC server. Listens for new connections</p>
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.GrpcServer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">port</em>, <em class="sig-param">name</em>, <em class="sig-param">connection_type=&lt;class 'omcc.grpc.grpc_server.GrpcServerChannel'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.GrpcServer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>port</strong> – port to listen on for new connections</p></li>
+<li><p><strong>name</strong> – server name</p></li>
+<li><p><strong>connection_type</strong> – class used to create new connections</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="omcc.grpc.grpc_server.OmciChannelHelloServicer">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.grpc_server.</code><code class="sig-name descname">OmciChannelHelloServicer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grpc_server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelHelloServicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omcc.grpc.service_definition.tr451_vomci_sbi_service_pb2_grpc.VomciHelloSbiServicer</span></code></p>
+<p>Provides methods that implement the Hello Sbi Server</p>
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.OmciChannelHelloServicer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grpc_server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelHelloServicer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.OmciChannelHelloServicer.HelloVomci">
+<code class="sig-name descname">HelloVomci</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelHelloServicer.HelloVomci" title="Permalink to this definition">¶</a></dt>
+<dd><p>rpc to be called - Session establishment</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="omcc.grpc.grpc_server.OmciChannelMessageServicer">
+<em class="property">class </em><code class="sig-prename descclassname">omcc.grpc.grpc_server.</code><code class="sig-name descname">OmciChannelMessageServicer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grpc_server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelMessageServicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">omcc.grpc.service_definition.tr451_vomci_sbi_service_pb2_grpc.VomciMessageSbiServicer</span></code></p>
+<p>Provides methods that implement the Message Sbi Server</p>
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.OmciChannelMessageServicer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grpc_server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelMessageServicer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.OmciChannelMessageServicer.VomciTx">
+<code class="sig-name descname">VomciTx</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelMessageServicer.VomciTx" title="Permalink to this definition">¶</a></dt>
+<dd><p>rpc to be called - OMCI msgs from pOLT –&gt; vOMCI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="omcc.grpc.grpc_server.OmciChannelMessageServicer.ListenForVomciRx">
+<code class="sig-name descname">ListenForVomciRx</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omcc.grpc.grpc_server.OmciChannelMessageServicer.ListenForVomciRx" title="Permalink to this definition">¶</a></dt>
+<dd><p>rpc to be called - OMCI msgs from vOMCI –&gt; pOLT</p>
 </dd></dl>
 
 </dd></dl>
@@ -221,7 +328,8 @@ Implementation below is just for testing</p>
   <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">3. OMCC Service (OMH SBI)</a><ul>
-<li><a class="reference internal" href="#module-omcc.grpc.omci_channel_grpc">3.1. gRPC Channel</a></li>
+<li><a class="reference internal" href="#module-omcc.grpc.grpc_client">3.1. gRPC Client</a></li>
+<li><a class="reference internal" href="#module-omcc.grpc.grpc_server">3.2. gRPC Server</a></li>
 </ul>
 </li>
 </ul>

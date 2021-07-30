@@ -11,98 +11,172 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from nbi import kafka_interface
-from omcc.grpc.omci_channel_grpc import GrpcChannel
-import omcc.grpc.omci_channel_grpc_server as grpc_server
+# from nbi import kafka_interface
+from nbi import kafka_proto_interface as kafka_interface
+from omcc.grpc.grpc_client import GrpcClientChannel
+from omcc.grpc.grpc_server import GrpcServer, GrpcServerChannel
 from omh_nbi.omh_handler import OMHStatus
 from omh_nbi.handlers.onu_activate import OnuActivateHandler
+from omh_nbi.handlers.onu_mib_sync import OnuMibDataSyncHandler
 from database.omci_olt import *
 from database.omci_olt import OltDatabase
-import os
+from database.onu_management_chain import ManagementChain
+import os, time, threading
 
 DEFAULT_BOOTSTRAP_SERVERS = kafka_interface.DEFAULT_BOOTSTRAP_SERVERS
 
 logger = OmciLogger.getLogger(__name__)
 
 VOMCI_GRPC_SERVER = True
-# LOCAL_GRPC_SERVER_PORT = 58433
-LOCAL_GRPC_SERVER_PORT = os.getenv("LOCAL_GRPC_SERVER_PORT", default=8433)
+LOCAL_GRPC_SERVER_PORT = os.getenv("LOCAL_GRPC_SERVER_PORT", default=58433)
 
 
 class VOmci:
-    def __init__(self):
-        self._name = "vomci1"
+    def __init__(self, name=None):
+        if name is None:
+            self._name = "vomci1"
+        else:
+            self._name = name
         self._kafka_if = None
         self._key_map = {}
         self._server = None
+        self._kafka_thread = None
 
-    def create_polt_connection(self) -> 'Olt':
+    @property
+    def name(self):
+        return self._name
+
+    def start(self):
+        self._kafka_if = kafka_interface.KafkaProtoInterface(self)
+        self._kafka_thread = threading.Thread(name='kafka_vomci_thread', target=self._kafka_if.start)
+        self._kafka_thread.start()
+        self._server = GrpcServer(port=LOCAL_GRPC_SERVER_PORT, parent=self)
+
+    def create_polt_connection(self):
         # Create gRPC channel and try to connect
         polt_host = '10.66.1.2'
         polt_port = 8433
         logger.info("connecting to {}:{}..".format(polt_host, polt_port))
-        channel = GrpcChannel(name=self._name)
-        olt = channel.connect(host=polt_host, port=polt_port)
-        if olt is None:
+        channel = GrpcClientChannel(name=self._name)
+        ret_val = channel.connect(host=polt_host, port=polt_port)
+        if not ret_val:
             logger.warning("Test {}: connection failed".format(self._name))
-            return None
+            return False
         logger.info("Test {}: connected".format(self._name))
-        return olt
+        return True
+
+    def add_managed_onus(self, comm_channel):
+        """
+        Add managed onus to communication channel, as per configuration.
+        This function should be called by the GrpcServer when
+        a new client connection is initiated.
+        """
+        for managed_onu in ManagementChain.GetManagedOnus():
+            if managed_onu.downstream_endpoint_name == comm_channel.remote_endpoint_name:
+                onu_id = (managed_onu.ct_ref, managed_onu.onu_id)
+                comm_channel.add_managed_onu(managed_onu.olt_name, managed_onu.onu_name, onu_id)
+
+    def trigger_create_onu(self, onu_name) -> (bool, str):
+        """
+        Add ONU with onu_name to management chain.
+        To be called by the kafka interface when a
+        "create ONU" request is received.
+        Args:
+            onu_name: unique name of ONU
+        """
+        if ManagementChain.GetOnu(onu_name) is not None:
+            er_string = "ONU {} already exists in the management chain".format(onu_name)
+            logger.error(er_string)
+            self._kafka_if.send_unsuccessful_response(onu_name, error_msg=er_string)
+            return
+        ManagementChain.CreateOnu(onu_name)
+        logger.info("Onu {} was created in vOMCi".format(onu_name))
+        self._kafka_if.send_successful_response(onu_name)
+
+    def trigger_set_onu_communication(self, olt_name: str, onu_name: str, channel_termination: str,
+                                      onu_tc_id: int, available: bool, olt_endpoint_name: str,
+                                      voltmf_endpoint_name: str, voltmf_name: str):
+        """
+        Use arguments to set/update the communication points and management chain
+        of given ONU. Then initiate the ONU detect sequence. To be called by
+        the kafka interface when a "set ONU communication" request is received.
+        """
+        managed_onu = ManagementChain.SetOnuCommunication(olt_name, onu_name, channel_termination,
+                                                          onu_tc_id, available, olt_endpoint_name,
+                                                          voltmf_endpoint_name, voltmf_name)
+        # Assign channel if communication is available
+        channel = None
+        for channel in self._server.connections().values():
+            if managed_onu.downstream_endpoint_name == channel.remote_endpoint_name:
+                onu_id = (managed_onu.ct_ref, managed_onu.onu_id)
+                channel.add_managed_onu(managed_onu.olt_name, onu_name, onu_id)
+                break
+        managed_onu.SetDsChannel(channel)
+        if available:
+            if channel is None:
+                error_msg = "ONU {}: can't enable communication. remote-endpoint {} is not connected".format(
+                    onu_name, managed_onu.downstream_endpoint_name)
+                logger.error(error_msg)
+                self._kafka_if.send_unsuccessful_response(onu_name, error_msg=error_msg)
+            self.trigger_onu_mib_sync(olt_name, olt_endpoint_name, onu_name, channel_termination, onu_tc_id)
+        else:
+            self._kafka_if.send_successful_response(onu_name)
 
     def trigger_kafka_response(self, handler):
         # TODO need to correlate request & response here.
         # possibly save the original; request in the handler
-        logger.info("Sending kafka response for ONU {}, request/event {}: {}".format(
+        logger.debug("Sending kafka response for ONU {}, request/event {}: {}".format(
             handler.onu.onu_name, handler.user_data, handler.status))
         if handler.status == OMHStatus.OK:
             self._kafka_if.send_successful_response(handler.onu.onu_name)
         else:
-            # TODO: Send NAK here
-            logger.error("Request failed for ONU {}. Request/Event: {}".format(
-                handler.onu.onu_name, handler.user_data))
+            self._kafka_if.send_unsuccessful_response(handler.onu.onu_name, error_msg=str(handler.status))
+            logger.error("Request failed for ONU {}. Request/Event: {}. Error {}".format(
+                handler.onu.onu_name, handler.user_data, handler.status))
 
-    def trigger_onu_activate(self, olt_id: str, onu_name: str, channel_termination: str, onu_tc_id: int):
+    def trigger_kafka_align_notification(self, handler):
+        logger.debug("Sending kafka alignment notification for ONU {}, request/event {}: status={} aligned={}".format(
+            handler.onu.onu_name, handler.user_data, handler.status, handler.is_aligned))
+        self._kafka_if.send_alignment_notification(handler.onu.onu_name, handler.is_aligned)
+
+    def trigger_onu_mib_sync(self, olt_id: str, remote_endpoint_name: str, onu_name: str, channel_termination: str,
+                             onu_tc_id: int):
         onu_sbi_id = (channel_termination, onu_tc_id)
         # Add ONU to the database
         start_tci = 1
         # Check if ONU already exists. Create if not.
-        olt = OltDatabase.OltGet(olt_id)
+        logger.info('ONU MIB sync: ONU {}.{} at OLT {}. remote_endpoint_name:{}'.format(
+            channel_termination, onu_tc_id, olt_id, remote_endpoint_name))
+
+        olt = OltDatabase.OltGet((olt_id, remote_endpoint_name))
         if olt is None:
-            logger.error("OLT with {} has not been connected yet".format(onu_name))
+            logger.error("OLT {} with {} has not been connected yet".format(olt_id, onu_name))
+            self._kafka_if.send_unsuccessful_response(onu_name)
             return
+
         onu = olt.OnuGetByName(onu_name, False)
         if onu is None:
-            onu = olt.OnuAdd(onu_name, onu_sbi_id, tci=start_tci)
-            if onu is None:
-                logger.error("Failed to create ONU {}".format(onu_name))
-                # TODO: Send kafka NAK here
-                return
-            logger.info("ONU {} added to the database. Activating..".format(onu_name))
-        else:
-            logger.info("ONU {} exists. Re-activating..".format(onu_name))
-        activate_handler = OnuActivateHandler(onu)
-        # TODO: can store entire request here, including its correlation tag
-        activate_handler.set_user_data('detect')
-        activate_handler.start(self.trigger_kafka_response)
-
-    def trigger_onu_undetect(self, olt_id: str, onu_name: str):
-        olt = OltDatabase.OltGet(olt_id)
-        if olt is None:
-            logger.warning("OLT with {} has not been connected yet".format(onu_name))
+            logger.error("ONU {} doesn't exist. It must be created first using create-onu RPC".format(onu_name))
+            self._kafka_if.send_unsuccessful_response(onu_name)
             return
-        if olt.OnuGetByName(onu_name, False) is not None:
-            olt.OnuDelete(onu_name)
-            logger.info("ONU {} deleted from the database".format(onu_name))
+
         self._kafka_if.send_successful_response(onu_name)
+        mib_sync_handler = OnuMibDataSyncHandler(onu)
+        # TODO: can store entire request here, including its correlation tag
+        mib_sync_handler.set_user_data('detect')
+        mib_sync_handler.start(self.trigger_kafka_align_notification)
 
-    def start(self):
-        if not VOMCI_GRPC_SERVER:
-            olt = self.create_polt_connection()
-            if olt is None:
-                return
-        self._kafka_if = kafka_interface.KafkaInterface(self)
-        self._kafka_if.start()
-
-    def start_grpc_server(self):
-        self._server = grpc_server.GrpcServer(port=LOCAL_GRPC_SERVER_PORT)
-        self._server.create_listen_endpoint()
+    def trigger_delete_onu(self, onu_name: str):
+        managed_onu = ManagementChain.DeleteOnu(onu_name)
+        if managed_onu is None:
+            logger.warning("Cannot delete ONU {} that has not been created".format(onu_name))
+            self._kafka_if.send_unsuccessful_response(onu_name)
+            return
+        logger.info("ONU {} deleted from the managed-onus database".format(onu_name))
+        polt_id = (managed_onu.olt_name, managed_onu.downstream_endpoint_name)
+        olt = OltDatabase.OltGet(polt_id)
+        if olt is not None:
+            if olt.OnuGetByName(onu_name, False) is not None:
+                olt.OnuDelete(onu_name)
+                logger.info("ONU {} MIB deleted from the database".format(onu_name))
+        self._kafka_if.send_successful_response(onu_name)

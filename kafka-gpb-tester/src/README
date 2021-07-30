@@ -1,0 +1,7 @@
+
+#To generate the tr451_vomci_nbi_message_pb2.py
+
+#In the folder of the .proto files
+
+mkdir python
+protoc -I=. --python_out=python ./tr451_vomci_nbi_message.proto

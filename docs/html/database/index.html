@@ -218,7 +218,7 @@ The derived class must have a few pre-defined class variables.</p>
 
 <dl class="py method">
 <dt id="database.omci_me.ME.set_attr_value">
-<code class="sig-name descname">set_attr_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number_or_name</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_me.ME.set_attr_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_attr_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number_or_name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">set_encoded</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_me.ME.set_attr_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find a ME attribute by number or name and set its value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -233,6 +233,20 @@ The derived class must have a few pre-defined class variables.</p>
 <dl class="py method">
 <dt id="database.omci_me.ME.attr_is_set">
 <code class="sig-name descname">attr_is_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number_or_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_me.ME.attr_is_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a ME attribute by number or name and return True if the attr is set explicitly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>number_or_name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – ME attribute number or name.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="database.omci_me.ME.attr_is_encoded">
+<code class="sig-name descname">attr_is_encoded</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number_or_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_me.ME.attr_is_encoded" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find a ME attribute by number or name and return True if the attr is set explicitly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2088,17 +2102,17 @@ different value is an error).</p></li>
 <p>This module implements per-ONU MIB</p>
 <dl class="py class">
 <dt id="database.omci_onu_mib.OnuMib">
-<em class="property">class </em><code class="sig-prename descclassname">database.omci_onu_mib.</code><code class="sig-name descname">OnuMib</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_onu_mib.OnuMib" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">database.omci_onu_mib.</code><code class="sig-name descname">OnuMib</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_onu_mib.OnuMib" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Per-ONU collection of MEs.</p>
 <p>This class is internal and is operated by OnuDriver</p>
 <dl class="py method">
 <dt id="database.omci_onu_mib.OnuMib.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_onu_mib.OnuMib.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_onu_mib.OnuMib.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>OnuMib Class Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU Id</p>
+<dd class="field-odd"><p><strong>onu_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ONU Name</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2330,7 +2344,7 @@ providing a communication path to the pOLT.</p>
 
 <dl class="py method">
 <dt id="database.omci_olt.Olt.OnuAdd">
-<code class="sig-name descname">OnuAdd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.OnuAdd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">OnuAdd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em>, <em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.OnuAdd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add ONU to the OLT database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2350,11 +2364,11 @@ providing a communication path to the pOLT.</p>
 
 <dl class="py method">
 <dt id="database.omci_olt.Olt.OnuDelete">
-<code class="sig-name descname">OnuDelete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.OnuDelete" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">OnuDelete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.OnuDelete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete ONU from the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU Id</p>
+<dd class="field-odd"><p><strong>onu_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ONU Name</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2380,13 +2394,33 @@ providing a communication path to the pOLT.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="database.omci_olt.Olt.OnuGetByName">
+<code class="sig-name descname">OnuGetByName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em>, <em class="sig-param"><span class="n">log_error</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.OnuGetByName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ONU by ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>onu_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ONU Name</p></li>
+<li><p><strong>log_error</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – True=error log if ONU is not found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ONU driver or None if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="database.omci_olt.Olt.send">
-<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.send" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.Olt.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send raw OMCI message to ONU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>onu_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ONU Id</p></li>
+<li><p><strong>onu</strong> (<a class="reference internal" href="../omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver" title="omh_nbi.onu_driver.OnuDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnuDriver</span></code></a>) – ONU object</p></li>
 <li><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code>) – raw OMCI message without CRC/MIC</p></li>
 </ul>
 </dd>
@@ -2462,6 +2496,20 @@ The function forwards the message to the relevant OnuDriver.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#database.omci_olt.Olt" title="database.omci_olt.Olt"><code class="xref py py-class docutils literal notranslate"><span class="pre">Olt</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="database.omci_olt.OltDatabase.OltGetFirst">
+<em class="property">classmethod </em><code class="sig-name descname">OltGetFirst</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#database.omci_olt.OltDatabase.OltGetFirst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get first OLT in the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#database.omci_olt.Olt" title="database.omci_olt.Olt"><code class="xref py py-class docutils literal notranslate"><span class="pre">Olt</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Olt if successful, None if there are no Olts in the database</p>
 </dd>
 </dl>
 </dd></dl>

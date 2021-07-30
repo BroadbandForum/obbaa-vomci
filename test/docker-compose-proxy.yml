@@ -1,0 +1,46 @@
+version: '3.5'
+networks:
+    baadist_default:
+        driver: bridge
+        name: baadist_default
+
+services:
+    vproxy:
+      image: obbaa-vproxy
+      hostname: obbaa-vproxy
+      container_name: obbaa-vproxy
+      ports:
+        - 8433:8433
+      environment:
+        GRPC_CLIENT_NAME: obbaa-vproxy-grpc-client-1
+        GRPC_SERVER_NAME: obbaa-vproxy-grpc-server-1
+        LOCAL_GRPC_SERVER_PORT: 8433
+        REMOTE_GRPC_SERVER_PORT: 58433
+        # should be replaced with vomci container's network Gateway IP
+        REMOTE_GRPC_SERVER_ADDR: ${IP}
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
+        # List of Consumer topics, seperated by spaces
+        KAFKA_REQUEST_TOPICS: "PROXY_REQUEST"
+        KAFKA_RESPONSE_TOPICS: "PROXY_RESPONSE"
+        KAFKA_NOTIFICATION_TOPICS: "PROXY_NOTIFICATION"
+      networks:
+        - baadist_default
+
+    testolt:
+      image: test-olt
+      hostname: test-olt
+      container_name: test-olt
+      ports:
+        - 8484:8484
+      environment:
+        LOCAL_GRPC_SERVER_PORT: 8484
+        REMOTE_GRPC_SERVER_PORT: 8433
+        REMOTE_GRPC_SERVER_HOST: obbaa-vproxy
+      depends_on:
+        - vproxy
+      networks:
+        - baadist_default
+
+
+
+

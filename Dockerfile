@@ -21,19 +21,16 @@ ARG DOCKER-TAG=latest
 ARG DOCKER-IMAGE=$(DOCKER-ORG)/$(DOCKER-NAME):$(DOCKER-TAG)
 ARG DOCKER-CMD=bash
 
-# copy source code #TODO
 RUN mkdir -p /obbaa-vomci
 # copy source code
-COPY . /obbaa-vomci
-
-ENV PYTHONPATH=/obbaa-vomci
-
-
-
-WORKDIR /obbaa-vomci
+COPY requirements.txt /obbaa-vomci/requirements.txt
 RUN PYTHONPATH=/obbaa-vomci \
  && pip3 install -r /obbaa-vomci/requirements.txt
-EXPOSE 8801
-CMD ['python3 -V']
-CMD python3 bin/start_vomci.py
+COPY . /obbaa-vomci
+ENV PYTHONPATH=/obbaa-vomci
+WORKDIR /obbaa-vomci
 
+EXPOSE 8801
+EXPOSE 58433
+CMD ['python3 -V']
+CMD python3 /obbaa-vomci/bin/start_vomci.py

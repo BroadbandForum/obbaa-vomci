@@ -19,7 +19,7 @@
 
 import logging
 import json
-from omcc.grpc.omci_channel_grpc import GrpcChannel
+from omcc.grpc.grpc_client import GrpcClientChannel
 from mapper.yang_to_omci_mapper import extractPayload
 from omci_logger import OmciLogger
 from omh_nbi.handlers.onu_activate import OnuActivateHandler
@@ -40,13 +40,14 @@ def test_extractPayload():
     logger = OmciLogger.getLogger(__name__)
 
     logger.info("test_YangtoOmciMapper: connecting to the pOLT {}:{}".format(polt_host, polt_port))
-    channel = GrpcChannel(vomci_name)
-    olt = channel.connect(polt_host, polt_port)
-    if olt is None:
+    channel = GrpcClientChannel(vomci_name)
+    ret_val = channel.connect(polt_host, polt_port)
+    if not ret_val:
         logger.info("test_YangtoOmciMapper: connection failed with pOLT")
         return -1
+    olt = channel.add_managed_onu(channel.remote_endpoint_name, onu_name, (cterm_name, onu_id), tci)
     logger.info("test_YangtoOmciMapper: connected to the pOLT: {}".format(olt.id))
-    onu = olt.OnuAdd(onu_name, (cterm_name, onu_id), tci)
+    onu = olt.OnuGet((cterm_name, onu_id))
     activate_handler = OnuActivateHandler(onu)
     status = activate_handler.run()
     logger.info("test_YangtoOmciMapper: activate_handler status: {}".format(status))

@@ -30,6 +30,7 @@ from omci_logger import OmciLogger
 logger = OmciLogger.getLogger(__name__)
 
 OltId = str                 # pOLT name
+PoltId = Tuple[OltId, str]  # OLT id: pOLT name, remote endpoint name
 
 # Channel termination key
 # XXX this type might need to be refined
@@ -76,6 +77,10 @@ class Name:
         assert names is None or name in names
         self._name = name
         self._description = description or ''
+
+    @property
+    def name(self):
+        return self._name
 
     def info(self) -> str:
         description = ' %r' % self._description if self._description else ''

@@ -52,13 +52,13 @@
 and additional functions and properties for request-response correlation.</p>
 <dl class="py class">
 <dt id="omh_nbi.onu_driver.OnuDriver">
-<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.onu_driver.</code><code class="sig-name descname">OnuDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">olt</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">omh_nbi.onu_driver.</code><code class="sig-name descname">OnuDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em>, <em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">olt</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Per-ONU driver.
 This object is created by Olt.OnuAdd() factory.</p>
 <dl class="py method">
 <dt id="omh_nbi.onu_driver.OnuDriver.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">olt</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onu_name</span></em>, <em class="sig-param"><span class="n">onu_id</span></em>, <em class="sig-param"><span class="n">olt</span></em>, <em class="sig-param"><span class="n">tci</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -127,7 +127,7 @@ or reporting a TIMEOUT failure.</p>
 
 <dl class="py method">
 <dt id="omh_nbi.onu_driver.OnuDriver.set_flow_control">
-<code class="sig-name descname">set_flow_control</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_retries</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">ack_timeout</span><span class="o">=</span><span class="default_value">2.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.set_flow_control" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_flow_control</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_retries</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">ack_timeout</span><span class="o">=</span><span class="default_value">3.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#omh_nbi.onu_driver.OnuDriver.set_flow_control" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set flow control parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

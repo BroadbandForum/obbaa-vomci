@@ -47,6 +47,7 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
@@ -215,7 +216,15 @@
 </li>
         <li><a href="encode_decode/index.html#encode_decode.omci_action_set.SetAction.__init__">(encode_decode.omci_action_set.SetAction method)</a>
 </li>
-        <li><a href="omcc/index.html#omcc.grpc.omci_channel_grpc.GrpcChannel.__init__">(omcc.grpc.omci_channel_grpc.GrpcChannel method)</a>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_client.GrpcClientChannel.__init__">(omcc.grpc.grpc_client.GrpcClientChannel method)</a>
+</li>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_server.GrpcServer.__init__">(omcc.grpc.grpc_server.GrpcServer method)</a>
+</li>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_server.GrpcServerChannel.__init__">(omcc.grpc.grpc_server.GrpcServerChannel method)</a>
+</li>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelHelloServicer.__init__">(omcc.grpc.grpc_server.OmciChannelHelloServicer method)</a>
+</li>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelMessageServicer.__init__">(omcc.grpc.grpc_server.OmciChannelMessageServicer method)</a>
 </li>
         <li><a href="omcc/index.html#omcc.omci_channel.OltCommChannel.__init__">(omcc.omci_channel.OltCommChannel method)</a>
 </li>
@@ -268,9 +277,11 @@
 </li>
       <li><a href="database/index.html#database.omci_me.ME.attr">attr() (database.omci_me.ME method)</a>
 </li>
+      <li><a href="database/index.html#database.omci_me.ME.attr_encode">attr_encode() (database.omci_me.ME method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database/index.html#database.omci_me.ME.attr_encode">attr_encode() (database.omci_me.ME method)</a>
+      <li><a href="database/index.html#database.omci_me.ME.attr_is_encoded">attr_is_encoded() (database.omci_me.ME method)</a>
 </li>
       <li><a href="database/index.html#database.omci_me.ME.attr_is_set">attr_is_set() (database.omci_me.ME method)</a>
 </li>
@@ -320,7 +331,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="omcc/index.html#omcc.grpc.omci_channel_grpc.GrpcChannel.connect">connect() (omcc.grpc.omci_channel_grpc.GrpcChannel method)</a>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_client.GrpcClientChannel.connect">connect() (omcc.grpc.grpc_client.GrpcClientChannel method)</a>
 
       <ul>
         <li><a href="omcc/index.html#omcc.omci_channel.OltCommChannel.connect">(omcc.omci_channel.OltCommChannel method)</a>
@@ -400,9 +411,11 @@
 </li>
       <li><a href="encode_decode/index.html#encode_decode.omci_action_delete.DeleteAction">DeleteAction (class in encode_decode.omci_action_delete)</a>
 </li>
-      <li><a href="omcc/index.html#omcc.grpc.omci_channel_grpc.GrpcChannel.disconnect">disconnect() (omcc.grpc.omci_channel_grpc.GrpcChannel method)</a>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_client.GrpcClientChannel.disconnect">disconnect() (omcc.grpc.grpc_client.GrpcClientChannel method)</a>
 
       <ul>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_server.GrpcServerChannel.disconnect">(omcc.grpc.grpc_server.GrpcServerChannel method)</a>
+</li>
         <li><a href="omcc/index.html#omcc.omci_channel.OltCommChannel.disconnect">(omcc.omci_channel.OltCommChannel method)</a>
 </li>
       </ul></li>
@@ -557,14 +570,14 @@
         <li><a href="omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver.get_all_instances">(omh_nbi.onu_driver.OnuDriver method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database/index.html#database.omci_onu_mib.OnuMib.get_all_me_classes">get_all_me_classes() (database.omci_onu_mib.OnuMib method)</a>
 
       <ul>
         <li><a href="omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver.get_all_me_classes">(omh_nbi.onu_driver.OnuDriver method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database/index.html#database.omci_onu_mib.OnuMib.get_by_name">get_by_name() (database.omci_onu_mib.OnuMib method)</a>
 
       <ul>
@@ -587,7 +600,19 @@
 </li>
       <li><a href="encode_decode/index.html#encode_decode.omci_action_get.GetAction">GetAction (class in encode_decode.omci_action_get)</a>
 </li>
-      <li><a href="omcc/index.html#omcc.grpc.omci_channel_grpc.GrpcChannel">GrpcChannel (class in omcc.grpc.omci_channel_grpc)</a>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_client.GrpcClientChannel">GrpcClientChannel (class in omcc.grpc.grpc_client)</a>
+</li>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.GrpcServer">GrpcServer (class in omcc.grpc.grpc_server)</a>
+</li>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.GrpcServerChannel">GrpcServerChannel (class in omcc.grpc.grpc_server)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelHelloServicer.HelloVomci">HelloVomci() (omcc.grpc.grpc_server.OmciChannelHelloServicer method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -625,9 +650,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database/index.html#database.omci_me_types.large_string_me">large_string_me (class in database.omci_me_types)</a>
 </li>
+      <li><a href="omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler.last_action">last_action() (omh_nbi.omh_handler.OmhHandler property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler.last_action">last_action() (omh_nbi.omh_handler.OmhHandler property)</a>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelMessageServicer.ListenForVomciRx">ListenForVomciRx() (omcc.grpc.grpc_server.OmciChannelMessageServicer method)</a>
 </li>
       <li><a href="omh_nbi/index.html#omh_nbi.omh_handler.OmhHandler.logerr_and_return">logerr_and_return() (omh_nbi.omh_handler.OmhHandler method)</a>
 </li>
@@ -703,7 +730,9 @@
 </li>
         <li><a href="encode_decode/index.html#module-encode_decode.omci_action_set">encode_decode.omci_action_set</a>
 </li>
-        <li><a href="omcc/index.html#module-omcc.grpc.omci_channel_grpc">omcc.grpc.omci_channel_grpc</a>
+        <li><a href="omcc/index.html#module-omcc.grpc.grpc_client">omcc.grpc.grpc_client</a>
+</li>
+        <li><a href="omcc/index.html#module-omcc.grpc.grpc_server">omcc.grpc.grpc_server</a>
 </li>
         <li><a href="omcc/index.html#module-omcc.omci_channel">omcc.omci_channel</a>
 </li>
@@ -774,11 +803,20 @@
 </li>
       <li><a href="database/index.html#database.omci_olt.OltDatabase.OltGet">OltGet() (database.omci_olt.OltDatabase class method)</a>
 </li>
+      <li><a href="database/index.html#database.omci_olt.OltDatabase.OltGetFirst">OltGetFirst() (database.omci_olt.OltDatabase class method)</a>
+</li>
       <li>
-    omcc.grpc.omci_channel_grpc
+    omcc.grpc.grpc_client
 
       <ul>
-        <li><a href="omcc/index.html#module-omcc.grpc.omci_channel_grpc">module</a>
+        <li><a href="omcc/index.html#module-omcc.grpc.grpc_client">module</a>
+</li>
+      </ul></li>
+      <li>
+    omcc.grpc.grpc_server
+
+      <ul>
+        <li><a href="omcc/index.html#module-omcc.grpc.grpc_server">module</a>
 </li>
       </ul></li>
       <li>
@@ -797,6 +835,10 @@
       <li><a href="database/index.html#database.omci_me_types.omci_status">omci_status (in module database.omci_me_types)</a>
 </li>
       <li><a href="encode_decode/index.html#encode_decode.omci_action.OmciAction">OmciAction (class in encode_decode.omci_action)</a>
+</li>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelHelloServicer">OmciChannelHelloServicer (class in omcc.grpc.grpc_server)</a>
+</li>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelMessageServicer">OmciChannelMessageServicer (class in omcc.grpc.grpc_server)</a>
 </li>
       <li>
     omh_nbi.handlers.gem_port_create
@@ -826,6 +868,8 @@
         <li><a href="omh_nbi/index.html#module-omh_nbi.handlers.onu_activate">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     omh_nbi.handlers.onu_mib_reset
 
@@ -833,8 +877,6 @@
         <li><a href="omh_nbi/index.html#module-omh_nbi.handlers.onu_mib_reset">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     omh_nbi.handlers.onu_mib_upload
 
@@ -903,6 +945,8 @@
       <li><a href="omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver">OnuDriver (class in omh_nbi.onu_driver)</a>
 </li>
       <li><a href="database/index.html#database.omci_olt.Olt.OnuGet">OnuGet() (database.omci_olt.Olt method)</a>
+</li>
+      <li><a href="database/index.html#database.omci_olt.Olt.OnuGetByName">OnuGetByName() (database.omci_olt.Olt method)</a>
 </li>
       <li><a href="database/index.html#database.omci_onu_mib.OnuMib">OnuMib (class in database.omci_onu_mib)</a>
 </li>
@@ -985,7 +1029,9 @@
       <li><a href="database/index.html#database.omci_olt.Olt.send">send() (database.omci_olt.Olt method)</a>
 
       <ul>
-        <li><a href="omcc/index.html#omcc.grpc.omci_channel_grpc.GrpcChannel.send">(omcc.grpc.omci_channel_grpc.GrpcChannel method)</a>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_client.GrpcClientChannel.send">(omcc.grpc.grpc_client.GrpcClientChannel method)</a>
+</li>
+        <li><a href="omcc/index.html#omcc.grpc.grpc_server.GrpcServerChannel.send">(omcc.grpc.grpc_server.GrpcServerChannel method)</a>
 </li>
         <li><a href="omcc/index.html#omcc.omci_channel.OltCommChannel.send">(omcc.omci_channel.OltCommChannel method)</a>
 </li>
@@ -1006,10 +1052,10 @@
 </li>
       <li><a href="omh_nbi/index.html#omh_nbi.handlers.omh_handler_utils.set_ext_vlan_tag_op">set_ext_vlan_tag_op() (in module omh_nbi.handlers.omh_handler_utils)</a>
 </li>
-      <li><a href="omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver.set_flow_control">set_flow_control() (omh_nbi.onu_driver.OnuDriver method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="omh_nbi/index.html#omh_nbi.onu_driver.OnuDriver.set_flow_control">set_flow_control() (omh_nbi.onu_driver.OnuDriver method)</a>
+</li>
       <li><a href="database/index.html#database.omci_me.ME.set_user_attr">set_user_attr() (database.omci_me.ME method)</a>
 </li>
       <li><a href="encode_decode/index.html#encode_decode.omci_action_set.SetAction">SetAction (class in encode_decode.omci_action_set)</a>
@@ -1097,6 +1143,8 @@
       <li><a href="database/index.html#database.omci_me_types.voip_media_profile_me">voip_media_profile_me (class in database.omci_me_types)</a>
 </li>
       <li><a href="database/index.html#database.omci_me_types.voip_voice_ctp_me">voip_voice_ctp_me (class in database.omci_me_types)</a>
+</li>
+      <li><a href="omcc/index.html#omcc.grpc.grpc_server.OmciChannelMessageServicer.VomciTx">VomciTx() (omcc.grpc.grpc_server.OmciChannelMessageServicer method)</a>
 </li>
   </ul></td>
 </tr></table>

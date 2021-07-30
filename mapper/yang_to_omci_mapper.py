@@ -18,6 +18,7 @@
 #
 
 from typing import Optional, Tuple, Any, Union
+from omh_nbi.handlers.onu_activate import OnuActivateHandler
 from omh_nbi.handlers.uni_set import UniSetHandler
 from omh_nbi.handlers.tcont_create import TcontCreateHandler
 from omh_nbi.handlers.gem_port_create import GemPortCreateHandler
@@ -29,9 +30,11 @@ from omh_nbi.omh_handler import OmhHandler, OMHStatus
 from omh_nbi.onu_driver import OnuDriver
 from database.omci_olt import OltDatabase
 from omci_logger import OmciLogger
+from omci_types import PoltId
+#from vomci import VOmci
 logger = OmciLogger.getLogger(__name__)
 
-def extractPayload(onuname: str, oltname: str, payload: dict) -> OMHStatus:
+def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict) -> OMHStatus:
     """
     Parse yang objects and invoke yangtoomci mapper handler class
     Args:
@@ -50,26 +53,41 @@ def extractPayload(onuname: str, oltname: str, payload: dict) -> OMHStatus:
         logger.info("onu {} is not present in the database".format(onuname))
         return OMHStatus.ONU_NOT_FOUND
 
-    if 'operation' not in payload:
-        logger.error("'operation' is missing in the request")
-        return OMHStatus.ERROR_IN_PARAMETERS
+    keys = payload.keys()
+    logger.debug("yang_to_omci_mapper::extractPayload key=={} payload={}".format(keys, payload))
+    copy_config = False
 
-    if 'copy-config' == payload['operation']:
-        if 'target' in payload:
-            targetDict = payload['target']
-    elif 'edit-config' == payload['operation']:
-        if 'delta' in payload:
-            targetDict = payload['delta']
+    if 'config_inst' in keys:
+        targetDict = payload['config_inst']
+        copy_config = True
+    elif 'current_config_inst' in keys:
+        targetDict = payload['current_config_inst']
+        if 'delta_config' in keys:
+            deltaDict = payload['delta_config']
+    elif 'delta_config' in keys:
+        targetDict = payload['delta_config']
+    elif 'operation' in keys:
+        if 'copy-config' == payload['operation']:
+            copy_config = True
+            if 'target' in payload:
+                targetDict = payload['target']
+        elif 'edit-config' == payload['operation']:
+            if 'delta' in payload:
+                targetDict = payload['delta']
     else:
         logger.error("The requested operation is not supported by vOMCI")
         return OMHStatus.NOT_SUPPORTED
 
-    logger.info("yang_to_omci_mapper :: extractPayload")
-    handlers = {'tcont': [], 'qos-policy-profile': [], 'uni': [], 'gem': [], 'vlan-subif': []}
-    handler_args = {'tcont': [], 'qos-policy-profile': [], 'uni': [], 'gem': [], 'vlan-subif': []}
+    handlers = {'onu' : [], 'tcont': [], 'qos-policy-profile': [], 'uni': [], 'gem': [], 'vlan-subif': []}
+    handler_args = {'onu' : [], 'tcont': [], 'qos-policy-profile': [], 'uni': [], 'gem': [], 'vlan-subif': []}
     pol_dict = {}
     cls_dict = {}
     prof_dict = {}
+
+    # Must resync ONU in case of copy-config
+    if copy_config:
+        handlers['onu'].append(OnuActivateHandler)
+        handler_args['onu'].append((False,))
 
     if targetDict is not None:
         if 'bbf-xpongemtcont:xpongemtcont' in targetDict:
@@ -255,7 +273,9 @@ def extractPayload(onuname: str, oltname: str, payload: dict) -> OMHStatus:
                             handler_args['vlan-subif'].append((subif_name, uni_name, classifier, action, qos_profile))
 
         logger.info("yang_to_omci_mapper :: extractPayload :: calling YangtoOmciMapperHandler for invoking omh_nbi handlers")
-        mapperObj = YangtoOmciMapperHandler(onu)
+        mapperObj = YangtoOmciMapperHandler(vomci, onu)
+        for i in range(len(handlers['onu'])):
+            mapperObj.add_handler(handlers['onu'][i], handler_args['onu'][i])
         for i in range(len(handlers['tcont'])):
             mapperObj.add_handler(handlers['tcont'][i], handler_args['tcont'][i])
         for i in range(len(handlers['uni'])):
@@ -274,12 +294,13 @@ def extractPayload(onuname: str, oltname: str, payload: dict) -> OMHStatus:
 
 
 class YangtoOmciMapperHandler:
-    def __init__(self, onu: 'OnuDriver'):
+    def __init__(self, vomci : 'VOmci', onu: 'OnuDriver'):
         """
         Invoke omh_nbi handlers
         Args:
             onu: onu driver instance
         """
+        self._vomci = vomci
         self._onu = onu
         self._status = OMHStatus.OK
         self._default_timeout = 3.0
@@ -318,13 +339,9 @@ class YangtoOmciMapperHandler:
             return OMHStatus.OK
 
         self._onu.set_flow_control(self._default_retries, self._default_timeout)
-        logger.info("YangtoOmciMapperHandler: starting execution in the foreground")
         handler = YangtoOmciMapperHandler.OmhNbiHandler(self._onu, self._handler_types, self._handler_args)
-        self._status = handler.run()
-
-        #TBD : After integrating the code with Aris, will call the handlers in BG
-        #logger.info("YangtoOmciMapperHandler: starting execution in the background")
-        #handler.start(vomci.trigger_kafka_response)
+        logger.info("YangtoOmciMapperHandler: starting execution in the background")
+        handler.start(self._vomci.trigger_kafka_response)
 
         logger.info("YangtoOmciMapperHandler: Finished execution. Status: {}".format(handler.status.name))
 

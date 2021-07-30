@@ -21,21 +21,11 @@ import sys
 OmciLogger(level=logging.DEBUG)
 logger = OmciLogger.getLogger(__name__)
 
+
 def start_vomci_threads():
-    # Create a thread that will listen for kafka
-    logger.debug('Starting a thread that will consume kafka messages')
+    logger.debug('Starting vomci')
     v_omci = vomci.VOmci()
-    main_listener_thread = threading.Thread(name="main_listener", target=v_omci.start)
-    main_listener_thread.start()
-    if vomci.VOMCI_GRPC_SERVER:
-        logger.debug('Initializing a grpc server on vOMCI')
-        # grpc_listener_thread = threading.Thread(name="grpc_listener", target=v_omci.start_grpc_server)
-        # grpc_listener_thread.start()
-        v_omci.start_grpc_server()
-    else:
-        logger.debug('Initializing a grpc client on vOMCI')
-        v_omci.create_polt_connection()
-    time.sleep(2)
+    v_omci.start()
 
 
 def main():

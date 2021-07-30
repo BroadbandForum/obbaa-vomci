@@ -20,18 +20,14 @@ ARG DOCKER-TAG=latest
 ARG DOCKER-IMAGE=$(DOCKER-ORG)/$(DOCKER-NAME):$(DOCKER-TAG)
 ARG DOCKER-CMD=bash
 
-# copy source code #TODO
 RUN mkdir -p /obbaa-vproxy
 # copy source code
-COPY . /obbaa-vproxy
-
-ENV PYTHONPATH=/obbaa-vproxy
-
-
-
-WORKDIR /obbaa-vproxy
+COPY requirements.txt /obbaa-vproxy/requirements.txt
 RUN PYTHONPATH=/obbaa-vproxy \
  && pip3 install -r /obbaa-vproxy/requirements.txt
+COPY . /obbaa-vproxy
+ENV PYTHONPATH=/obbaa-vproxy
+WORKDIR /obbaa-vproxy
+EXPOSE 8433
 CMD ['python3 -V']
 CMD python3 bin/start_vproxy.py
-

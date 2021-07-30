@@ -48,6 +48,10 @@ class OltCommChannel(Name):
         """
         raise Exception('Unimplemented connect() method')
 
+    @property
+    def olt(self):
+        return self._olt
+
     def disconnect(self):
         """ Disconnect from the peer pOlt
         """

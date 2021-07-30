@@ -24,4 +24,60 @@ The vOMCI Proxy works as an aggregation and interception point that avoids the n
 The following command must be run in the vOMCI subdirectory of the source code in order to create the docker images
 `make docker-build`
 
+##  Run via docker-compose
+This is an example docker-compose snippet to test functionality. It does not include BAA.
+Save as `docker-compose.yml` and start with `docker-compose up -d`.
+```
+version: '3.5'
+networks:
+    baadist_default:
+        driver: bridge
+        name: baadist_default
 
+services:
+    zookeeper:
+      image: confluentinc/cp-zookeeper:5.5.0
+      hostname: zookeeper
+      container_name: zookeeper
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+      networks:
+        - baadist_default
+
+    kafka:
+      image: confluentinc/cp-kafka:5.5.0
+      hostname: kafka
+      container_name: kafka
+      depends_on:
+        - zookeeper
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      networks:
+        - baadist_default
+
+    vomci:
+      image: broadbandforum/obbaa-vomci
+      hostname: obbaa-vomci
+      container_name: obbaa-vomci
+      ports:
+        - 8801:8801
+      environment:
+        GRPC_SERVER_NAME: vOMCIProxy
+        LOCAL_GRPC_SERVER_PORT: 58433
+        # Kafka bootstrap server, please provide only one address
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+        # List of Consumer topics, seperated by spaces
+        KAFKA_REQUEST_TOPICS: "OBBAA_ONU_REQUEST OBBAA_ONU_NOTIFICATION"
+        KAFKA_RESPONSE_TOPIC: 'OBBAA_ONU_RESPONSE'
+      networks:
+        - baadist_default
+      depends_on:
+        - zookeeper
+        - kafka
+```

@@ -21,14 +21,15 @@
 """This module implements per-OLT and multi-OLT databases
 """
 
+from collections import OrderedDict
 from omci_types import *
 from omh_nbi.onu_driver import OnuDriver
 import threading
 
 class Olt:
-    """ Per OLT collectyion of ONUs """
+    """ Per OLT collection of ONUs """
 
-    def __init__(self, id : OltId, channel: 'OltCommChannel'):
+    def __init__(self, id : PoltId, channel: 'OltCommChannel'):
         """ Olt Class Constructor.
 
             Olt is a collection of OnuDriver instances + reference to OmciChannel
@@ -42,11 +43,16 @@ class Olt:
         self._channel = channel
         self._onus = {}
         self._onus_by_name = {}
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
     @property
-    def id(self) -> OltId:
+    def id(self) -> PoltId:
         return self._id
+
+    @property
+    def olt_id(self) -> OltId:
+        (olt_id, remote_endpoint) = self._id
+        return olt_id
 
     @property
     def channel(self):
@@ -66,6 +72,7 @@ class Olt:
         """ Add ONU to the OLT database.
 
         Args:
+            onu_name: ONU Name
             onu_id: ONU Id
             tci: initial TCI value (mainly for debugging)
         Returns:
@@ -73,11 +80,35 @@ class Olt:
         """
         with self._lock:
             if onu_id in self._onus:
-                logger.error("OnuAdd: ONU {} is already in the database" % onu_id)
+                logger.error("OnuAdd: ONU {} is already in the database".format(onu_id))
                 return None
             onu = OnuDriver(onu_name, onu_id, self, tci)
             self._onus[onu_id] = onu
             self._onus_by_name[onu_name] = onu
+        return onu
+
+    def OnuAddUpdate(self, onu_name: OnuName, onu_id: OnuSbiId, tci: int = 0) -> OnuDriver:
+        """ Add ONU if doesn't exist or update onu_id if it is already in the database
+        Args:
+            onu_name: ONU Name
+            onu_id: ONU SBI Id
+            tci: initial TCI value (mainly for debugging)
+        Returns:
+             ONU driver or None in case of error
+        """
+        with self._lock:
+            if onu_name not in self._onus_by_name:
+                return self.OnuAdd(onu_name, onu_id, tci)
+            # ONU id is already in the database. Re-assign onu_id
+            onu = self._onus_by_name[onu_name]
+            if onu.onu_id != onu_id:
+                if onu_id in self._onus:
+                    logger.error("OnuAddUpdate: Can't assign SBI ID {} to ONU {}. It is ialready assigned to ONU {}".\
+                                 format(onu_id, onu_name, self._onus[onu_id].onu_name))
+                    return None
+            del self._onus[onu.onu_id]
+            onu.set_onu_id(onu_id)
+            self._onus[onu_id] = onu
         return onu
 
     def OnuDelete(self, onu_name: OnuName):
@@ -137,7 +168,8 @@ class Olt:
             if not self._channel:
                 logger.error("send: can't send message to ONU {}. No active channel".format(onu.onu_id))
                 return False
-            return self._channel.send(onu, msg)
+
+            return self._channel.send(self.olt_id, onu.onu_id, msg)
 
     def recv(self, onu_id: OnuSbiId, msg: RawMessage):
         """ Receive an OMCI message.
@@ -164,7 +196,7 @@ class OltDatabase:
     _lock = threading.Lock()
 
     @classmethod
-    def OltAddUpdate(cls, olt_id: OltId, channel: 'OltCommChannel') -> Olt:
+    def OltAddUpdate(cls, olt_id: PoltId, channel: 'OltCommChannel') -> Olt:
         """ Add OLT to the database or update an existing OLT.
 
         Args:
@@ -184,7 +216,7 @@ class OltDatabase:
         return olt
 
     @classmethod
-    def OltDelete(cls, olt_id: OltId):
+    def OltDelete(cls, olt_id: PoltId):
         """ Delete OLT from the database.
 
         Args:
@@ -197,7 +229,7 @@ class OltDatabase:
             del cls._olts[olt_id]
 
     @classmethod
-    def OltGet(cls, olt_id: OltId) -> Olt:
+    def OltGet(cls, olt_id: PoltId) -> Olt:
         """ Find OLT by id.
 
         Args:
@@ -207,3 +239,16 @@ class OltDatabase:
             if olt_id not in cls._olts:
                 return None
             return cls._olts[olt_id]
+
+    @classmethod
+    def OltGetFirst(cls) -> Olt:
+        """Get first OLT in the database
+
+        Returns:
+            Olt if successful, None if there are no Olts in the database
+        """
+        with cls._lock:
+            all_olts = list(cls._olts.values())
+            if len(all_olts) == 0:
+                return None
+            return all_olts[0]

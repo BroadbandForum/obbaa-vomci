@@ -15,7 +15,6 @@ import os
 import threading
 import time
 import logging
-
 import proxy.proxy as proxy
 from omci_logger import OmciLogger
 
@@ -23,28 +22,9 @@ OmciLogger(level=logging.DEBUG)
 logger = OmciLogger.getLogger(__name__)
 
 
-def start_proxy_threads():
-    # Create a thread that will listen for kafka
-    logger.debug('Starting a thread that will send gRPC messages')
-    vproxy = proxy.Proxy("temp_proxy_name")
-    # grpc_client_thread = threading.Thread(name="grpc_client", target=vproxy.create_vomci_connection)
-    # grpc_client_thread.start()
-    vproxy.create_polt_connection_server()
-
-
-def start_gRPC_simulator():
-    # Create a thread that will listen for kafka
-    logger.debug('Starting a thread that will send gRPC messages')
-    vproxy = proxy.Proxy("gRPC_simulator")
-    grpc_client_thread = threading.Thread(name="grpc_client", target=vproxy.create_vomci_connection)
-    grpc_client_thread.start()
-
 def main():
-    time.sleep(4)
-    if os.getenv("IS_SIMULATOR"):
-        start_gRPC_simulator()
-    else:
-        start_proxy_threads()
+    vproxy = proxy.Proxy()
+    vproxy.start()
 
 
 if __name__ == '__main__':
