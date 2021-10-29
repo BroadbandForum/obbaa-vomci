@@ -64,6 +64,8 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
         targetDict = payload['current_config_inst']
         if 'delta_config' in keys:
             deltaDict = payload['delta_config']
+            if deltaDict:
+                targetDict = deltaDict
     elif 'delta_config' in keys:
         targetDict = payload['delta_config']
     elif 'operation' in keys:
@@ -180,9 +182,17 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
                         # Mapper function for uni-interface
                         if 'type' in interfaceIter and 'ethernetCsmacd' in interfaceIter['type']:
                             uni_name = interfaceIter['name']
-                            # TBD: currently passing 0 to uni_id as 'parent-rel-pos' attribute is not part of interface
-                            # uni_id   = uni['parent-rel-pos'] - 1
+                            
+                            #search for parent-rel-pos. Assuming uni_id=0 if not found
                             uni_id = 0
+                            if 'bbf-interface-port-reference:port-layer-if' in interfaceIter:
+                                hw_component_name = interfaceIter['bbf-interface-port-reference:port-layer-if']
+                                for hwIter in targetDict['ietf-hardware:hardware']['component']:
+                                    if ('name' in hwIter) and (hw_component_name == hwIter['name']):
+                                        if 'parent-rel-pos' in hwIter:
+                                            logger.debug("found parent-rel-pos {} for uni_name:{}".format(hwIter['parent-rel-pos'], uni_name))
+                                            uni_id = hwIter['parent-rel-pos']-1
+                                                        
                             logger.info("uni_name:{}, uni_id:{}".format(uni_name, uni_id))
                             handlers['uni'].append(UniSetHandler)
                             handler_args['uni'].append((uni_name, uni_id))

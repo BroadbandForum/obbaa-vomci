@@ -95,7 +95,8 @@ class SetAction(OmciAction):
         if self._ak:
             # SET response - normal flow
             self._omci_result, self._opt_attrs_mask, self._attr_exec_mask = struct.unpack_from(
-                "!HHH", msg, self.content_offset)
+                "!BHH", msg, self.content_offset)
+            logger.debug('Decoded OMCI result: {} att_mask: {} att_exec_mask: {} at offset: {}'.format(self._omci_result, self._opt_attrs_mask, self._attr_exec_mask, self.content_offset))
             ret = True
         else:
             # SET request - mainly for debugging

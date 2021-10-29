@@ -44,6 +44,20 @@ class GrpcProxyServerChannel(GrpcServerChannel):
     def direction(self) -> ProxyChannelDirection:
         return self._direction
 
+    def get_olt_name(self):
+        """
+            Return name of managed olt. In the case of
+            the proxy's grpc server, there will only be
+            one managed olt per grpc server __channel__,
+            (but multiple olts per grpc __server__)
+            so return from the first value of the dict.
+        """
+        all_olts = list(self._olts.values())
+        if len(all_olts) == 0:
+            return None
+        (olt_name, endpoint_name) = all_olts[0].id
+        return olt_name
+
     def recv(self, vomci_msg : tr451_vomci_sbi_message_pb2):
         """ Message received via the channel.
             Hand it over to the proxy for forwarding

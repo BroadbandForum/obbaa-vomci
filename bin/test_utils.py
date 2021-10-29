@@ -235,6 +235,8 @@ class TestOmhDriver:
         for iter in range(self._args.iters):
             if self._args.iters > 1:
                 logger.info("Test {}: iteration {}".format(self._name, iter + 1))
+                if iter > 0:
+                    input("Press Enter to continue...")
             handler = TestOmhDriver.TestHandler(self._onu, self._handler_type, extra_args)
             if self._args.background:
                 logger.info("Test {}: starting execution in the background".format(self._name))

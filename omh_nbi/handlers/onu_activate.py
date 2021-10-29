@@ -80,6 +80,8 @@ class OnuActivateHandler(OmhHandler):
             if action.me.mib_data_sync == onu_data.mib_data_sync and onu_data.mib_data_sync != 0:
                 logger.info('ONU {} is already in sync'.format(self.onu.onu_id))
                 return OMHStatus.OK
+            logger.info('ONU {} is not in sync. local mib_sync={}  received mib_sync={}'.format(
+                self.onu.onu_id, onu_data.mib_data_sync, action.me.mib_data_sync))
 
         # Execute activation sequence
         if self.run_subsidiary(OnuMibResetHandler(self._onu)) != OMHStatus.OK:

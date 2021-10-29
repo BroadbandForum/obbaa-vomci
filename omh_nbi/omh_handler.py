@@ -24,7 +24,7 @@
 """
 from omci_types import Name, RawMessage, AutoGetter
 from omci_logger import OmciLogger
-from database.omci_me_types import omci_status
+from database.omci_me_types import omci_status, omci_me_class
 from encode_decode.omci_action import OmciAction
 from enum import Enum, auto
 import threading
@@ -337,6 +337,7 @@ class OmhHandler(Name, AutoGetter):
         Returns: rollback status
         """
         # Rollback in the order opposite to execution
+        self._onu.commit(omci_me_class['ONU_DATA'])
         self._onu.clear_candidate()
         self._rolling_back = True
         self._actions.reverse()

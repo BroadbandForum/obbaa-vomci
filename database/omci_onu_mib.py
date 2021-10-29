@@ -219,13 +219,21 @@ class OnuMib:
         """Clear ONU MIB"""
         with self._lock:
             self._per_class_dict = {}
+            self._by_name = {}
 
-    def merge(self, candidate: 'OnuMib'):
+    def _merge_me_class(self, cl):
+        for cand_me in cl.values():
+            old_me = self.get(cand_me.me_class, cand_me.inst, log_error=False)
+            if old_me is not None:
+                self.set(cand_me)
+            else:
+                self.add(cand_me)
+
+    def merge(self, candidate: 'OnuMib', me_class: int):
         """ Merge values from candidate into this MIB """
-        for cl in candidate._per_class_dict.values():
-            for cand_me in cl.values():
-                old_me = self.get(cand_me.me_class, cand_me.inst, log_error=False)
-                if old_me is not None:
-                    self.set(cand_me)
-                else:
-                    self.add(cand_me)
+        if me_class is None:
+            for cl in candidate._per_class_dict.values():
+                self._merge_me_class(cl)
+        else:
+            if me_class in candidate._per_class_dict:
+                self._merge_me_class(candidate._per_class_dict[me_class])

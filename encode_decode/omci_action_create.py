@@ -75,7 +75,8 @@ class CreateAction(OmciAction):
         """
         if self._ak:
             # CREATE response - normal flow
-            self._omci_result, self._attr_exec_mask = struct.unpack_from("!HH", msg, self.content_offset)
+            self._omci_result, self._attr_exec_mask = struct.unpack_from("!BH", msg, self.content_offset)
+            logger.debug('Decoded OMCI result: {} attr_exec_mask: {} at offset: {}'.format(self._omci_result, self._attr_exec_mask, self.content_offset))
             ret = True
         else:
             # CREATE request - mainly for debugging

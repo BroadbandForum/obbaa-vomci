@@ -81,23 +81,28 @@ class VlanSubInterfaceSetHandler(OmhHandler):
                                           'interface {} already exists'.format(self._iface_name))
 
         # Find or create QoS Policy profile
+        qos_profile_exists = False
         if self._qos_profile is None:
             qos_profile_name = lower_me.user_attr('qos_profile_name')
             if qos_profile_name is None:
                 return self.logerr_and_return(OMHStatus.ERROR_IN_PARAMETERS,
                     "ingress-qos-policy-profile must be set on the sub-interface or it's lower UNI")
+        else:
+            qos_profile_name = self._qos_profile.name
 
-            qos_profile_me = self._onu.get_by_name(qos_profile_name)
-            if qos_profile_me is None:
+        qos_profile_me = self._onu.get_by_name(qos_profile_name)
+        if qos_profile_me is None:
+            # Qos profile is not found. If it was set on the lower interface, it must already exist at this point
+            if self._qos_profile is None:
                 return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
                     "qos-policy-profile {} is not found".format(qos_profile_name))
-
-        else:
             # Create 802.1p mapper first, finish creating QoS service profile a bit later
             status = create_8021p_svc_mapper(self, self._qos_profile.name)
             if status != OMHStatus.OK:
                 return status
             qos_profile_me = self.last_action.me
+        else:
+            qos_profile_exists = True
 
         # Create Bridge port config data ME
         status = create_mac_bridge_port(self, qos_profile_me)
@@ -116,8 +121,8 @@ class VlanSubInterfaceSetHandler(OmhHandler):
         vlan_tag_me = self.last_action.me
         vlan_tag_me.set_user_attr('lower', self._lower_name)
 
-        # Now finish creating QoS policy profile
-        if self._qos_profile is not None:
+        # Now finish creating QoS policy profile if doesn't exist
+        if self._qos_profile is not None and not qos_profile_exists:
             status = self.run_subsidiary(QosPolicyProfileSetHandler(self._onu, self._qos_profile, self._iface_name))
             if status != OMHStatus.OK:
                 return status
@@ -128,7 +133,8 @@ class VlanSubInterfaceSetHandler(OmhHandler):
             ext_vlan_tag_inst = lower_me.user_attr('ext_vlan_tag_op')
             if ext_vlan_tag_inst is None:
                 return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
-                                              "Can't find ext_vlan_tag_op user attribute for interface {}".format(lower_name))
+                                              "Can't find ext_vlan_tag_op user attribute for interface {}".format(
+                                                  self._lower_name))
             ext_val_tag_me = self._onu.get(omci_me_class['EXT_VLAN_TAG_OPER_CONFIG_DATA'], ext_vlan_tag_inst, clone=True)
             if ext_val_tag_me is None:
                 return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,

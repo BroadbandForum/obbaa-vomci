@@ -38,6 +38,7 @@ from omh_nbi.handlers.vlan_subinterface_set import VlanSubInterfaceSetHandler
 from omh_nbi.handlers.omh_types import PacketClassifier, PacketAction, \
     VlanAction, VlanTag, PBIT_VALUE_ANY, VID_VALUE_ANY
 from omh_nbi.handlers.ip_host_config_set import IpHostConfigSetHandler
+from omh_nbi.handlers.qos_policy_profile_set import QosPolicyProfile, QosPolicyProfileSetHandler
 logger = OmciLogger.getLogger(__name__)
 
 DEFAULT_SUBIF_NAME = 'vlan-subif.1'
@@ -60,6 +61,7 @@ DEFAULT_NUM_TCS = 2
 DEFAULT_DIRECTION = 'BIDIRECTIONAL'
 DEFAULT_ENCRYPTION = 'NO_ENCRYPTION'
 DEFAULT_ENABLE_DHCP = False
+DEFAULT_PRECREATE_QOS_POLICY_PROFILE = False
 
 def main(argv=None) -> int:
     test = TestOmhDriver(name='VLAN-SUB-INTERFACE', any_handler=False)
@@ -101,13 +103,15 @@ def main(argv=None) -> int:
         help='GEM port encryption: %r' % DEFAULT_ENCRYPTION)
     test.parser.add_argument('--enable-dhcp', type=bool, default=DEFAULT_ENABLE_DHCP,
         help='Set IP_HOST_CONFIG(DHCP=ON): %r' % DEFAULT_ENABLE_DHCP)
+    test.parser.add_argument('--pre-create-qos-policy-profile', type=bool, default=DEFAULT_PRECREATE_QOS_POLICY_PROFILE,
+        help='Pre-create QoS Policy Profile: %r' % DEFAULT_PRECREATE_QOS_POLICY_PROFILE)
     test.parse_arguments()
     if test.args.num_tcs * test.args.num_pbits_per_tc > 8:
         print("num-tcs * num-pbits-per-tc must be <= 8")
         return -1
 
     handler_types = [OnuActivateHandler, UniSetHandler]
-    handler_extra_args = [(True,), (test.args.uni_name, test.args.uni_id)]
+    handler_extra_args = [(False,), (test.args.uni_name, test.args.uni_id)]
 
     # Validate ingress and egress VLAN configuration
     valid_actions = ('PUSH', 'POP', 'TRANSLATE')
@@ -134,6 +138,10 @@ def main(argv=None) -> int:
         for p in range(test.args.num_pbits_per_tc):
             qos_profile.tc_set(pbit+p, tc)
         pbit += test.args.num_pbits_per_tc
+
+    if test.args.pre_create_qos_policy_profile:
+        handler_types.append(QosPolicyProfileSetHandler)
+        handler_extra_args.append((qos_profile, test.args.uni_name))
 
     # Create PacketClassifier and PacketAction
     ingress_o_tag = (test.args.ingress_o_vid != VID_VALUE_ANY) and \

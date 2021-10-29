@@ -64,7 +64,7 @@ class UniSetHandler(OmhHandler):
             return OMHStatus.OK
         uni = copy.deepcopy(uni)
         uni.admin_state = 'UNLOCK'
-        return self.transaction(SetAction(uni, ('admin_state',)))
+        return self.transaction(SetAction(self, uni, ('admin_state',)))
 
     def run_to_completion(self) -> OMHStatus:
         logger.info(self.info())

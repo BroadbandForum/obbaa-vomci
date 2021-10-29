@@ -210,9 +210,9 @@ class OnuDriver():
         self._main_mib.clear()
         self.clear_candidate()
 
-    def commit(self):
+    def commit(self, me_class : int = None ):
         """ Commit candidate MIB into the main MIB """
-        self._main_mib.merge(self._candidate_mib)
+        self._main_mib.merge(self._candidate_mib, me_class)
         self.clear_candidate()
 
     def add(self, me: ME) -> bool:

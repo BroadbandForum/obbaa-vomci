@@ -54,17 +54,11 @@ class GrpcClientChannel(OltCommChannel):
         self._remote_endpoint_name = None
         self._olts = dict()
 
-    def recv(self, vomci_msg : tr451_vomci_sbi_message_pb2):
-        packet = vomci_msg.omci_packet_msg
-        onu_header = packet.header
-        olt_id = onu_header.olt_name
-        olt = self._olts.get(olt_id)
-        onu_id = (onu_header.chnl_term_name, onu_header.onu_id)
-        logger.info("GrpcClient: Received message {} from OLT {}".format(packet.payload, olt.id))
-        olt.recv(onu_id, packet.payload)
-
-    def get_olt_with_id(self, olt_id):
+    def get_olt_with_id(self, olt_id) -> bool:
         return self._olts.get(olt_id)
+
+    def olt_connection_exists(self, olt_id):
+        return self._olts.get(olt_id) is not None
 
     @property
     def remote_endpoint_name(self):
@@ -73,24 +67,6 @@ class GrpcClientChannel(OltCommChannel):
     @property
     def local_endpoint_name(self):
         return self._name
-
-    def _thread_function(self):
-        logger.info("ListenForVomciRx thread {} started".format(self._name))
-        try:
-            for vomci_msg in self._omci_rx_stream:
-                self.recv(vomci_msg)
-        except:
-            exc_info = sys.exc_info()
-            if len(exc_info) > 1 and str(exc_info[1]).find('StatusCode.CANCELLED') >= 0:
-                logger.info("{}: gRPC disconnect by user request.".format(self._name))
-            else:
-                logger.warning("{}: gRPC disconnect. {}".format(self._name, exc_info[0]))
-            self._hello_stub = None
-            self._message_stub = None
-            self._channel = None
-            self._omci_rx_stream = None
-        logger.info("ListenForVomciRx thread {} terminated".format(self._name))
-        self.disconnected()
 
     def connect(self, host: str, port: int, auth: Optional['Dict'] = None, retry=False) -> bool :
         """ Connect with peer entity (client mode)).
@@ -152,8 +128,18 @@ class GrpcClientChannel(OltCommChannel):
             self._thread = None
         self.disconnected()
 
-    def olt_connection_exists(self, olt_id):
-        return self._olts.get(olt_id) is not None
+    def recv(self, vomci_msg : tr451_vomci_sbi_message_pb2):
+        packet = vomci_msg.omci_packet_msg
+        onu_header = packet.header
+        olt_id = onu_header.olt_name
+        olt = self.get_olt_with_id(olt_id)
+        if olt is None:
+            logger.error("Failed while receiving message from {} for olt {}. OLT connection not found".format(
+                self.remote_endpoint_name, olt_id))
+            return
+        onu_id = (onu_header.chnl_term_name, onu_header.onu_id)
+        logger.info("GrpcClient: Received message {} from OLT {}".format(packet.payload, olt.id))
+        olt.recv(onu_id, packet.payload)
 
     def send(self, olt_id, onu_id: OnuSbiId, msg: RawMessage) -> bool:
         """ Send message to ONU
@@ -167,7 +153,7 @@ class GrpcClientChannel(OltCommChannel):
         if not self.olt_connection_exists(olt_id):
             logger.warning("GrpcClient: wrong channel for {}".format(olt_id))
             return False
-        olt = self._olts.get(olt_id)
+        olt = self.get_olt_with_id(olt_id)
         onu = olt.OnuGet(onu_id=onu_id, log_error=False)
         if onu is None:
             logger.warning("GrpcClient: connection for ONU {} not found".format(onu_id))
@@ -226,3 +212,20 @@ class GrpcClientChannel(OltCommChannel):
         logger.info("Managed ONU {}:{} was added to pOLT {}".format(onu_name, onu_id, olt.id))
         return olt
 
+    def _thread_function(self):
+        logger.info("ListenForVomciRx thread {} started".format(self._name))
+        try:
+            for vomci_msg in self._omci_rx_stream:
+                self.recv(vomci_msg)
+        except:
+            exc_info = sys.exc_info()
+            if len(exc_info) > 1 and str(exc_info[1]).find('StatusCode.CANCELLED') >= 0:
+                logger.info("{}: gRPC disconnect by user request.".format(self._name))
+            else:
+                logger.warning("{}: gRPC disconnect. {}".format(self._name, exc_info[0]))
+            self._hello_stub = None
+            self._message_stub = None
+            self._channel = None
+            self._omci_rx_stream = None
+        logger.info("ListenForVomciRx thread {} terminated".format(self._name))
+        self.disconnected()

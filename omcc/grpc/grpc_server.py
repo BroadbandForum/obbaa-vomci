@@ -46,8 +46,15 @@ class GrpcServerChannel(OltCommChannel):
         self.disconnecting = False
         self.omci_msg_queue = queue.Queue()  # packets to be sent to OLT rx_stream single per OLT
         self._remote_endpoint_name = None
+        self._olts = dict()
         if remote_endpoint is not None:
             self._remote_endpoint_name = remote_endpoint
+
+    def get_olt_with_id(self, olt_id) -> bool:
+        return self._olts.get(olt_id)
+
+    def olt_connection_exists(self, olt_id):
+        return self._olts.get(olt_id) is not None
 
     @property
     def remote_endpoint_name(self):
@@ -73,21 +80,22 @@ class GrpcServerChannel(OltCommChannel):
                 time.sleep(1)
         self.disconnected()
 
-    def get_olt_name(self):
-        if self._olt is None:
-            return False
-        (olt_name, endpoint_name) = self._olt.id
-        return olt_name
-
-    def olt_connection_exists(self, olt_id):
-        if self._olt is None:
-            return False
-        return self._olt.id == (olt_id, self.remote_endpoint_name)
-
-    def get_olt_with_id(self, olt_id):
-        if self.olt_connection_exists(olt_id):
-            return self._olt
-        return None
+    def recv(self, vomci_msg : tr451_vomci_sbi_message_pb2):
+        packet = vomci_msg.omci_packet_msg
+        if packet is None:
+            logger.error("Message from {} is not a packet".format(
+                self._context and self._context.peer() or '?'))
+            return
+        onu_header = packet.header
+        olt_id = onu_header.olt_name
+        olt = self.get_olt_with_id(olt_id)
+        if olt is None:
+            logger.error("Failed while receiving message from {} for olt {}. OLT connection not found".format(self.remote_endpoint_name, olt_id))
+            return
+        onu_id = (onu_header.chnl_term_name, onu_header.onu_id)
+        logger.debug("Sending message from {} to ONU {}.{}.{}".format(self.remote_endpoint_name, olt, onu_id[0], onu_id[1]))
+        payload = packet.payload
+        olt.recv(onu_id, payload)
 
     def send(self, olt_id, onu_id, msg: RawMessage) -> bool:
         """ Send message to ONU
@@ -99,7 +107,8 @@ class GrpcServerChannel(OltCommChannel):
         if not self.olt_connection_exists(olt_id):
             logger.error("Cannot send message for olt {} in channel with {}".format(olt_id, self.remote_endpoint_name))
             return False
-        onu = self._olt.OnuGet(onu_id=onu_id, log_error=False)
+        olt = self.get_olt_with_id(olt_id)
+        onu = olt.OnuGet(onu_id=onu_id, log_error=False)
         onu_id = onu.onu_id
         header = tr451_vomci_sbi_message_pb2.OnuHeader(olt_name=olt_id, chnl_term_name=onu_id[0], onu_id=onu_id[1])
         omci_packet = tr451_vomci_sbi_message_pb2.OmciPacket(header=header, payload=msg)
@@ -117,11 +126,24 @@ class GrpcServerChannel(OltCommChannel):
         Returns:
             Olt object
         """
-        polt_id = (olt_id, self.remote_endpoint_name)
-        logger.info("vOMCI {} is connected to pOLT {}".format(self.local_endpoint_name, polt_id))
-        if self._olt is None:
-            self._olt = OltDatabase().OltAddUpdate(polt_id, self)
-        return self._olt
+        if not self.olt_connection_exists(olt_id):
+            polt_id = (olt_id, self.remote_endpoint_name)
+            logger.info("vOMCI {} is connected to pOLT {}".format(self.local_endpoint_name, polt_id))
+            self._olts[olt_id] = OltDatabase().OltAddUpdate(polt_id, self)
+        return self._olts[olt_id]
+
+    def disconnected(self):
+        """ Disconnected indication
+        """
+        if self._olts is None:
+            return
+        keys_list = list(self._olts.keys())
+        for olt_id in keys_list:
+            polt_id = (olt_id, self.remote_endpoint_name)
+            logger.info("vOMCI {} disconnected from pOLT {}".format(self.local_endpoint_name, polt_id))
+            self._olts[olt_id].set_channel(None)
+            OltDatabase().OltDelete(polt_id)
+            del self._olts[olt_id]
 
     def add_managed_onu(self, olt_id, onu_name: OnuName, onu_id: OnuSbiId, tci: int = 0):
         """ Add managed onu to self OLT Database
@@ -130,26 +152,10 @@ class GrpcServerChannel(OltCommChannel):
             onu_id: ONU id
             onu_name: ONU name
         """
-        if self._olt is None:
-            self.connected(olt_id)
-        if not self.olt_connection_exists(olt_id):
-            return None
-        self._olt.OnuAddUpdate(onu_name, onu_id, tci)
-        logger.info("Managed ONU {}:{} was added to pOLT {} ".format(onu_name, onu_id, self._olt.id))
-        return self._olt
-
-    def recv(self, vomci_msg : tr451_vomci_sbi_message_pb2):
-        packet = vomci_msg.omci_packet_msg
-        if packet is None:
-            logger.error("Message from {} is not a packet".format(
-                self._context and self._context.peer() or '?'))
-            return
-        onu_header = packet.header
-        onu_id = (onu_header.chnl_term_name, onu_header.onu_id)
-        logger.debug("Sending message from {} to ONU {}.{}.{}".format(self.remote_endpoint_name, self._olt, onu_id[0], onu_id[1]))
-        payload = packet.payload
-        if self._olt is not None:
-            self._olt.recv(onu_id, payload)
+        olt = self.connected(olt_id)
+        olt.OnuAddUpdate(onu_name, onu_id, tci)
+        logger.info("Managed ONU {}:{} was added to pOLT {}".format(onu_name, onu_id, olt.id))
+        return olt
 
 
 class GrpcServer:
