@@ -69,6 +69,7 @@ class UniSetHandler(OmhHandler):
     def run_to_completion(self) -> OMHStatus:
         logger.info(self.info())
 
+
         # Do nothing if UNI is already in the local MIB
         if self._onu.get_by_name(self._uni_name) is not None:
             logger.info('{} - Already configured'.format(self.info()))

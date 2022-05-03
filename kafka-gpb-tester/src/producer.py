@@ -45,20 +45,20 @@ proxy_error = Error()
 
 #the field names are the same as the .proto file
 vomci_msg.header.msg_id="1"
-vomci_msg.header.sender_name="vomci1"
+vomci_msg.header.sender_name="vomci-vendor-1"
 vomci_msg.header.recipient_name="vOLTMF"
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_FUNCTION
 vomci_msg.header.object_name="vomci1"
 
-vomci_msg.body.response.rpc_resp.status_resp.status_code=0
+vomci_msg.body.response.update_config_resp.status_resp.status_code=0
 
 proxy_msg.header.msg_id="2"
-proxy_msg.header.sender_name="vomci-proxy"
+proxy_msg.header.sender_name="proxy-1"
 proxy_msg.header.recipient_name="vOLTMF"
 proxy_msg.header.object_type=proxy_msg.header.VOMCI_PROXY
 proxy_msg.header.object_name="vomci-proxy"
 
-proxy_msg.body.response.rpc_resp.status_resp.status_code=0
+proxy_msg.body.response.update_config_resp.status_resp.status_code=0
 
 producer.produce(VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()

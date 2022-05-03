@@ -1,0 +1,4 @@
+kafka-python==2.0.1
+grpcio
+grpcio-tools
+# kafka==2.0.1

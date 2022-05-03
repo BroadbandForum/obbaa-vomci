@@ -45,10 +45,14 @@ services:
         KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
         # List of Consumer topics, seperated by spaces
         KAFKA_REQUEST_TOPICS: "VOMCI_REQUEST"
-        KAFKA_RESPONSE_TOPICS: 'VOMCI_RESPONSE'
+        KAFKA_RESPONSE_TOPICS: "VOMCI_RESPONSE"
         KAFKA_NOTIFICATION_TOPICS: "VOMCI_NOTIFICATION"
+        VOMCI_KAFKA_SENDER_NAME: "bbf-vomci"
+        VOMCI_KAFKA_VOLTMF_NAME: "vOLTMF"
       networks:
         - baadist_default
+      volumes:
+        - /baa/stores/vomci-vproxy-db:/db
       depends_on:
         - zookeeper
         - kafka

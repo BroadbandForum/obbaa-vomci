@@ -23,6 +23,7 @@
 from typing import Tuple
 from omci_types import *
 from database.omci_me import ME
+from database.omci_me_types import MeClassMapper
 from database.omci_me_types import omci_me_class
 from omci_logger import OmciLogger
 from collections import OrderedDict
@@ -205,6 +206,7 @@ class OnuMib:
         """
         if me_class not in self._per_class_dict:
             return tuple()
+
         return tuple(self._per_class_dict[me_class].values())
 
     def get_all_me_classes(self) -> Tuple[int,...]:

@@ -23,9 +23,11 @@ import json
 OmciLogger(level=logging.DEBUG)
 logger = OmciLogger.getLogger(__name__)
 
+DB_LOCATION = '/db/database.db'
+
 def start_vomci_threads():
     logger.debug('Starting vomci')
-    v_omci = vomci.VOmci()
+    v_omci = vomci.VOmci(DB_LOCATION)
     v_omci.start()
     while True:
         time.sleep(20)

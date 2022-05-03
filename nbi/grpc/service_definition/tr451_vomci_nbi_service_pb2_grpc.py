@@ -167,7 +167,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -176,7 +175,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def GetData(request,
@@ -184,7 +183,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -193,7 +191,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def ReplaceConfig(request,
@@ -201,7 +199,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -210,7 +207,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def UpdateConfigReplica(request,
@@ -218,7 +215,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -227,7 +223,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def UpdateConfigInstance(request,
@@ -235,7 +231,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -244,7 +239,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def RPC(request,
@@ -252,7 +247,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -261,7 +255,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def Action(request,
@@ -269,7 +263,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -278,7 +271,7 @@ class VomciMessageNbi(object):
             tr451__vomci__nbi__message__pb2.Msg.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def ListenForNotification(request,
@@ -286,7 +279,6 @@ class VomciMessageNbi(object):
             options=(),
             channel_credentials=None,
             call_credentials=None,
-            insecure=False,
             compression=None,
             wait_for_ready=None,
             timeout=None,
@@ -295,4 +287,4 @@ class VomciMessageNbi(object):
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             tr451__vomci__nbi__message__pb2.Msg.FromString,
             options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -94,3 +94,13 @@ class GetAction(OmciAction):
             self._attr_mask = struct.unpack_from("!H", msg, self.content_offset)[0]
             ret = True
         return ret
+
+    def commit(self, onu: 'OnuDriver'):
+        """ Commit action results top ONU MIB.
+
+        Args:
+            onu : OnuDriver containing the current ONU MIB
+        Raises: an exception in case of commit failure
+        """
+        if not onu.set(self._me):
+            raise Exception('{} - failed to commit to the local MIB'.format(self.name))

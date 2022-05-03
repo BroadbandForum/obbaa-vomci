@@ -25,6 +25,7 @@
 """
 
 import logging
+import resource
 from typing import Dict, Optional, Tuple, Union
 from omci_types import *
 from omci_logger import OmciLogger
@@ -156,6 +157,7 @@ class ME(NumberName, MEAttrGetter, MEAttrSetter):
             assert self.attrs[i].number == i
         self._user_data = None
         self.user_name = None
+        self.hd_name = None
 
     @property
     def inst(self) -> int:
@@ -350,3 +352,21 @@ class ME(NumberName, MEAttrGetter, MEAttrSetter):
 
     def __str__(self) -> str:
         return self.to_string(True, 0xffff)
+
+class Alarm(NumberName):
+    def __init__(self, number: int, name: str, resource: str,  description: Optional[str] = None, *, names: Optional[Set[str]] = None):
+        super().__init__(number, name,description, names=names)
+        self.state = False
+        self.resource = resource
+
+    def resource(self):
+        return self.resource
+
+    def get_state(self):
+        return self.state
+
+    def set_state(self,state: bool):
+        self.state = state
+
+    def __repr__(self) -> str:
+        return super().__repr__()+"\x08, state=%r)" % self.state

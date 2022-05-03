@@ -1,4 +1,5 @@
-FROM ubuntu:20.04
+ARG FROM=broadbandforum/sphinx:latest
+FROM $FROM
 
 ARG http_proxy
 ARG https_proxy
@@ -6,12 +7,15 @@ ARG https_proxy
 ENV http_proxy $http_proxy
 ENV https_proxy $https_proxy
 
+#this should be the file from the root, but we canno refer
+#to files outside the build path
+COPY requirements.txt /kafka-gpb-tester/requirements.txt
+
 RUN apt-get update && \
     apt-get install -y python3 && \
-    apt-get install -y python3-pip && \
-    pip install -U protobuf==3.8.0 && \
-    pip install confluent-kafka   
-
+    apt-get install -y python3-pip && \   
+    pip install confluent-kafka && \    
+    pip3 install -r /kafka-gpb-tester/requirements.txt
 
 CMD /bin/bash
 

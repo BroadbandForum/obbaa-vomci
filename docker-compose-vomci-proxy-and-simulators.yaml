@@ -1,0 +1,171 @@
+version: '3.5'
+networks:
+    baadist_default:
+        driver: bridge
+        name: baadist_default
+
+services:
+    zookeeper:
+      image: confluentinc/cp-zookeeper:5.5.0
+      hostname: zookeeper
+      container_name: zookeeper
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+      networks:
+        - baadist_default
+
+    kafka:
+      image: confluentinc/cp-kafka:5.5.0
+      hostname: kafka
+      container_name: kafka
+      depends_on:
+        - zookeeper
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      networks:
+        - baadist_default
+
+    vomci:      
+      image: obbaa-develop.registry.broadband-forum.org/obbaa-vomci
+      #image: broadbandforum/obbaa-vomci:develop
+      #image: obbaa-vomci
+      hostname: obbaa-vomci
+      container_name: obbaa-vomci
+      
+      ### uncomment to run container without starting simulator
+      #entrypoint: tail
+      #command: ["-f","/dev/null"]
+      
+      ports:
+        - 8801:8801
+        - 58433:58433
+      environment:
+        GRPC_SERVER_NAME: vOMCi-grpc-1
+        LOCAL_GRPC_SERVER_PORT: 58433
+        # Kafka bootstrap server, please provide only one address
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
+        # List of Consumer topics, separated by spaces
+        KAFKA_REQUEST_TOPICS: "vomci1-request"
+        KAFKA_RESPONSE_TOPICS: 'vomci1-response'
+        KAFKA_NOTIFICATION_TOPICS: "vomci1-notification"
+        VOMCI_KAFKA_SENDER_NAME: "vomci1"
+        VOMCI_KAFKA_VOLTMF_NAME: "vOLTMF"
+      networks:
+        - baadist_default
+      depends_on:
+        - zookeeper
+        - kafka
+      #volumes:
+        ### Uncomment for persistency
+        #- /baa/stores/vomci-db:/db
+        ### Overrides the code (useful for development)  
+        #- .:/obbaa-vomci
+        
+        
+    vproxy:
+      image: obbaa-develop.registry.broadband-forum.org/obbaa-vproxy
+      #image: broadbandforum/obbaa-vproxy:develop
+      #image: obbaa-vproxy
+      hostname: obbaa-vproxy
+      container_name: obbaa-vproxy
+      
+      ### uncomment to run container without starting simulator
+      #entrypoint: tail
+      #command: ["-f","/dev/null"]
+      
+      ports:
+        - 8433:8433
+      environment:
+        GRPC_CLIENT_NAME: proxy-grpc-1
+        GRPC_SERVER_NAME: proxy-grpc-2
+        LOCAL_GRPC_SERVER_PORT: 8433
+        REMOTE_GRPC_SERVER_PORT: 58433
+        REMOTE_GRPC_SERVER_ADDR: obbaa-vomci
+        # Kafka bootstrap server, please provide only one address
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+        # List of Consumer topics, seperated by spaces
+        KAFKA_REQUEST_TOPICS: "vomci-proxy-request"
+        KAFKA_RESPONSE_TOPICS: 'vomci-proxy-response'
+        KAFKA_NOTIFICATION_TOPICS: "vomci-proxy-notification"
+      networks:
+        - baadist_default
+      depends_on:
+        - vomci
+      #volumes:
+        ### Uncomment for persistency
+        #- /baa/stores/vproxy-db:/db
+        ### Overrides the code (useful for development)  
+        #- .:/obbaa-vproxy
+             
+   
+    polt-simulator:
+      image: obbaa-simulators.registry.broadband-forum.org/obbaa-polt-simulator:netopeer2.x_2.1_develop
+      #image: broadbandforum/obbaa-polt-simulator:latest
+      #image: obbaa-polt-simulator
+      stdin_open: true
+      tty: true
+      container_name: polt-simulator
+           
+      command: ["-dummy_tr385"]
+      
+      ### uncomment to run container without starting simulator
+      #entrypoint: tail
+      #command: ["-f","/dev/null"]
+      
+      hostname: polt-simulator
+      
+      environment:
+        - PASSWD=root
+      ports:
+        - "10830:10830"
+      
+      networks:
+        - baadist_default
+
+    onu-simulator:
+      image: broadbandforum/obbaa-onu-simulator:latest
+      #image: obbaa-onu-simulator
+      container_name: onu-simulator
+      stdin_open: true
+      tty: true
+      
+      entrypoint: python3
+      command: ["/usr/local/bin/onusim.py", "-p", "50000","-n","CT_1","-i", "1", "-l", "2" ]
+      
+      ### uncomment to run container without starting simulator
+      #entrypoint: tail
+      #command: ["-f","/dev/null"]
+      
+      hostname: onu-simulator
+      
+      environment:
+        - PASSWD=root
+      ports:
+        - "50000:50000"
+   
+      networks:
+        - baadist_default
+   
+    kafka-gpb-tester:
+      image: obbaa-simulators.registry.broadband-forum.org/kafka-gpb-tester:R5.0
+      #image: kafka-gpb-tester
+      
+      container_name: kafka-gpb-tester
+      
+      ### don't run a command by default
+      ### enter the container with 'docker exec -it kafka-gpb-tester bash' to execute the scripts in /kafka-gpb-teste
+      entrypoint: tail
+      command: ["-f","/dev/null"]
+
+      volumes:
+         - ./kafka-gpb-tester:/kafka-gpb-tester
+      
+      networks:
+        - baadist_default
+   

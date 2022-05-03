@@ -160,7 +160,7 @@ class GrpcServerChannel(OltCommChannel):
 
 class GrpcServer:
     """ gRPC server. Listens for new connections """
-    def __init__(self, port, name=None, connection_type=GrpcServerChannel, parent=None):
+    def __init__(self, adress, port = 8443, name=None, connection_type=GrpcServerChannel, parent=None):
         """ Class constructor.
 
         Args:
@@ -169,11 +169,14 @@ class GrpcServer:
             connection_type : class used to create new connections
         """
         self._name = name and name or grpc_vomci_name
+        if adress == '::':
+            adress = '[::]'
+        self._adress = adress
         self._port = port
         self._hello_servicer = OmciChannelHelloServicer(self)
         self._message_servicer = OmciChannelMessageServicer(self)
         self._server = None  # server that host the two servicers
-        self._thread = None  # Tread that runs the server
+        self._thread = None  # Thread that runs the server
         self._connections = {}  # this is a dict that includes all the GrpcChannels
         self._connection_type = connection_type
         self._parent = None
@@ -196,17 +199,17 @@ class GrpcServer:
         self._server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         tr451_vomci_sbi_service_pb2_grpc.add_VomciHelloSbiServicer_to_server(self._hello_servicer, self._server)
         tr451_vomci_sbi_service_pb2_grpc.add_VomciMessageSbiServicer_to_server(self._message_servicer, self._server)
-        self._server.add_insecure_port('0.0.0.0:' + str(self._port))
+        self._server.add_insecure_port(self._adress + ":" + str(self._port))
 
         self._server.start()
-        logger.debug("gRPC server is waiting for connections")
+        logger.debug("gRPC server is waiting for connections..")
         self._server.wait_for_termination()
         self._server = None
         self._thread = None
 
     def _start(self):
         if self._thread is None:
-            logger.info("Starting gRPC server")
+            logger.info("Starting gRPC server at {}:{}".format(self._adress, self._port))
             self._thread = threading.Thread(name=self._name, target=self._server_routine)
             self._thread.start()
         else:

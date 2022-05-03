@@ -68,5 +68,5 @@ class GrpcProxyServerChannel(GrpcServerChannel):
 
 class GrpcProxyServer(GrpcServer):
     """ Proxy gRPC server """
-    def __init__(self, parent, name, port):
-        super().__init__(name=name, port=port, connection_type=GrpcProxyServerChannel, parent=parent)
+    def __init__(self, name, remote_adress, remote_port, parent):
+        super().__init__(remote_adress, remote_port, name, connection_type=GrpcProxyServerChannel, parent=parent)

@@ -31,6 +31,9 @@ from encode_decode.omci_action import OmciAction
 from omci_logger import OmciLogger
 import threading
 
+from omh_nbi.omh_handler import OmhHandler
+from omh_nbi.handlers.alarm_handler import AlarmHandler
+
 logger = OmciLogger.getLogger(__name__)
 
 DEFAULT_MAX_RETRIES = 3         # Default number of message retransmissions in case of timeout
@@ -41,7 +44,7 @@ class OnuDriver():
         This object is created by Olt.OnuAdd() factory.
     """
 
-    _message_handler_by_mt = {}
+    _message_handler_by_mt = {16: AlarmHandler}
 
     def __init__(self, onu_name: OnuName, onu_id: OnuSbiId, olt: 'Olt', tci = 0):
         """
@@ -181,7 +184,9 @@ class OnuDriver():
                 logger.error("recv: Don't know how to handle MT {} from ONU {}. Message discarded.".format(
                     action, self._onu_id))
                 return
-            OnuDriver._message_handler_by_mt[action].recv(self, msg)
+            OnuDriver._message_handler_by_mt[action].recv(msg,self)
+
+    
 
     #
     # MIB management
@@ -217,13 +222,25 @@ class OnuDriver():
 
     def add(self, me: ME) -> bool:
         """Add ME to the database
-
+        
         Args:
             me: ME object
         Returns:
             True if successful, False if [me_class, me_inst] already exists in the MIB
         """
+
         return self._candidate_mib.add(me)
+    
+    def delete(self, me_class: int,inst: int) -> bool:
+        """Delete ME from database
+
+        Args:
+            me: ME object
+        Returns:
+            True if successful, False if [me_class, me_inst] not exist in the MIB
+        """
+        return self._main_mib.delete(me_class,inst)
+
 
     def set(self, me: ME) -> bool:
         """Update an existing ME in the candidate database.
@@ -313,8 +330,10 @@ class OnuDriver():
         Returns:
             tuple of all MEs of the specified me_class
         """
+       
         cand_list = self._candidate_mib.get_all_instances(me_class)
         main_list = self._main_mib.get_all_instances(me_class)
+
         return tuple(sorted(dict.fromkeys(cand_list + main_list), key=OnuDriver._me_inst))
 
     def get_all_me_classes(self) -> Tuple[int,...]:

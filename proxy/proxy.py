@@ -23,17 +23,14 @@ import nbi.grpc.service_definition.tr451_vomci_nbi_service_pb2 as tr451_vomci_nb
 from omci_types import RawMessage, OnuSbiId
 from database.onu_management_chain import ManagementChain
 from database.omci_olt import OltDatabase
+from vnf import VNF
 import os, threading, time
 
 DEFAULT_BOOTSTRAP_SERVERS = kafka_interface.DEFAULT_BOOTSTRAP_SERVERS
 logger = OmciLogger.getLogger(__name__)
-VOMCI_GRPC_SERVER = True
-LOCAL_GRPC_SERVER_PORT = os.getenv("LOCAL_GRPC_SERVER_PORT", default=8433)
-REMOTE_GRPC_SERVER_PORT = os.getenv("REMOTE_GRPC_SERVER_PORT", default=58433)
-REMOTE_GRPC_SERVER_ADDR = os.getenv("REMOTE_GRPC_SERVER_ADDR", default='obbaa-vomci_vomci_1')
-DEFAULT_GRPC_NAME = "obbaa-vproxy"
-vproxy_default_name = os.getenv("GRPC_SERVER_NAME", default=DEFAULT_GRPC_NAME)
-grpc_vproxy_client_name = os.getenv("GRPC_CLIENT_NAME", default=DEFAULT_GRPC_NAME)
+
+VPROXY_NAME = os.getenv('VOMCI_KAFKA_SENDER_NAME', 'obbaa-vproxy')
+grpc_vproxy_client_name = os.getenv("GRPC_CLIENT_NAME", default=VPROXY_NAME)
 
 class ProxyChannelDirection(Enum):
     Upstream = auto()
@@ -44,26 +41,17 @@ import proxy.proxy_channel_grpc_client as proxy_grpc_channel
 from proxy.proxy_channel_grpc_server import GrpcProxyServer
 
 
-
-class Proxy:
-    def __init__(self, name=None):
-        self._name = name and name or vproxy_default_name
+class Proxy(VNF):
+    def __init__(self, db_location, name=None):
+        if name is None:
+            name = VPROXY_NAME
+        super().__init__(db_location, name)
         self._client_endpoint_name = grpc_vproxy_client_name
         self._server_endpoint_name = self._name
-        self._key_map = {}
-        self._server = None
-        self._upstream_conn = dict()  # contains all upstream client connections
-        self._downstream_conn = dict()  # contains all downstream client connections
-        self._kafka_thread = None
-        self._kafka_if = None
 
     def start(self):
         logger.info("Starting vomci proxy")
-        self._kafka_if = kafka_interface.KafkaProtoInterface(self)
-        self._kafka_thread = threading.Thread(name='kafka_vomci_thread', target=self._kafka_if.start)
-        self._kafka_thread.start()
-        self._start_grpc_server()
-        self._create_vomci_connection()
+        super().start()
 
     def trigger_create_onu(self, onu_name):
         """
@@ -155,15 +143,15 @@ class Proxy:
         logger.info("{}: connected to {}:{}".format(self._client_endpoint_name, host, port))
         return client
 
-    def _start_grpc_server(self):
-        self._server = GrpcProxyServer(name=self._server_endpoint_name, parent=self, port=LOCAL_GRPC_SERVER_PORT)
+    def trigger_start_grpc_server(self, name, remote_adress, remote_port = 8443):
+        if self._server is not None:
+            self._server.stop()
+        self._server = GrpcProxyServer(name, remote_adress, remote_port, parent=self)
 
-    def _create_vomci_connection(self) -> None:
+    def trigger_create_grpc_connection(self, host, port):
         """
         Initiate a client grpc connection towards the vomci.
         """
-        host = REMOTE_GRPC_SERVER_ADDR
-        port = REMOTE_GRPC_SERVER_PORT
         logger.info("proxy client {}: Initiating connection with vomci at {}:{}".format(grpc_vproxy_client_name, host, port))
         client = self._start_grpc_client(direction=ProxyChannelDirection.Upstream, host=host, port=port)
         self._upstream_conn[client.remote_endpoint_name] = client

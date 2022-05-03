@@ -91,6 +91,8 @@ def test_simple_kafka_message():
     producer.send(KAFKA_CONSUMER_TOPIC,bytes(msg.SerializeToString()))
     assert kafka_if._consumer._last_rcvd_object is None
 
+
+
 def main():
     start_v_omci_consumer_thread()
     test_simple_kafka_message()

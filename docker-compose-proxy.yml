@@ -16,12 +16,15 @@ services:
         GRPC_SERVER_NAME: obbaa-vproxy-grpc-server-1
         LOCAL_GRPC_SERVER_PORT: 8433
         REMOTE_GRPC_SERVER_PORT: 58433
-        # should be replaced with vomci container's network Gateway IP
-        REMOTE_GRPC_SERVER_ADDR: ${IP}
+        REMOTE_GRPC_SERVER_ADDR: "obbaa-vomci"
         KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
         # List of Consumer topics, seperated by spaces
         KAFKA_REQUEST_TOPICS: "PROXY_REQUEST"
         KAFKA_RESPONSE_TOPICS: "PROXY_RESPONSE"
         KAFKA_NOTIFICATION_TOPICS: "PROXY_NOTIFICATION"
+        VOMCI_KAFKA_SENDER_NAME: "bbf-vproxy"
+        VOMCI_KAFKA_VOLTMF_NAME: "vOLTMF"
       networks:
         - baadist_default
+      volumes:
+        - /baa/stores/vomci-vproxy-db:/db

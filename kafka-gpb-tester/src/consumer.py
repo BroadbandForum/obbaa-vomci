@@ -21,14 +21,17 @@
 
 from tr451_vomci_nbi_message_pb2 import Msg
 from confluent_kafka import Consumer
+from confluent_kafka.cimpl import Consumer, KafkaException, KafkaError
 import sys
+
+import global_params as GLB
 
 conf = {'bootstrap.servers': "kafka:9092",
         'group.id': "vOLTMF",
         'auto.offset.reset': 'smallest'}
 
-VOMCI_TOPIC_NAME="vomci1-response"
-VPROXY_TOPIC_NAME="vomci-proxy-response"
+VOMCI_TOPIC_NAME=GLB.VOMCI_RESPONSE_TOPIC_NAME
+VPROXY_TOPIC_NAME=GLB.VPROXY_RESPONSE_TOPIC_NAME
 
 consumer = Consumer(conf)
 
@@ -42,56 +45,37 @@ def msg_process(msg):
     print("--------------------------------------")
     print("Message received:")
     print("--------------------------------------")
-    #the field names are the same as the .proto file
-    print("msg.header.msg_id="             + gpbmsg.header.msg_id               )
-    print("msg.header.sender_name="        + gpbmsg.header.sender_name          )
-    print("msg.header.recipient_name="     + gpbmsg.header.recipient_name       )
-    print("msg.header.object_type="        + str(gpbmsg.header.object_type)       )
-    print("msg.header.object_name="        + str(gpbmsg.header.object_name)       )
+    print(gpbmsg)
+    
+
     if gpbmsg.body.WhichOneof("msg_body") == "request":
         if gpbmsg.body.request.WhichOneof("req_type") == "rpc":
-            print("msg.body.request.rpc.input_data="+ gpbmsg.body.request.rpc.input_data.decode("utf-8") )
+            print("### rpc input_data="+ gpbmsg.body.request.rpc.input_data.decode("utf-8") )
         elif gpbmsg.body.request.WhichOneof("req_type") == "action":
-            print("msg.body.request.action.input_data=" + gpbmsg.body.request.action.input_data.decode("utf-8"))
-        else:
-            print("###request type not implemented:" + gpbmsg.body.request.WhichOneof("req_type"))
+            print("### action input_data=" + gpbmsg.body.request.action.input_data.decode("utf-8"))
+            
     elif gpbmsg.body.WhichOneof("msg_body") == "response":
         if gpbmsg.body.response.WhichOneof("resp_type") == "rpc_resp":
-            if gpbmsg.body.response.rpc_resp.status_resp.status_code == 0:
-                print("msg.body.response.rpc_resp.status_resp.status_code=OK")
-            elif gpbmsg.body.response.rpc_resp.status_resp.status_code == 1:
-                print("msg.body.reponse.rpc_resp.status_resp.status_code=GENERAL_ERROR")
-                print("msg.body.response.rpc_resp.status_resp.error.error_type="+ str(gpbmsg.body.response.rpc_resp.status_resp.error[0].error_type))
-                print("msg.body.response.rpc_resp.status_resp.error.error_tag=" + str(gpbmsg.body.response.rpc_resp.status_resp.error[0].error_tag))
-                print("msg.body.response.rpc_resp.status_resp.error.error_severity=" + str(gpbmsg.body.response.rpc_resp.status_resp.error[0].error_severity))
-                print("msg.body.response.rpc_resp.status_resp.error.error_app_tag=" + str(gpbmsg.body.response.rpc_resp.status_resp.error[0].error_app_tag))
-                print("msg.body.response.rpc_resp.status_resp.error.error_path=" + str(gpbmsg.body.response.rpc_resp.status_resp.error[0].error_path))
-                print("msg.body.response.rpc_resp.status_resp.error.error_message=" + str(gpbmsg.body.response.rpc_resp.status_resp.error[0].error_message))
+            if gpbmsg.body.response.action_resp.status_resp.status_code == 0:
+                print("### Response is an OK")
+            elif gpbmsg.body.response.action_resp.status_resp.status_code == 1:
+                print("### Response is a GENERAL ERROR")
             else:
                 print("### invalid status code")
+
 
         elif gpbmsg.body.response.WhichOneof("resp_type") == "action_resp":
             if gpbmsg.body.response.action_resp.status_resp.status_code == 0:
-                print("msg.body.response.action_resp.status_resp.status_code=OK")
+                print("### Response is an OK")
             elif gpbmsg.body.response.action_resp.status_resp.status_code == 1:
-                print("msg.body.reponse.action_resp.status_resp.status_code=GENERAL_ERROR")
-                print("msg.body.response.action_resp.status_resp.error.error_type=" + str(gpbmsg.body.response.action_resp.status_resp.error[0].error_type))
-                print("msg.body.response.action_resp.status_resp.error.error_tag=" + str(gpbmsg.body.response.action_resp.status_resp.error[0].error_tag))
-                print("msg.body.response.action_resp.status_resp.error.error_severity=" + str(gpbmsg.body.response.action_resp.status_resp.error[0].error_severity))
-                print("msg.body.response.action_resp.status_resp.error.error_app_tag=" + str(gpbmsg.body.response.action_resp.status_resp.error[0].error_app_tag))
-                print("msg.body.response.action_resp.status_resp.error.error_path=" + str(gpbmsg.body.response.action_resp.status_resp.error[0].error_path))
-                print("msg.body.response.action_resp.status_resp.error.error_message=" + str(gpbmsg.body.response.action_resp.status_resp.error[0].error_message))
+                print("Response is a GENERAL ERROR")
             else:
                 print("### invalid status code")
-        else:
-            print("###response type not implemented:" + gpbmsg.body.response.WhichOneof("resp_type"))
-    else:
-        print ("###body type not implemented:" + gpbmsg.body.WhichOneof("msg_body"))
+
 
 def basic_consume_loop(consumer, topics):
     print("Consuming from topics:")
-    print(topics[0])
-    print(topics[1])
+    print(str(topics))
     try:
         consumer.subscribe(topics)
 
@@ -115,5 +99,10 @@ def basic_consume_loop(consumer, topics):
 def shutdown():
     running = False
     
-    
-basic_consume_loop(consumer, [VOMCI_TOPIC_NAME, VPROXY_TOPIC_NAME])
+if len(sys.argv) > 1:
+    if sys.argv[1] == "--no-proxy":    
+        basic_consume_loop(consumer, [VOMCI_TOPIC_NAME])
+    else:
+        print("Invalid arg:", sys.argv[1])
+else:
+    basic_consume_loop(consumer, [VOMCI_TOPIC_NAME, VPROXY_TOPIC_NAME])

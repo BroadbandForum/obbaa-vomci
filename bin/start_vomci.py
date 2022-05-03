@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 import threading
 import time
 import logging
@@ -21,10 +22,13 @@ import sys
 OmciLogger(level=logging.DEBUG)
 logger = OmciLogger.getLogger(__name__)
 
+DB_LOCATION_DIR='/db'
+DB_LOCATION = DB_LOCATION_DIR + '/database.db'
 
 def start_vomci_threads():
     logger.debug('Starting vomci')
-    v_omci = vomci.VOmci()
+    os.makedirs(DB_LOCATION_DIR, exist_ok = True)
+    v_omci = vomci.VOmci(DB_LOCATION)
     v_omci.start()
 
 

@@ -52,6 +52,7 @@ class GrpcClientChannel(OltCommChannel):
         self._omci_rx_stream = None
         self._thread = None
         self._remote_endpoint_name = None
+        self._adress = None
         self._olts = dict()
 
     def get_olt_with_id(self, olt_id) -> bool:
@@ -93,6 +94,7 @@ class GrpcClientChannel(OltCommChannel):
                 hello_rsp = self._hello_stub.HelloVomci(hello_req)
                 self._omci_rx_stream = self._message_stub.ListenForVomciRx(google.protobuf.empty_pb2.Empty())
                 fail = False
+                self._adress = ('{}:{}'.format(host, port))
             except:
                 logger.warning("Failed to connect to {}:{}. Error {}".format(host, port, sys.exc_info()[0]))
                 self._hello_stub = None

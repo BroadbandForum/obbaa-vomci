@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # from nbi import kafka_interface
+from typing import Tuple
 from nbi import kafka_proto_interface as kafka_interface
 from omcc.grpc.grpc_client import GrpcClientChannel
 from omcc.grpc.grpc_server import GrpcServer, GrpcServerChannel
@@ -21,36 +22,27 @@ from omh_nbi.handlers.onu_mib_sync import OnuMibDataSyncHandler
 from database.omci_olt import *
 from database.omci_olt import OltDatabase
 from database.onu_management_chain import ManagementChain
+from vnf import VNF
 import os, time, threading
 
 DEFAULT_BOOTSTRAP_SERVERS = kafka_interface.DEFAULT_BOOTSTRAP_SERVERS
 
 logger = OmciLogger.getLogger(__name__)
 
-VOMCI_GRPC_SERVER = True
-LOCAL_GRPC_SERVER_PORT = os.getenv("LOCAL_GRPC_SERVER_PORT", default=58433)
+VOMCI_NAME = os.getenv('VOMCI_KAFKA_SENDER_NAME', 'obbaa-vomci')
 
-
-class VOmci:
-    def __init__(self, name=None):
+class VOmci(VNF):
+    def __init__(self, db_location, name=None):
         if name is None:
-            self._name = "vomci1"
-        else:
-            self._name = name
-        self._kafka_if = None
-        self._key_map = {}
-        self._server = None
-        self._kafka_thread = None
+            name = VOMCI_NAME
+        super().__init__(db_location, name)
 
     @property
     def name(self):
         return self._name
 
     def start(self):
-        self._kafka_if = kafka_interface.KafkaProtoInterface(self)
-        self._kafka_thread = threading.Thread(name='kafka_vomci_thread', target=self._kafka_if.start)
-        self._kafka_thread.start()
-        self._server = GrpcServer(port=LOCAL_GRPC_SERVER_PORT, parent=self)
+        super().start()
 
     def create_polt_connection(self):
         # Create gRPC channel and try to connect
@@ -75,6 +67,11 @@ class VOmci:
             if managed_onu.downstream_endpoint_name == comm_channel.remote_endpoint_name:
                 onu_id = (managed_onu.ct_ref, managed_onu.onu_id)
                 comm_channel.add_managed_onu(managed_onu.olt_name, managed_onu.onu_name, onu_id)
+
+    def trigger_start_grpc_server(self, name, remote_adress, remote_port = 8443):
+        if self._server is not None:
+            self._server.stop()
+        self._server = GrpcServer(remote_adress, remote_port, name, parent=self)
 
     def trigger_create_onu(self, onu_name) -> (bool, str):
         """
@@ -101,6 +98,11 @@ class VOmci:
         of given ONU. Then initiate the ONU detect sequence. To be called by
         the kafka interface when a "set ONU communication" request is received.
         """
+
+        if self._server is None:
+            logger.error("No grpc connection established!")
+            return
+
         managed_onu = ManagementChain.SetOnuCommunication(olt_name, onu_name, channel_termination,
                                                           onu_tc_id, available, olt_endpoint_name,
                                                           voltmf_endpoint_name, voltmf_name)
@@ -128,7 +130,7 @@ class VOmci:
         logger.debug("Sending kafka response for ONU {}, request/event {}: {}".format(
             handler.onu.onu_name, handler.user_data, handler.status))
         if handler.status == OMHStatus.OK:
-            self._kafka_if.send_successful_response(handler.onu.onu_name)
+            self._kafka_if.send_successful_response(handler.onu)
         else:
             self._kafka_if.send_unsuccessful_response(handler.onu.onu_name, error_msg=str(handler.status))
             logger.error("Request failed for ONU {}. Request/Event: {}. Error {}".format(

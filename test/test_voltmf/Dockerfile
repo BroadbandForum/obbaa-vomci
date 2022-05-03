@@ -30,4 +30,4 @@ ENV PYTHONPATH=/test-voltmf
 WORKDIR /test-voltmf
 EXPOSE 8484
 CMD ['python3 -V']
-CMD python3 test/test_voltmf/start_test_voltmf.py
+CMD python3 test/test_voltmf/start_test_voltmf_proto.py

@@ -130,13 +130,13 @@ def process_message(m) -> None:
     logger.warning('{}:{}:{}: key= {} value= {}'.format(m.topic, m.partition, m.offset, m.key, m.value))
 
 
-def start_kafka_producer():
-    producer = kafka.KafkaProducer(bootstrap_servers=self._bootstrap_servers)
+def start_kafka_producer(callback=None):
+    producer = kafka.KafkaProducer(bootstrap_servers=DEFAULT_BOOTSTRAP_SERVERS)
     return producer
 
 
-def start_kafka_json_producer():
-    json_producer = kafka.KafkaProducer(bootstrap_servers=self._bootstrap_servers,
+def start_kafka_json_producer(callback=None):
+    json_producer = kafka.KafkaProducer(bootstrap_servers=DEFAULT_BOOTSTRAP_SERVERS,
                                         value_serializer=lambda v: json.dumps(v).encode('utf-8'))
     return json_producer
 

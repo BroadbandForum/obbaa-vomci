@@ -6,10 +6,10 @@ from omci_logger import OmciLogger
 import vomci
 
 DEFAULT_BOOTSTRAP_SERVERS = kafka_interface.DEFAULT_BOOTSTRAP_SERVERS
-logger = OmciLogger.getDebugLogger(__name__)
+logger = OmciLogger.getLogger(__name__)
 # logger.basicConfig(level=logging.DEBUG)
 KAFKA_CONSUMER_TOPIC = kafka_interface.KAFKA_REQUEST_TOPICS[0]
-KAFKA_RESPONSE_TOPIC = kafka_interface.KAFKA_RESPONSE_TOPIC
+KAFKA_RESPONSE_TOPIC = kafka_interface.KAFKA_RESPONSE_TOPICS
 
 
 def create_consumer():

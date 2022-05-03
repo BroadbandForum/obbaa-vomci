@@ -30,4 +30,4 @@ ENV PYTHONPATH=/test-voltmf-proxy
 WORKDIR /test-voltmf-proxy
 EXPOSE 8484
 CMD ['python3 -V']
-CMD python3 test/test_voltmf_proxy/start_test_voltmf_proxy.py
+CMD python3 test/test_voltmf_proxy/start_test_voltmf_proxy_proto.py

@@ -63,11 +63,6 @@ def create_onu_rpc():
     kafka_if.send_msg(msg['set'])
     while True:
         time.sleep(5)
-    # kafka_if.send_msg(msg['create1'])
-    # time.sleep(5)
-    # kafka_if.send_msg(msg['set1'])
-    # time.sleep(140)
-    # kafka_if.send_msg(msg['delete1'])
 
 if __name__ == '__main__':
     create_onu_rpc()

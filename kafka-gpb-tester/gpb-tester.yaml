@@ -8,7 +8,7 @@ services:
         image: kafka-gpb-tester:latest
         container_name: kafka-gpb-tester
         volumes:
-           - "~/obbaa-vomci/kafka-gpb-tester:/kafka-gpb-tester"
+           - ".:/kafka-gpb-tester"
         networks:
             - baadist_default
         stdin_open: true

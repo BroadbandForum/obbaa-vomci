@@ -14,6 +14,7 @@ RUN apt-get update \
         kafkacat \
  && apt-get clean
 
+RUN pip3 install confluent-kafka
 ARG TAG=latest
 ARG DOCKER-ORG=broadbandforum
 ARG DOCKER-NAME=obbaa-vomci

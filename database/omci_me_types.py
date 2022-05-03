@@ -1489,6 +1489,7 @@ class pptp_eth_uni_me(ME):
     me_class = 11
     name = 'PPTP_ETH_UNI'
     description = 'PPTP Ethernet UNI'
+
     attrs = (
         Attr(0, 'me_inst', 'Managed entity instance', 'R', 'M', NumberDatum(2, fixed=0)),
         Attr(1, 'expected_type', 'Expected Type', 'RW', 'M', NumberDatum(1)),
@@ -1509,6 +1510,7 @@ class pptp_eth_uni_me(ME):
     )
     num_attrs = len(attrs)
     actions = ('set', 'get')
+    
 
     def __init__(self,
             inst : int,
@@ -1542,6 +1544,10 @@ class pptp_eth_uni_me(ME):
             pppoe_filter : Attribute #14. PPPoE filter.
             power_control : Attribute #15. Power control.
         """
+        
+        
+        
+        
         super(pptp_eth_uni_me, self).__init__(inst)
         if expected_type is not None:
             self.set_attr_value(1, expected_type)
@@ -1567,6 +1573,12 @@ class pptp_eth_uni_me(ME):
             self.set_attr_value(14, pppoe_filter)
         if power_control is not None:
             self.set_attr_value(15, power_control)
+
+        self.alarms = (
+            Alarm(0,'bbf-obbaa-ethernet-alarm-types:loss-of-signal','/ietf-interfaces:interfaces/interface','Loss of signal'),
+        )
+       
+    
 
 
 #################
@@ -1712,7 +1724,7 @@ class onu_g_me(ME):
     description = 'ONU-G (9.1.1)'
     attrs = (
         Attr(0, 'me_inst', 'Managed entity instance', 'R', 'M', NumberDatum(2, fixed=0)),
-        Attr(1, 'vendor_id', '4 MS bytes of ONU serial number', 'R', 'M', NumberDatum(4)),
+        Attr(1, 'vendor_id', '4 MS bytes of ONU serial number', 'R', 'M', BytesDatum(4)),
         Attr(2, 'version', 'ONU version string by the vendor', 'R', 'M', BytesDatum(14)),
         Attr(3, 'serial_number', 'Serial number', 'R', 'M', BytesDatum(8)),
         Attr(4, 'traffic_management', '', 'R', 'M', onu_g_traffic_management),
@@ -1974,6 +1986,9 @@ class ani_g_me(ME):
             lower_transmit_power_threshold : Attribute #15. .
             upper_transmit_power_threshold : Attribute #16. .
         """
+
+
+
         super(ani_g_me, self).__init__(inst)
         if gem_block_length is not None:
             self.set_attr_value(3, gem_block_length)
@@ -1994,6 +2009,16 @@ class ani_g_me(ME):
         if upper_transmit_power_threshold is not None:
             self.set_attr_value(16, upper_transmit_power_threshold)
 
+        
+        self.alarms = (
+            Alarm(0,'bbf-hardware-transceiver-alarm-types:rx-power-low', '/ietf-hardware:hardware/component','Low receive (RX) input power'),
+            Alarm(1,'bbf-hardware-transceiver-alarm-types:rx-power-high','/ietf-hardware:hardware/component','High receive (RX) input power'),
+            Alarm(2,'bbf-obbaa-xpon-onu-alarm-types:signal-fail','/ietf-interfaces:interfaces/interface','Signal Fail'),
+            Alarm(3,'bbf-obbaa-xpon-onu-alarm-types:signal-degraded','/ietf-interfaces:interfaces/interface','Signal Degraded'),
+            Alarm(4,'bbf-hardware-transceiver-alarm-types:tx-power-low','/ietf-hardware:hardware/component','Low transmit (TX) input power'),
+            Alarm(5,'bbf-hardware-transceiver-alarm-types:tx-power-high','/ietf-hardware:hardware/component','High transmit (TX) input power'),
+            Alarm(6,'bbf-hardware-transceiver-alarm-types:tx-bias-high','/ietf-hardware:hardware/component','High transmit (TX) bias current'),
+        )
 
 #################
 # gem_port_net_ctp_pm: GEM Port Network CTP PM(9.2.13)

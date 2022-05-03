@@ -32,5 +32,6 @@ WORKDIR /obbaa-vomci
 
 EXPOSE 8801
 EXPOSE 58433
+EXPOSE 8443
 CMD ['python3 -V']
 CMD python3 /obbaa-vomci/test/start_vomci.py

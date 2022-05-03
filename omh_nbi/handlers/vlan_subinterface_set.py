@@ -33,7 +33,7 @@ based on the specified VLAN classification and modification rules.
 """
 from typing import Optional
 from .omh_types import PacketClassifier, PacketAction
-from .omh_handler_utils import create_8021p_svc_mapper, create_mac_bridge_port, create_vlan_tagging_filter_data, set_ext_vlan_tag_op
+from .omh_handler_utils import create_8021p_svc_mapper, create_mac_bridge_port, create_vlan_tagging_filter_data, set_ext_vlan_tag_op, create_ext_vlan_tag_oper_config_data
 from omh_nbi.omh_handler import OmhHandler, OMHStatus
 from .qos_policy_profile_set import QosPolicyProfile, QosPolicyProfileSetHandler
 from database.omci_me_types import omci_me_class
@@ -123,6 +123,12 @@ class VlanSubInterfaceSetHandler(OmhHandler):
 
         # Now finish creating QoS policy profile if doesn't exist
         if self._qos_profile is not None and not qos_profile_exists:
+            #TODO
+            #a valid profile shoul have configurations...
+            if not any(self._qos_profile._pbit_to_tc_map):
+                return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
+                    "Invalid qos-policy-profile {}, it is possibly a reference to an unexistent profile. pbit_to_tc_map=".format(self._qos_profile._pbit_to_tc_map))
+
             status = self.run_subsidiary(QosPolicyProfileSetHandler(self._onu, self._qos_profile, self._iface_name))
             if status != OMHStatus.OK:
                 return status
@@ -137,8 +143,16 @@ class VlanSubInterfaceSetHandler(OmhHandler):
                                                   self._lower_name))
             ext_val_tag_me = self._onu.get(omci_me_class['EXT_VLAN_TAG_OPER_CONFIG_DATA'], ext_vlan_tag_inst, clone=True)
             if ext_val_tag_me is None:
-                return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
-                                              "Can't find ext_vlan_tag_op[{}]".format(ext_vlan_tag_inst))
+                status = create_ext_vlan_tag_oper_config_data(self, lower_me)
+
+                if status != OMHStatus.OK:
+                    return status
+                
+                ext_val_tag_me = self._onu.get(omci_me_class['EXT_VLAN_TAG_OPER_CONFIG_DATA'], ext_vlan_tag_inst, clone=True)
+                # return self.logerr_and_return(OMHStatus.INTERNAL_ERROR,
+                #                               "Can't find ext_vlan_tag_op[{}]".format(ext_vlan_tag_inst))
+
+
             status = set_ext_vlan_tag_op(self, ext_val_tag_me, self._classifier, vlan_action)
             if status != OMHStatus.OK:
                 return status

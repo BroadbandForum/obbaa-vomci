@@ -50,8 +50,8 @@ docker-exec:
 	docker container exec -it $(DOCKER-NAME) $(DOCKER-CMD)
 
 test-kafka-end:
-	docker-compose -f test/docker-compose.yml down
 	docker-compose -f test/docker-compose-proxy.yml down
+	docker-compose -f test/docker-compose.yml down
 
 test-kafka:
 	docker image build -f test/Dockerfile $(DOCKER-BUILDOPTS) --tag=$(DOCKER-NAME) .
@@ -59,12 +59,8 @@ test-kafka:
 	docker image build -f test/test_voltmf_proxy/Dockerfile $(DOCKER-BUILDOPTS) --tag=test-voltmf-proxy:latest .
 	docker image build -f proxy/Dockerfile $(DOCKER-BUILDOPTS) --tag=obbaa-vproxy:latest .
 	docker image build -f test/test_olt/Dockerfile $(DOCKER-BUILDOPTS) --tag=test-olt:latest .
-	docker-compose -f test/docker-compose.yml up -d
-	touch test/.env
-	rm test/.env
-	echo -n "IP" > test/.env
-	docker network inspect baadist_default --format=='{{(index .IPAM.Config 0).Gateway}}' >> test/.env
-	docker-compose -f test/docker-compose-proxy.yml up
+	docker-compose -f test/docker-compose-proxy.yml up -d
+	docker-compose -f test/docker-compose.yml up
 
 # sphinx-build handles remaining targets; make help to get a list
 %:

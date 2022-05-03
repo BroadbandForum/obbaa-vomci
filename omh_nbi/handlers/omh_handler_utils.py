@@ -19,12 +19,18 @@
 #
 
 """ OMH Handler utilities """
+from xmlrpc.client import boolean
+from encode_decode.omci_action_delete import DeleteAction
 from ..omh_handler import OmhHandler, OMHStatus
 from .omh_types import PacketClassifier, PacketAction, VlanAction, VlanTag, PBIT_VALUE_ANY, VID_VALUE_ANY
 from database.omci_me_types import *
 from omh_nbi.onu_driver import OnuDriver
 from encode_decode.omci_action_create import CreateAction
 from encode_decode.omci_action_set import SetAction
+
+ovid_pbit = dict()
+dict_outer_filter = dict()
+dict_inner_filter = dict()
 
 def create_8021p_svc_mapper(handler:OmhHandler, name: str) -> OMHStatus:
     """ Create 802.1p Service Mapper
@@ -90,7 +96,40 @@ def create_mac_bridge_port(handler: OmhHandler, tp: ME) -> OMHStatus:
         tp.set_user_attr('bridge_port', mac_bridge_port.inst)
     return OMHStatus.OK
 
+def delete_mac_bridge_port(handler: OmhHandler, tp: ME) -> OMHStatus:
+     
+    """Delete MAC Bridge Port Config Data for an interface
 
+    Args:
+        handler: OMH handler that requested this service
+        tp: Bridge port Termination Point
+    Returns:
+        completion status
+    """
+    #Verify that exist. If not, internal error.
+    mac_bridge_svc_prof = handler._onu.get_first(omci_me_class['MAC_BRIDGE_SVC_PROF'])
+    if mac_bridge_svc_prof is None:
+         return handler.logerr_and_return(OMHStatus.INTERNAL_ERROR,
+                                       "MAC Bridge Service Profile ME doesn't exist")
+
+    all_bridge_ports = handler._onu.get_all_instance_ids(omci_me_class['MAC_BRIDGE_PORT_CONFIG_DATA'])
+    port_num = len(all_bridge_ports) > 0 and all_bridge_ports[-1] + 1 or 1
+    
+    mac_bridge_port = handler._onu.get(omci_me_class['MAC_BRIDGE_PORT_CONFIG_DATA'],port_num-1)
+
+    
+    if mac_bridge_port is None:
+        return handler.logerr_and_return(OMHStatus.ERROR_IN_PARAMETERS,
+                                          'Mac_Bridge_Port is {} for the port_num {}'.format((mac_bridge_port),(port_num)))
+
+    
+    status = handler.transaction(DeleteAction(handler, mac_bridge_port))
+
+    if status == OMHStatus.OK: 
+          tp.clear_user_attr('bridge_port')
+         
+    return OMHStatus.OK
+    
 def create_ext_vlan_tag_oper_config_data(handler: OmhHandler, iface: ME, input_tpid: int = 0, output_tpid: int = 0) -> OMHStatus:
     """Create MAC Bridge Port Config Data for an interface
     Requires user attribute iface.bridge_port_num to be set
@@ -149,6 +188,11 @@ def create_vlan_tagging_filter_data(handler: OmhHandler, inst: int, name: str,
     else:
         o_vid = classifier is None and None or classifier.field('o_vid')
 
+    if o_vid.pbit == None:
+        o_vid.pbit = ovid_pbit[name]
+
+    ovid_pbit[name] = o_vid.pbit
+
     tcid = 0
     if o_vid is None:
         action = 'TAGGED_BRIDGING_A_NO_INVESTIGATION_UNTAGGED_BRIDGING_A'
@@ -170,6 +214,35 @@ def create_vlan_tagging_filter_data(handler: OmhHandler, inst: int, name: str,
     tag_filter_me = vlan_tag_filter_data_me(inst, vlan_filter_list=vlan_filter, forward_oper=action, num_of_entries=1)
     tag_filter_me.user_name = name
     return handler.transaction(CreateAction(handler, tag_filter_me))
+
+
+
+def delete_vlan_tagging_filter_data(handler: OmhHandler, inst: int,
+                                    classifier: PacketClassifier, vlan_action: VlanAction, is_merge: boolean = False)  -> OMHStatus:
+    
+    
+    """ Delete VLAN Tagging Filter Data ME
+    Args:
+        handler: OMH handler that requested this service
+        inst: instance id. Must be equal to the instance of the associated MAC Bridge Port Data ME
+        classifier: Packet classifier
+        vlan_action: Packet VLAN action
+    Returns:
+        completion status
+    """
+    if vlan_action is None:  
+            return handler.logerr_and_return(OMHStatus.NOT_SUPPORTED,
+                                             "VLAN action {} not supported ".format(vlan_action.action))
+
+    if classifier is None:
+            return handler.logerr_and_return(OMHStatus.NOT_SUPPORTED,
+                                             "Classifier {} not exist ".format(classifier))
+
+ 
+    tag_filter_me = handler._onu.get(omci_me_class['VLAN_TAG_FILTER_DATA'],inst)
+    if is_merge != True:
+        ovid_pbit.pop(tag_filter_me.user_name)
+    return handler.transaction(DeleteAction(handler, tag_filter_me))
 
 
 def set_ext_vlan_tag_op(handler: OmhHandler, ext_vlan_tag_op: ext_vlan_tag_oper_config_data_me,
@@ -230,15 +303,18 @@ def set_ext_vlan_tag_op(handler: OmhHandler, ext_vlan_tag_op: ext_vlan_tag_oper_
                                      "VLAN action {} is not supported".format(vlan_action.action))
     # XXX TODO no support for dual PUSH
     outer_treatment = {}
-    outer_treatment['treatment'] = num_to_delete
-    outer_treatment['treatment_outer_priority'] = EXT_VLAN_TAG_DO_NOT_ADD_TAG
+    outer_treatment['treatment'] = num_to_delete 
+    outer_treatment['treatment_outer_priority'] = EXT_VLAN_TAG_DO_NOT_ADD_TAG 
+    
     inner_treatment = {}
+
+    
     if vlan_action.action == VlanAction.Action.PUSH or vlan_action.action == VlanAction.Action.TRANSLATE:
-        inner_treatment['treatment_inner_priority'] = vlan_action.o_vid.pbit
-        inner_treatment['treatment_inner_vid'] = vlan_action.o_vid.vid
-        inner_treatment['treatment_inner_tpid'] = EXT_VLAN_TAG_SET_TPID_BY_EXT_VLAN_TAG_OP_COPY_DEI_FROM_PACKET
+        inner_treatment['treatment_inner_priority'] = vlan_action.o_vid.pbit 
+        inner_treatment['treatment_inner_vid'] = vlan_action.o_vid.vid 
+        inner_treatment['treatment_inner_tpid'] = EXT_VLAN_TAG_SET_TPID_BY_EXT_VLAN_TAG_OP_COPY_DEI_FROM_PACKET 
     else:
-        inner_treatment['treatment_inner_priority'] = EXT_VLAN_TAG_DO_NOT_ADD_TAG
+        inner_treatment['treatment_inner_priority'] = EXT_VLAN_TAG_DO_NOT_ADD_TAG 
 
     ext_vlan_tag_op.rx_frame_vlan_tag_oper_table =  {
         'outer_filter_word': outer_filter,
@@ -246,8 +322,45 @@ def set_ext_vlan_tag_op(handler: OmhHandler, ext_vlan_tag_op: ext_vlan_tag_oper_
         'outer_treatment_word': outer_treatment,
         'inner_treatment_word': inner_treatment }
 
+    dict_inner_filter[0] = inner_filter
+    dict_outer_filter[0] = outer_filter
+
     return handler.transaction(SetAction(handler, ext_vlan_tag_op, ('rx_frame_vlan_tag_oper_table',)))
 
+def delete_ext_vlan_tag_op_table_entry(handler: OmhHandler, ext_vlan_tag_op: ext_vlan_tag_oper_config_data_me) -> OMHStatus:
+
+    """Delete Extended_Vlan_Tag_Oper_Config_Data
+     Delete the rule of this configuration
+    """
+
+    EXT_VLAN_TAG_DO_NOT_ADD_TAG = 15
+    EXT_VLAN_TREATMENT_DELETE = 3
+    EXT_VLAN_TAG_OUTER_VID_DELETE = 8191
+    EXT_VLAN_TAG_INNER_VID_DELETE = 8191
+    EXT_VLAN_TAG_OUTER_TPID_DELETE = 7
+    EXT_VLAN_TAG_INNER_VID_DELETE = 7
+
+
+    # Delete the last 8 bytes of outter_treatment and inner_treatment
+    outer_treatment = {}
+    outer_treatment['treatment'] = EXT_VLAN_TREATMENT_DELETE
+    outer_treatment['treatment_outer_priority'] = EXT_VLAN_TAG_DO_NOT_ADD_TAG 
+    outer_treatment['treatment_outer_vid'] = EXT_VLAN_TAG_OUTER_VID_DELETE
+    outer_treatment['treatment_outer_tpid'] = EXT_VLAN_TAG_OUTER_TPID_DELETE
+    
+    inner_treatment = {}
+    inner_treatment['treatment_inner_priority'] = EXT_VLAN_TAG_DO_NOT_ADD_TAG 
+    inner_treatment['treatment_inner_vid'] = EXT_VLAN_TAG_INNER_VID_DELETE
+    inner_treatment['treatment_inner_tpid'] = EXT_VLAN_TAG_INNER_VID_DELETE
+    
+
+    ext_vlan_tag_op.rx_frame_vlan_tag_oper_table =  {
+        'outer_filter_word': dict_outer_filter[0],
+        'inner_filter_word': dict_inner_filter[0],
+        'outer_treatment_word': outer_treatment,
+        'inner_treatment_word': inner_treatment }
+
+    return handler.transaction(SetAction(handler, ext_vlan_tag_op, ('rx_frame_vlan_tag_oper_table',)))
 
 def get_uni(onu: OnuDriver, uni: Union[str, int]) -> ME:
     """ Get UNI ME by name or index.
@@ -258,13 +371,32 @@ def get_uni(onu: OnuDriver, uni: Union[str, int]) -> ME:
     Returns:
         UNI ME or None if not found
     """
+    
     if isinstance(uni, str):
         return onu.get_by_name(uni)
 
     # uni is an index
-    all_unis = onu.get_all_instances(omci_me_class['PPTP_ETH_UNI']) + \
-                onu.get_all_instances(omci_me_class['VIRTUAL_ETH_INTF_POINT'])
+    all_unis = onu.get_all_instances(omci_me_class['PPTP_ETH_UNI']) 
+    
     return uni < len(all_unis) and all_unis[uni] or None
+
+def get_ani(onu: OnuDriver, ani: Union[str, int]) -> ME:
+    """ Get ANI ME by name or index.
+
+    Args:
+         onu: OnuDriver
+         ani: ANI name assigned using me.user_name or 0-based index
+    Returns:
+        ANI ME or None if not found
+    """
+    if isinstance(ani, str):
+        return onu.get_by_name(ani)
+
+    # ani is an index
+    all_anis = onu.get_all_instances(omci_me_class['ANI_G']) 
+                
+    
+    return ani < len(all_anis) and all_anis[ani] or None
 
 
 def get_queue_by_owner_tc(onu: OnuDriver, is_upstream: bool, owner: ME, tc: int) -> ME:

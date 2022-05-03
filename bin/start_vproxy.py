@@ -21,9 +21,12 @@ from omci_logger import OmciLogger
 OmciLogger(level=logging.DEBUG)
 logger = OmciLogger.getLogger(__name__)
 
+DB_LOCATION_DIR='/db'
+DB_LOCATION = DB_LOCATION_DIR + '/database.db'
 
 def main():
-    vproxy = proxy.Proxy()
+    os.makedirs(DB_LOCATION_DIR, exist_ok = True)
+    vproxy = proxy.Proxy(DB_LOCATION)
     vproxy.start()
 
 
