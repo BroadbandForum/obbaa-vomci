@@ -52,7 +52,7 @@ services:
       networks:
         - baadist_default
       volumes:
-        - /baa/stores/vomci-vproxy-db:/db
+        - /baa/stores/vomci-function-db:/db
       depends_on:
         - zookeeper
         - kafka

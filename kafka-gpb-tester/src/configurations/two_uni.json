@@ -1,0 +1,617 @@
+{
+	"bbf-qos-classifiers:classifiers": {
+		"classifier-entry": [
+			{
+				"name": "classifier_eg0",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 0
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 0
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg1",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 1
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 1
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg2",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 2
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 2
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg3",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 3
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 3
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg4",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 4
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 4
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg5",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 5
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 5
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg6",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 6
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 6
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_eg7",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 7
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"bbf-qos-policing:pbit-marking-list": [
+						{
+							"index": 0,
+							"pbit-value": 7
+						}
+					],
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"match-all": [
+						null
+					]
+				}
+			},
+			{
+				"name": "classifier_ing0",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 0
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "0"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing1",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 1
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "1"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing2",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 2
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "2"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing3",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 3
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "3"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing4",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 4
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "4"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing5",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 5
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "5"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing6",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 6
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "6"
+						}
+					]
+				}
+			},
+			{
+				"name": "classifier_ing7",
+				"classifier-action-entry-cfg": [
+					{
+						"action-type": "bbf-qos-classifiers:scheduling-traffic-class",
+						"scheduling-traffic-class": 7
+					}
+				],
+				"filter-operation": "bbf-qos-classifiers:match-all-filter",
+				"match-criteria": {
+					"any-protocol": [
+						null
+					],
+					"dscp-range": "any",
+					"tag": [
+						{
+							"index": 0,
+							"in-pbit-list": "7"
+						}
+					]
+				}
+			}
+		]
+	},
+	"bbf-qos-policies:policies": {
+		"policy": [
+			{
+				"name": "POLICY_ING",
+				"classifiers": [
+					{
+						"name": "classifier_ing0"
+					},
+					{
+						"name": "classifier_ing1"
+					},
+					{
+						"name": "classifier_ing2"
+					},
+					{
+						"name": "classifier_ing3"
+					},
+					{
+						"name": "classifier_ing4"
+					},
+					{
+						"name": "classifier_ing5"
+					},
+					{
+						"name": "classifier_ing6"
+					},
+					{
+						"name": "classifier_ing7"
+					}
+				]
+			},
+			{
+				"name": "POLICY_EG",
+				"classifiers": [
+					{
+						"name": "classifier_eg0"
+					},
+					{
+						"name": "classifier_eg1"
+					},
+					{
+						"name": "classifier_eg2"
+					},
+					{
+						"name": "classifier_eg3"
+					},
+					{
+						"name": "classifier_eg4"
+					},
+					{
+						"name": "classifier_eg5"
+					},
+					{
+						"name": "classifier_eg6"
+					},
+					{
+						"name": "classifier_eg7"
+					}
+				]
+			}
+		]
+	},
+	"bbf-qos-policies:qos-policy-profiles": {
+		"policy-profile": [
+			{
+				"name": "IPP0",
+				"policy-list": [
+					{
+						"name": "POLICY_ING"
+					}
+				]
+			},
+			{
+				"name": "QPP0",
+				"policy-list": [
+					{
+						"name": "POLICY_EG"
+					}
+				]
+			}
+		]
+	},
+	"ietf-hardware:hardware": {
+		"component": [
+			{
+				"name": "ont1",
+				"admin-state": "unlocked",
+				"parent-rel-pos": 1,
+				"class": "iana-hardware:chassis"
+			},
+			{
+				"parent": "ont1",
+				"name": "ontCard_ont1_1",
+				"admin-state": "unlocked",
+				"parent-rel-pos": 1,
+				"class": "bbf-hardware-types:board"
+			},
+			{
+				"parent": "ontCard_ont1_1",
+				"name": "ontCage_ont1",
+				"parent-rel-pos": 1,
+				"class": "bbf-hardware-types:cage"
+			},
+			{
+				"parent": "ontCage_ont1",
+				"name": "ontSfp_ont1",
+				"parent-rel-pos": 1,
+				"class": "bbf-hardware-types:transceiver"
+			},
+			{
+				"parent": "ontSfp_ont1",
+				"name": "ontAniPort_ont1",
+				"parent-rel-pos": 1,
+				"class": "bbf-hardware-types:transceiver-link"
+			},
+			{
+				"parent": "ontCard_ont1_1",
+				"name": "ontUni_ont1_1_1",
+				"parent-rel-pos": 1,
+				"class": "bbf-hardware-types:transceiver-link"
+			},
+			{
+				"parent": "ontCard_ont1_1",
+				"name": "ontUni_ont1_1_2",
+				"parent-rel-pos": 2,
+				"class": "bbf-hardware-types:transceiver-link"
+			}
+		]
+	},
+	"ietf-interfaces:interfaces": {
+		"interface": [
+			{
+				"name": "ontAni_ont1",
+				"bbf-interface-port-reference:port-layer-if": "ontAniPort_ont1",
+				"type": "bbf-xpon-if-type:ani",
+				"bbf-xponani:ani": {
+					"upstream-fec": true,
+					"management-gemport-aes-indicator": false,
+					"onu-id": 1
+				},
+				"enabled": true
+			},
+			{
+				"name": "enet_uni_ont1_1_1",
+				"bbf-interface-port-reference:port-layer-if": "ontUni_ont1_1_1",
+				"type": "iana-if-type:ethernetCsmacd",
+				"enabled": true
+			},
+			{
+				"name": "enet_uni_ont1_1_2",
+				"bbf-interface-port-reference:port-layer-if": "ontUni_ont1_1_2",
+				"type": "iana-if-type:ethernetCsmacd",
+				"enabled": true
+			},
+			{
+				"bbf-sub-interfaces:subif-lower-layer": {
+					"interface": "enet_uni_ont1_1_1"
+				},
+				"name": "enet_vlan_ont1",
+				"bbf-qos-policies:ingress-qos-policy-profile": "IPP0",
+				"type": "bbf-if-type:vlan-sub-interface",
+				"bbf-sub-interfaces:inline-frame-processing": {
+					"ingress-rule": {
+						"rule": [
+							{
+								"name": "rule_1",
+								"priority": 100,
+								"flexible-match": {
+									"bbf-sub-interface-tagging:match-criteria": {
+										"untagged": [
+											null
+										]
+									}
+								},
+								"ingress-rewrite": {
+									"bbf-sub-interface-tagging:pop-tags": 0,
+									"bbf-sub-interface-tagging:push-tag": [
+										{
+											"index": 0,
+											"dot1q-tag": {
+												"vlan-id": 11,
+												"tag-type": "bbf-dot1q-types:c-vlan",
+												"pbit-from-tag-index": 0,
+												"dei-from-tag-index": 0
+											}
+										}
+									]
+								}
+							}
+						]
+					},
+					"egress-rewrite": {
+						"bbf-sub-interface-tagging:pop-tags": 1
+					}
+				},
+				"enabled": true
+			}
+		]
+	},
+	"bbf-xpongemtcont:xpongemtcont": {
+		"tconts": {
+			"tcont": [
+				{
+					"interface-reference": "ontAni_ont1",
+					"name": "tcont_ont1",
+					"alloc-id": 1024,
+					"traffic-descriptor-profile-ref": "TDP0"
+				},
+				{
+					"interface-reference": "ontAni_ont1",
+					"name": "tcont_ont2",
+					"alloc-id": 1025,
+					"traffic-descriptor-profile-ref": "TDP0"
+				}
+			]
+		},
+		"gemports": {
+			"gemport": [
+				{
+					"tcont-ref": "tcont_ont1",
+					"gemport-id": 1024,
+					"traffic-class": 0,
+					"name": "gem_ont1",
+					"interface": "enet_uni_ont1_1_1"
+				},
+				{
+					"tcont-ref": "tcont_ont2",
+					"gemport-id": 1025,
+					"traffic-class": 0,
+					"name": "gem_ont2",
+					"interface": "enet_uni_ont1_1_2"
+				}
+			]
+		}
+	}
+}

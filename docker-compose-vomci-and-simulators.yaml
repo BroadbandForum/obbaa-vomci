@@ -32,15 +32,15 @@ services:
         - baadist_default
 
     vomci:      
-      image: obbaa-develop.registry.broadband-forum.org/obbaa-vomci
+      image: obbaa-vomci-new
       #image: broadbandforum/obbaa-vomci:develop
       #image: obbaa-vomci
-      hostname: obbaa-vomci
+      #hostname: obbaa-vomci
       container_name: obbaa-vomci
       
       ### uncomment to run container without starting simulator
-      #entrypoint: tail
-      #command: ["-f","/dev/null"]
+      entrypoint: tail
+      command: ["-f","/dev/null"]
       
       ports:
         - 8801:8801
@@ -91,18 +91,18 @@ services:
         - baadist_default
 
     onu-simulator:
-      image: broadbandforum/obbaa-onu-simulator:latest
+      image: my-onu-simulator2
       #image: obbaa-onu-simulator
       container_name: onu-simulator
       stdin_open: true
       tty: true
       
-      entrypoint: python3
-      command: ["/usr/local/bin/onusim.py", "-p", "50000","-n","CT_1","-i", "1", "-l", "2" ]
+      #entrypoint: python3
+      #command: ["/usr/local/bin/onusim.py", "-p", "50000","-n","CT_1","-i", "1", "-l", "2" ]
       
       ### uncomment to run container without starting simulator
-      #entrypoint: tail
-      #command: ["-f","/dev/null"]
+      entrypoint: tail
+      command: ["-f","/dev/null"]
       
       hostname: onu-simulator
       

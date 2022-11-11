@@ -19,6 +19,7 @@
 from tr451_vomci_nbi_message_pb2 import Msg
 from tr451_vomci_nbi_message_pb2 import Error
 from confluent_kafka import Producer
+from configurations import util
 import global_params as GLB
 
 
@@ -43,9 +44,12 @@ vomci_msg.header.object_type=vomci_msg.header.ONU
 vomci_msg.header.object_name=GLB.ONU_NAME
 
 
-vomci_msg.body.request.get_data.filter.extend([
-    bytes("{\"ietf-hardware:hardware-state\":{}}","utf-8")
-    ])
+get_hw_if = util.read_configuration('configurations/get_hw_if.json')
+get_hw = util.read_configuration('configurations/get_hw.json')
+get_if = util.read_configuration('configurations/get_if.json')
+get_all_alarms = util.read_configuration('configurations/get_all_alarms.json')
+
+vomci_msg.body.request.get_data.filter.append(bytes(get_all_alarms,"utf-8"))
 
 producer.produce(GLB.VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()

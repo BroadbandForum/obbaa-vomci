@@ -14,12 +14,11 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-# Created by Andre Brizido (Altice Labs) on 10/09/2021
+# Create by Fábio Mendes 30/05/2022
 
 from tr451_vomci_nbi_message_pb2 import Msg
 from tr451_vomci_nbi_message_pb2 import Error
 from confluent_kafka import Producer
-from configurations import util
 import global_params as GLB
 
 
@@ -43,10 +42,9 @@ vomci_msg.header.recipient_name=GLB.VOMCI_NAME
 vomci_msg.header.object_type=vomci_msg.header.ONU
 vomci_msg.header.object_name=GLB.ONU_NAME
 
-basic = util.read_configuration('configurations/basic.json')
-two_uni = util.read_configuration('configurations/two_uni.json')
-
-vomci_msg.body.request.replace_config.config_inst = bytes(basic, "utf-8")
+vomci_msg.body.request.get_data.filter.extend ([bytes(
+    "{ \"ietf-alarms:alarms\": {\"alarm-list\": {}}}"
+    ,"utf-8")])
 
 producer.produce(GLB.VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()

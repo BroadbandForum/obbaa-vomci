@@ -31,7 +31,7 @@ VPROXY_TOPIC_NAME="vomci-proxy-request"
 VOMCI_RESPONSE_TOPIC_NAME="vomci1-response"
 VPROXY_RESPONSE_TOPIC_NAME="vomci-proxy-response"
 
-VOMCI_NAME="vomci1"
+VOMCI_NAME="vomci-vendor-1"
 VPROXY_NAME="proxy-1"
 
 ONU_NAME="ont1"

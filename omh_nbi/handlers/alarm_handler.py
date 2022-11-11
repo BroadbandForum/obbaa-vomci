@@ -15,6 +15,7 @@ import struct
 import datetime
 import sys
 import os
+import json
 
 
 VOLTMF_KAFKA_SENDER_NAME = (os.environ.get('VOMCI_KAFKA_SENDER_NAME'))
@@ -28,6 +29,10 @@ class AlarmHandler(NotificationHandler):
    
     voltProducer = None
     seq_number = 0
+    recv_get_all_alarms = False
+
+    def notify_received_get_all_alarms():
+        AlarmHandler.recv_get_all_alarms = True
 
     def recv(msg: RawMessage, onu):
         logger.info("Received alarm")
@@ -37,6 +42,7 @@ class AlarmHandler(NotificationHandler):
             changed_alarms=dec[0]
             me=dec[1]
             inst=dec[2]
+            
             AlarmHandler.sendAlarmtovOLTMF(me,onu,changed_alarms,inst)
 
         
@@ -65,7 +71,7 @@ class AlarmHandler(NotificationHandler):
         logger.info("inst: %d" % inst)
         logger.info("alarm_bitmap: %r" % alarm_bitmap)
         logger.info("alarm_seqnum: %d" % next_seq_number)
-
+ 
         me = onu._main_mib.get(me_class=me_class,inst=inst)
         
         if me is None:
@@ -81,10 +87,10 @@ class AlarmHandler(NotificationHandler):
 
         if not ((next_seq_number == 1 and AlarmHandler.seq_number == 255) or next_seq_number == AlarmHandler.seq_number + 1):
             logger.error("A loss has occurred in the alarm notification. The alarms are not aligned, is required an alarm resynchronization")
+            AlarmHandler.sendMismatchtovOLTMF(onu, next_seq_number)
             return None
         
-        AlarmHandler.seq_number = next_seq_number
-        
+        AlarmHandler.seq_number = next_seq_number          
 
         changed_alarms=[]
         for idx in range(len(me.alarms)):
@@ -100,7 +106,37 @@ class AlarmHandler(NotificationHandler):
         logger.info("ME: %r", onu._main_mib.get(me_class,inst))   
         logger.info("(me_class: %r Inst: %d, Alarm: %r)\n" % (onu._main_mib.get_first(me_class),inst,onu._main_mib.get(me_class,inst).alarms))                                                                          
         
+        if not AlarmHandler.recv_get_all_alarms:
+            logger.info("Get_All_Alarms has not been received yet so alarm state is not changed and is not sent to vOLTMF ")   
+            return None 
+
         return changed_alarms,me,inst
+
+    def sendMismatchtovOLTMF(onu, next_seq_number):
+        mismatch_msg = tr451_vomci_nbi_message_pb2.Msg()
+        mismatch_msg.header.msg_id = "8"
+        mismatch_msg.header.sender_name = VOLTMF_KAFKA_SENDER_NAME
+        mismatch_msg.header.recipient_name = VOLTMF_KAFKA_VOLTMF_NAME
+        mismatch_msg.header.object_type = mismatch_msg.header.ONU
+        mismatch_msg.header.object_name = onu.onu_name
+
+        mismatch_notif = {
+            "bbf-vomci-function:onu-alarm-misalignment" : {
+                "onu-name" : "",
+                "detected-sequence-number" : ""
+
+            }
+        }
+
+        mismatch_notif["bbf-vomci-function:onu-alarm-misalignment"]["onu-name"] = onu.onu_name
+        mismatch_notif["bbf-vomci-function:onu-alarm-misalignment"]["detected-sequence-number"] = next_seq_number
+
+        mismatch_not = json.dumps(mismatch_notif).replace('\\u0000', '').replace('\\u0016', '')
+
+        mismatch_msg.body.notification.data = bytes(mismatch_not,'utf-8')
+        logger.info('sending the SUCCESS protobuf response to VOLTMF:{}'.format(mismatch_msg))
+
+        AlarmHandler.voltProducer.send_proto_notification(mismatch_msg)
 
     def sendAlarmtovOLTMF(me,onu,changed_alarms,inst):
 
@@ -139,7 +175,6 @@ class AlarmHandler(NotificationHandler):
             if (name==None):
                 logger.error("Resource not implemented")
                 return None
-
 
             resource = alarm.resource+"[name='"+name+"']"
 

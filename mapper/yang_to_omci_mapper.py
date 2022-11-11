@@ -27,6 +27,8 @@ from omh_nbi.handlers.gem_port_create import GemPortCreateHandler
 from omh_nbi.handlers.qos_policy_profile_set import QosPolicyProfile, QosPolicyProfileSetHandler
 from omh_nbi.handlers.vlan_subinterface_set import VlanSubInterfaceSetHandler
 from omh_nbi.handlers.get_hardware_state import GetHardwareStateHandler
+from omh_nbi.handlers.onu_get_all_alarms import GetAllAlarmsHandler
+from omh_nbi.handlers.get_interfaces_state import GetInterfacesStateHandler
 from omh_nbi.handlers.vlan_subinterface_remove import VlanSubInterfaceDeleteHandler
 from omh_nbi.handlers.omh_types import PacketClassifier, PacketAction, \
     VlanAction, VlanTag, PBIT_VALUE_ANY, VID_VALUE_ANY
@@ -115,14 +117,37 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
     if get_data:
         logger.info("yang_to_omci_mapper :: extractPayload :: handling get data request")
         # Currently, Get requests only report software images, regardless of given filters
-        get_handlers = {'hardware_state' : []}
-        get_handler_args = {'hardware_state' : []}
-        get_handlers['hardware_state'].append(GetHardwareStateHandler)
-        get_handler_args['hardware_state'].append(())            
+        get_handlers = {}
+        get_handler_args = {}
+
         mapperObj = YangtoOmciMapperHandler(vomci, onu)
-        mapperObj.add_handler(get_handlers['hardware_state'][0], get_handler_args['hardware_state'][0])
+
+        if 'ietf-hardware:hardware-state' in targetDict:
+            get_handlers['hardware_state'] = []
+            get_handler_args['hardware_state'] = []
+            get_handlers['hardware_state'].append(GetHardwareStateHandler)
+            get_handler_args['hardware_state'].append(())
+            for i in range(len(get_handlers['hardware_state'])):
+                mapperObj.add_handler(get_handlers['hardware_state'][i], get_handler_args['hardware_state'][i])
+        if 'ietf-interfaces:interfaces-state' in targetDict:
+            get_handlers['interfaces-state'] = []
+            get_handler_args['interfaces-state'] = []
+            get_handlers['interfaces-state'].append(GetInterfacesStateHandler)
+            get_handler_args['interfaces-state'].append(())   
+            for i in range(len(get_handlers['interfaces-state'])):
+                mapperObj.add_handler(get_handlers['interfaces-state'][i], get_handler_args['interfaces-state'][i])
+        if 'ietf-alarms:alarms' in targetDict:
+            get_handlers['alarm-list'] = []
+            get_handler_args['alarm-list'] = []
+            get_handlers['alarm-list'].append(GetAllAlarmsHandler)
+            get_handler_args['alarm-list'].append(())
+            for i in range(len(get_handlers['alarm-list'])):
+                mapperObj.add_handler(get_handlers['alarm-list'][i], get_handler_args['alarm-list'][i])
+
         status = mapperObj.run()
         return status
+
+
 
 
     # Must resync ONU in case of copy-config
@@ -235,7 +260,7 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
                                                     
                         logger.info("uni_name:{}, uni_id:{}".format(uni_name, uni_id))
                         handlers['uni'].append(UniSetHandler)
-                        handler_args['uni'].append((uni_name, uni_id))
+                        handler_args['uni'].append((uni_name, uni_id, hw_component_name))
                     
                         if 'ingress-qos-policy-profile' in interfaceIter:
                             profile_name = interfaceIter['ingress-qos-policy-profile']
@@ -295,13 +320,19 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
                                                             ing_i_pbit = PBIT_VALUE_ANY
                                                             ing_o_pbit = PBIT_VALUE_ANY
                                                         elif 'tag' in flexible_match_value:
+                                                            ing_i_vlan_tag = None
+                                                            ing_o_vlan_tag = None
+                                                            #NOTE: only single values are being processed, but the YANG allows ranges for the VLAN and p-bit (eg: 1,2,4-6)
                                                             for taglist in flexible_match_value['tag']:
-                                                                if 'tag-type' in taglist['dot1q-tag'] and taglist['dot1q-tag']['tag-type'] == 'bbf-dot1qt:c-vlan':
-                                                                    ing_i_vlan_tag = taglist['dot1q-tag']['vlan-id']
-                                                                    ing_i_pbit = taglist['dot1q-tag']['pbit']
-                                                                if 'tag-type' in taglist['dot1q-tag'] and taglist['dot1q-tag']['tag-type'] == 'bbf-dot1qt:s-vlan':
-                                                                    ing_o_vlan_tag = taglist['dot1q-tag']['vlan-id']
-                                                                    ing_o_pbit = taglist['dot1q-tag']['pbit']
+                                                                if 'tag-type' in taglist['dot1q-tag'] and taglist['dot1q-tag']['tag-type'] == 'bbf-dot1q-types:c-vlan':
+                                                                    ing_i_vlan_tag = yang_mapper_parse_vlan_tag(taglist['dot1q-tag']['vlan-id'])
+                                                                    ing_i_pbit = yang_mapper_parse_vlan_pbit(taglist['dot1q-tag']['pbit'])
+                                                                if 'tag-type' in taglist['dot1q-tag'] and taglist['dot1q-tag']['tag-type'] == 'bbf-dot1q-types:s-vlan':
+                                                                    ing_o_vlan_tag = yang_mapper_parse_vlan_tag(taglist['dot1q-tag']['vlan-id'])
+                                                                    ing_o_pbit = yang_mapper_parse_vlan_pbit(taglist['dot1q-tag']['pbit'])
+                                                        else:
+                                                            #Give a meaningful message instead of a "reference before assignment error".  
+                                                            raise Exception("Could not find a valid match-criteria for the ingress-rule.")
                                                         ingress_i_tag = (ing_i_vlan_tag != VID_VALUE_ANY and ing_i_vlan_tag != None) and \
                                                                         VlanTag(vid=ing_i_vlan_tag, pbit=ing_i_pbit) or None
                                                         ingress_o_tag = (ing_o_vlan_tag != VID_VALUE_ANY and ing_o_vlan_tag != None) and \
@@ -460,6 +491,20 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
         logger.error("copy-config:payload[target] OR edit-config:payload[delta] is None")
         return OMHStatus.ERROR_IN_PARAMETERS
  
+def yang_mapper_parse_vlan_tag(vlan):
+    if vlan == "any":
+        return VID_VALUE_ANY
+    elif vlan == "priority-tagged":
+        return 0
+    else: 
+        return int(vlan)
+    
+def yang_mapper_parse_vlan_pbit(pbit):
+    if pbit == "any":
+        return PBIT_VALUE_ANY
+    else:
+        return int(pbit)
+        
 
 def is_interface_name_config(currentConfig, intf_name):
     for intf in currentConfig['ietf-interfaces:interfaces']['interface']:

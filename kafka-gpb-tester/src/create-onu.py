@@ -42,7 +42,7 @@ vomci_msg.header.recipient_name=GLB.VOMCI_NAME
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_FUNCTION
 vomci_msg.header.object_name=GLB.VOMCI_NAME
 
-vomci_msg.body.request.rpc.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"create-onu\":{\"name\":\""  + GLB.ONU_NAME + "\"}}}","utf-8")
+vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"create-onu\":{\"name\":\""  + GLB.ONU_NAME + "\"}}}","utf-8")
 
 producer.produce(GLB.VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()
@@ -55,7 +55,7 @@ vomci_msg.header.recipient_name=GLB.VPROXY_NAME
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_PROXY
 vomci_msg.header.object_name=GLB.VPROXY_NAME
 
-vomci_msg.body.request.rpc.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"create-onu\":{\"name\":\""  + GLB.ONU_NAME + "\"}}}","utf-8")
+vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"create-onu\":{\"name\":\""  + GLB.ONU_NAME + "\"}}}","utf-8")
 
 producer.produce(GLB.VPROXY_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()

@@ -82,6 +82,10 @@ class Name:
     def name(self):
         return self._name
 
+    @property
+    def description(self):
+        return self._description if self._description else ''
+
     def info(self) -> str:
         description = ' %r' % self._description if self._description else ''
         return '%s%s' % (self._name, description)

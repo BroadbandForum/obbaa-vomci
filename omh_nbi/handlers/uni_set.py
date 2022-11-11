@@ -42,7 +42,7 @@ import copy
 logger = OmciLogger.getLogger(__name__)
 
 class UniSetHandler(OmhHandler):
-    def __init__(self, onu: 'OnuDriver', uni_name: str, uni_id: int):
+    def __init__(self, onu: 'OnuDriver', uni_name: str, uni_id: int, hd_name: str):
         """ Set UNI port.
 
         Args:
@@ -54,9 +54,10 @@ class UniSetHandler(OmhHandler):
         Returns:
             handler completion status
         """
-        super().__init__(name='set_uni', onu = onu, description='set_uni: {}.{}-{}'.format(onu.onu_id, uni_id, uni_name))
+        super().__init__(name='set_uni', onu = onu, description='set_uni: {}.{}-{}-{}'.format(onu.onu_id, uni_id, uni_name, hd_name))
         self._uni_name = uni_name
         self._uni_id = uni_id
+        self._hd_name = hd_name
 
     def _enable_uni(self, uni: ME) -> OMHStatus:
         """Enable UNI"""
@@ -102,6 +103,7 @@ class UniSetHandler(OmhHandler):
             return status
 
         uni_me.user_name = self._uni_name
+        uni_me.hd_name = self.hd_name
         self._onu.set(uni_me)
 
         # XXX TODO

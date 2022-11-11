@@ -729,11 +729,16 @@ class KafkaProtoInterface:
                 rsp.body.response.rpc_resp.status_resp.CopyFrom(stat)
             elif tp == 'action':
                 rsp.body.response.action_resp.status_resp.status_code = int()
+            if tp == 'update_config':
+                rsp.body.response.update_config_resp.status_resp.status_code = int()
             elif tp == 'replace_config':
                 rsp.body.response.replace_config_resp.status_resp.status_code = int()
-            elif tp == 'get_data':
-                yang_response = bytes(get_yang_response(onu),"utf-8")
+            elif tp == 'get_data':                
+                first_filter = msg.body.request.get_data.filter[0].decode("utf-8")
+                yang_response = bytes(get_yang_response(onu, first_filter),"utf-8")
                 rsp.body.response.get_resp.data = yang_response
+            else:
+                logger.error('Unknown request type:{}'.format(tp))
             logger.info('sending the SUCCESS protobuf response to VOLTMF:{}'.format(rsp))
             self._producer.send_proto_response(rsp)
 
@@ -762,6 +767,8 @@ class KafkaProtoInterface:
                 rsp.body.response.replace_config_resp.status_resp.status_code = int()
                 logger.info('sending the SUCCESS protobuf response to VOLTMF:{}'.format(rsp))
                 self._producer.send_proto_response(rsp)
+            else:
+                logger.error('Unknown request type:{}'.format(tp))
 
     def send_successful_response_hello(self,m):
 
@@ -869,6 +876,8 @@ class KafkaProtoInterface:
         elif tp == 'replace_config':
             rsp.body.response.replace_config_resp.status_resp.status_code = 1
             rsp.body.response.replace_config_resp.status_resp.error.append(er_rsp)
+        else:
+            logger.error('Unknown request type:{}'.format(tp))
         logger.info('GPB Processing failed,sending Unsuccessful response to VOLTMF:{}'.format(rsp))
         self._producer.send_proto_response(rsp)
 

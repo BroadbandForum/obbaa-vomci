@@ -281,8 +281,9 @@ def set_ext_vlan_tag_op(handler: OmhHandler, ext_vlan_tag_op: ext_vlan_tag_oper_
     outer_filter['filter_outer_tpid'] = EXT_VLAN_TAG_DO_NOT_FILTER_ON_TPID
 
     inner_filter = {}
-    if o_vid is not None:
-        vid = (i_vid is not None) and i_vid or o_vid
+    if i_vid is not None:
+        #vid = (i_vid is not None) and i_vid or o_vid        
+        vid = i_vid
         inner_filter['filter_inner_priority'] = (vid.pbit == PBIT_VALUE_ANY) \
             and EXT_VLAN_TAG_DO_NOT_FILTER_ON_PRIORITY or vid.pbit
         inner_filter['filter_inner_vid'] = (vid.vid == VID_VALUE_ANY) \

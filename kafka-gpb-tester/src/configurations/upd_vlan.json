@@ -1,0 +1,52 @@
+{
+	"ietf-interfaces:interfaces": {
+		"interface": [
+			{
+				"@": {
+					"ietf-netconf:operation": "merge"
+				},
+				"bbf-sub-interfaces:subif-lower-layer": {
+					"interface": "enet_uni_ont1_1_1"
+				},
+				"name": "enet_vlan_ont1",
+				"bbf-qos-policies:ingress-qos-policy-profile": "IPP0",
+				"type": "bbf-if-type:vlan-sub-interface",
+				"bbf-sub-interfaces:inline-frame-processing": {
+					"ingress-rule": {
+						"rule": [
+							{
+								"name": "rule_1",
+								"priority": 100,
+								"flexible-match": {
+									"bbf-sub-interface-tagging:match-criteria": {
+										"untagged": [
+											null
+										]
+									}
+								},
+								"ingress-rewrite": {
+									"bbf-sub-interface-tagging:pop-tags": 0,
+									"bbf-sub-interface-tagging:push-tag": [
+										{
+											"index": 0,
+											"dot1q-tag": {
+												"vlan-id": 12,
+												"tag-type": "bbf-dot1q-types:c-vlan",
+												"pbit-from-tag-index": 1,
+												"dei-from-tag-index": 0
+											}
+										}
+									]
+								}
+							}
+						]
+					},
+					"egress-rewrite": {
+						"bbf-sub-interface-tagging:pop-tags": 1
+					}
+				},
+				"enabled": true
+			}
+		]
+	}
+}

@@ -63,7 +63,7 @@ services:
         - kafka
       #volumes:
         ### Uncomment for persistency
-        #- /baa/stores/vomci-db:/db
+        #- /baa/stores/vomci-function-db:/db
         ### Overrides the code (useful for development)  
         #- .:/obbaa-vomci
         
@@ -99,7 +99,7 @@ services:
         - vomci
       #volumes:
         ### Uncomment for persistency
-        #- /baa/stores/vproxy-db:/db
+        #- /baa/stores/vomci-vproxy-db:/db
         ### Overrides the code (useful for development)  
         #- .:/obbaa-vproxy
              

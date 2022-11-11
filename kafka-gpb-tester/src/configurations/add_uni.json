@@ -1,0 +1,15 @@
+{
+	"ietf-hardware:hardware": {
+		"component": [
+			{
+				"@": {
+					"ietf-netconf:operation": "create"
+				},
+				"parent": "ontCard_ont1_1",
+				"name": "ontUni_ont1_1_2",
+				"parent-rel-pos": 2,
+				"class": "bbf-hardware-types:transceiver-link"
+			}
+		]
+	}
+}

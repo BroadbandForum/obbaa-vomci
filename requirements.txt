@@ -1,4 +1,5 @@
 kafka-python==2.0.1
 grpcio
 grpcio-tools
+protobuf==3.20.*
 # kafka==2.0.1
