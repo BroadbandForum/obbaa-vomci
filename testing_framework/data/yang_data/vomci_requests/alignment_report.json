@@ -1,0 +1,7 @@
+{
+    "bbf-vomci-function:onu-alignment-result": {
+        "onu-name": "$ONU_NAME$",
+        "datastore-tag":"",
+        "alignment-state":"$ALIGNMENT_STATUS$"
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "ietf-interfaces:interfaces-state": {
+        "interface": [
+            {
+                "name": "enet_uni_ont1_1_1",
+                "type": "iana-if-type:ethernetCsmacd",
+                "bbf-interface-port-reference:port-layer-if": [
+                    "ontUni_ont1_1_1"
+                ],
+                "admin-status": "up",
+                "oper-status": "up",
+                "bbf-interfaces-performance-management:performance": {
+                    "intervals-15min": {
+                        "history": [
+                            {
+                                "interval-number": 1,
+                                "invalid-data-flag": "false",
+                                "measured-time": 900,
+                                "in-broadcast-pkts": 21,
+                                "in-multicast-pkts": 22,
+                                "in-octets": 20,
+                                "out-broadcast-pkts": 11,
+                                "out-multicast-pkts": 12,
+                                "out-octets": 10,
+                                "time-stamp": "2023-04-14 10:32:01.999593"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "uni2_ONU5",
+                "type": "iana-if-type:ethernetCsmacd",
+                "bbf-interface-port-reference:port-layer-if": [
+                    "port_uni2_ONU5"
+                ],
+                "admin-status": "up",
+                "oper-status": "up",
+                "bbf-interfaces-performance-management:performance": {}
+            },
+            {
+                "name": "ontAni_ont1",
+                "type": "bbf-xpon-if-type:ani",
+                "admin-status": "up",
+                "oper-status": "up"
+            }
+        ]
+    }
+}

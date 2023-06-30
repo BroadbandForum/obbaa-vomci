@@ -22,6 +22,9 @@ from omh_nbi.handlers.onu_mib_sync import OnuMibDataSyncHandler
 from database.omci_olt import *
 from database.omci_olt import OltDatabase
 from database.onu_management_chain import ManagementChain
+from database.telemetry_subscription import Subscription
+from mapper.yang_to_omci_mapper import YangtoOmciMapperHandler, get_xpath_handler
+
 from vnf import VNF
 import os, time, threading
 
@@ -42,6 +45,7 @@ class VOmci(VNF):
         return self._name
 
     def start(self):
+        Subscription.set_push_call_back(self.trigger_push_subscribed_xpaths)
         super().start()
 
     def create_polt_connection(self):
@@ -127,6 +131,11 @@ class VOmci(VNF):
     def trigger_kafka_response(self, handler):
         # TODO need to correlate request & response here.
         # possibly save the original; request in the handler
+        if handler._subscription_id is not None:
+            logger.debug("Sending telemetry notification for subscription ID {} ONU {} Xpaths".format(
+                handler._subscription_id, handler.onu, str(handler.xpaths)))
+            self._kafka_if.send_telemetry_notification(handler.onu, handler.xpaths, handler.subscription_id)
+            return
         logger.debug("Sending kafka response for ONU {}, request/event {}: {}".format(
             handler.onu.onu_name, handler.user_data, handler.status))
         if handler.status == OMHStatus.OK:
@@ -182,3 +191,26 @@ class VOmci(VNF):
                 olt.OnuDelete(onu_name)
                 logger.info("ONU {} MIB deleted from the database".format(onu_name))
         self._kafka_if.send_successful_response(onu_name)
+
+    def trigger_push_subscribed_xpaths(self, onu_name, subscription_id, xpaths):
+        logger.info("Collecting telemetry data for subscription {} ONU {} XPaths {}".format(subscription_id, onu_name, xpaths))
+        onu = VOmci.__get_onu_by_name(onu_name)
+        if onu is None:
+            logger.warn("ONU {} does not exist for collecting telemetry data".format(onu_name))
+            return
+        mapperObj = YangtoOmciMapperHandler(self, onu)
+        mapperObj.set_subscription_xpaths(subscription_id, xpaths)
+        for xpath in xpaths:
+            mapperObj.add_handler(get_xpath_handler(xpath), None)
+        mapperObj.run()
+
+    @staticmethod
+    def __get_onu_by_name(onu_name):
+        managed_onu = ManagementChain.GetOnu(onu_name)
+        if managed_onu is None:
+            return None
+        olt_name = (managed_onu.olt_name, managed_onu.downstream_endpoint_name)
+        olt = OltDatabase().OltGet(olt_name)
+        if olt is None:
+            return None
+        return olt.OnuGetByName(onu_name, False)

@@ -132,15 +132,15 @@ class Proxy(VNF):
                 onu_id = (managed_onu.ct_ref, managed_onu.onu_id)
                 comm_channel.add_managed_onu(managed_onu.olt_name, managed_onu.onu_name, onu_id)
 
-    def _start_grpc_client(self, direction, host, port):
+    def _start_grpc_client(self, direction, host, port, local_name = grpc_vproxy_client_name):
         logger.info("connecting to {}:{}..".format(host, port))
-        client = proxy_grpc_channel.ProxyGrpcChannel(self, direction=direction, name=self._client_endpoint_name)
+        client = proxy_grpc_channel.ProxyGrpcChannel(self, direction=direction, name=local_name)
         ret_val = client.connect(host=host, port=port, retry=True)
         if not ret_val:
-            logger.info("{}: unable to connect to {}:{}".format(self._client_endpoint_name, host, port))
+            logger.info("{}: unable to connect to {}:{}".format(local_name, host, port))
             return
         self.add_managed_onus(client)
-        logger.info("{}: connected to {}:{}".format(self._client_endpoint_name, host, port))
+        logger.info("{}: connected to {}:{}".format(local_name, host, port))
         return client
 
     def trigger_start_grpc_server(self, name, remote_adress, remote_port = 8443):
@@ -148,12 +148,12 @@ class Proxy(VNF):
             self._server.stop()
         self._server = GrpcProxyServer(name, remote_adress, remote_port, parent=self)
 
-    def trigger_create_grpc_connection(self, host, port):
+    def trigger_create_grpc_connection(self, host, port, local_name = grpc_vproxy_client_name):
         """
         Initiate a client grpc connection towards the vomci.
         """
-        logger.info("proxy client {}: Initiating connection with vomci at {}:{}".format(grpc_vproxy_client_name, host, port))
-        client = self._start_grpc_client(direction=ProxyChannelDirection.Upstream, host=host, port=port)
+        logger.info("proxy client {}: Initiating connection with vomci at {}:{}".format(local_name, host, port))
+        client = self._start_grpc_client(direction=ProxyChannelDirection.Upstream, host=host, port=port, local_name=local_name)
         self._upstream_conn[client.remote_endpoint_name] = client
         return
 
@@ -227,7 +227,7 @@ class Proxy(VNF):
         conn = None
         logger.info('Packet received from the OLT:{} for ONU:{}'.format(olt_id,onu_id))
         for host in conn_dict.keys():
-            if conn_dict[host].olt_connection_exists(olt_id):
+            if conn_dict[host].olt_connection_exists(olt_id, onu_id):
                 conn = conn_dict[host]
                 break
         if conn is None:

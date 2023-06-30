@@ -1510,7 +1510,7 @@ class pptp_eth_uni_me(ME):
     )
     num_attrs = len(attrs)
     actions = ('set', 'get')
-    
+
 
     def __init__(self,
             inst : int,
@@ -1577,8 +1577,8 @@ class pptp_eth_uni_me(ME):
         self.alarms = (
             Alarm(0,'bbf-obbaa-ethernet-alarm-types:loss-of-signal','/ietf-interfaces:interfaces/interface','Loss of signal'),
         )
-       
     
+
 
 
 #################
@@ -1724,7 +1724,7 @@ class onu_g_me(ME):
     description = 'ONU-G (9.1.1)'
     attrs = (
         Attr(0, 'me_inst', 'Managed entity instance', 'R', 'M', NumberDatum(2, fixed=0)),
-        Attr(1, 'vendor_id', '4 MS bytes of ONU serial number', 'R', 'M', BytesDatum(4)),
+        Attr(1, 'vendor_id', '4 MS bytes of ONU serial number', 'R', 'M', NumberDatum(4)),
         Attr(2, 'version', 'ONU version string by the vendor', 'R', 'M', BytesDatum(14)),
         Attr(3, 'serial_number', 'Serial number', 'R', 'M', BytesDatum(8)),
         Attr(4, 'traffic_management', '', 'R', 'M', onu_g_traffic_management),
@@ -2009,7 +2009,7 @@ class ani_g_me(ME):
         if upper_transmit_power_threshold is not None:
             self.set_attr_value(16, upper_transmit_power_threshold)
 
-        
+
         self.alarms = (
             Alarm(0,'bbf-hardware-transceiver-alarm-types:rx-power-low', '/ietf-hardware:hardware/component','Low receive (RX) input power'),
             Alarm(1,'bbf-hardware-transceiver-alarm-types:rx-power-high','/ietf-hardware:hardware/component','High receive (RX) input power'),
@@ -3198,6 +3198,7 @@ voip_config_data_available_signalling_protocols = EnumDatum(
 voip_config_data_signalling_protocol_used = EnumDatum(
     1,
     (
+        ('NONE', 0x0),
         ('SIP', 0x1),
         ('H248', 0x2),
         ('MGCP', 0x3),
@@ -3218,10 +3219,12 @@ voip_config_data_available_voip_config_methods = EnumDatum(
 voip_config_data_voip_config_method_used = EnumDatum(
     1,
     (
+        ('NONE', 0x0),
         ('OMCI', 0x1),
         ('CONFIG_FILE', 0x2),
         ('TR069', 0x3),
         ('SIP', 0x4),
+        ('PROPRIETARY', 0x5),
     )
 )
 
@@ -3591,6 +3594,7 @@ class pots_uni_me(ME):
         Attr(10, 'hook_state', '', 'R', 'O', pots_uni_hook_state),
         Attr(11, 'holdover_time', '', 'RW', 'O', NumberDatum(2)),
         Attr(12, 'nominal_feed_voltage', '', 'RW', 'O', NumberDatum(1)),
+        Attr(13, 'loss_of_softswitch', '', 'RW', 'O', NumberDatum(1)),
     )
     num_attrs = len(attrs)
     actions = ('set', 'get', 'test')
@@ -3606,7 +3610,8 @@ class pots_uni_me(ME):
             rx_gain = None,
             tx_gain = None,
             holdover_time = None,
-            nominal_feed_voltage = None
+            nominal_feed_voltage = None,
+            loss_of_softswitch = None
         ):
         """ POTS_UNI ME Constructor.
 
@@ -3622,6 +3627,7 @@ class pots_uni_me(ME):
             tx_gain : Attribute #8. .
             holdover_time : Attribute #11. .
             nominal_feed_voltage : Attribute #12. .
+            loss_of_softswitch : Attribute #13. .
         """
         super(pots_uni_me, self).__init__(inst)
         if admin_state is not None:
@@ -3644,6 +3650,8 @@ class pots_uni_me(ME):
             self.set_attr_value(11, holdover_time)
         if nominal_feed_voltage is not None:
             self.set_attr_value(12, nominal_feed_voltage)
+        if loss_of_softswitch is not None:
+            self.set_attr_value(13, loss_of_softswitch)
 
 
 #################

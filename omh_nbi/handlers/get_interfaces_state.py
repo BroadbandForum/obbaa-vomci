@@ -55,6 +55,30 @@ class GetInterfacesStateHandler(OmhHandler):
             if status != OMHStatus.OK:
                 return status
 
+        mbpcds = self._onu.get_all_instances(omci_me_class['MAC_BRIDGE_PORT_CONFIG_DATA'])
+        mbpcd_me_attrs = (3, 4)
+        for mbpcd in mbpcds:
+            mbpcd_me = mac_bridge_port_config_data_me(mbpcd.me_inst)
+            status =  self.transaction(GetAction(self, mbpcd_me, mbpcd_me_attrs))
+            if status != OMHStatus.OK:
+                return status
+
+        pm_ups = self._onu.get_all_instances(omci_me_class['ETH_FRAME_UPSTREAM_PM'])
+        pm_up_me_attrs = (4, 6, 7)
+        for pm_up in pm_ups:
+            pm_up_me = eth_frame_upstream_pm_me(pm_up.me_inst)
+            status =  self.transaction(GetAction(self, pm_up_me, pm_up_me_attrs))
+            if status != OMHStatus.OK:
+                return status
+
+        pm_downs = self._onu.get_all_instances(omci_me_class['ETH_FRAME_DOWNSTREAM_PM'])
+        pm_down_me_attrs = (4, 6, 7)
+        for pm_down in pm_downs:
+            pm_down_me = eth_frame_downstream_pm_me(pm_down.me_inst)
+            status =  self.transaction(GetAction(self, pm_down_me, pm_down_me_attrs))
+            if status != OMHStatus.OK:
+                return status
+    
         anis = self._onu.get_all_instances(omci_me_class['ANI_G'])
         ani_me_attrs = (1,)
         for ani in anis:

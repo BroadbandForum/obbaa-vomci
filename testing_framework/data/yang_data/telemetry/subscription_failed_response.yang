@@ -1,0 +1,13 @@
+response {
+    action_resp {
+        status_resp {
+            status_code: ERROR_GENERAL
+            error {
+                error_type: "application"
+                error_severity: "error"
+                error_path: "/bbf-vomci-function:managed-onus/managed-onu[name=\'ONU5\']"
+                error_message: "ONU does not exist"
+            }
+        }
+    }
+}

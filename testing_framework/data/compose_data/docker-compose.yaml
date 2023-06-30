@@ -1,0 +1,329 @@
+version: '3.5'
+networks:
+    baadist_default:
+        driver: bridge
+        name: baadist_default
+        ipam:
+          driver: default
+          config:
+            - subnet: 172.16.0.0/16
+
+services:
+    zookeeper:
+      image: confluentinc/cp-zookeeper:5.5.0
+      hostname: zookeeper
+      container_name: zookeeper
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.2
+
+    kafka:
+      image: confluentinc/cp-kafka:5.5.0
+      hostname: kafka
+      container_name: kafka
+      depends_on:
+        - zookeeper
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.3
+
+    vomci:      
+      image: obbaa-vomci:latest
+      hostname: obbaa-vomci
+      container_name: obbaa-vomci
+      ports:
+        - 8801:8801
+        - 58433:58433
+      environment:
+        GRPC_SERVER_NAME: obbaa-vomci
+        LOCAL_GRPC_SERVER_PORT: 58433
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
+        KAFKA_REQUEST_TOPICS: "vomci1-request"
+        KAFKA_RESPONSE_TOPICS: 'vomci1-response'
+        KAFKA_NOTIFICATION_TOPICS: "vomci1-notification"
+        KAFKA_TELEMETRY_TOPICS: "vomci1-telemetry"
+        VOMCI_KAFKA_SENDER_NAME: "vomci1"
+        VOMCI_KAFKA_VOLTMF_NAME: "vOLTMF"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.41
+      depends_on:
+        - zookeeper
+        - kafka        
+
+    vomci2:      
+      image: obbaa-vomci:latest
+      hostname: obbaa-vomci2
+      container_name: obbaa-vomci2
+      ports:
+        - 8802:8802
+        - 58434:58434
+      environment:
+        GRPC_SERVER_NAME: obbaa-vomci2
+        LOCAL_GRPC_SERVER_PORT: 58434
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
+        KAFKA_REQUEST_TOPICS: "vomci2-request"
+        KAFKA_RESPONSE_TOPICS: 'vomci2-response'
+        KAFKA_NOTIFICATION_TOPICS: "vomci2-notification"
+        KAFKA_TELEMETRY_TOPICS: "vomci2-telemetry"
+        VOMCI_KAFKA_SENDER_NAME: "vomci2"
+        VOMCI_KAFKA_VOLTMF_NAME: "vOLTMF"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.42
+      depends_on:
+        - zookeeper
+        - kafka   
+
+    vomci3:      
+      image: obbaa-vomci:latest
+      hostname: obbaa-vomci3
+      container_name: obbaa-vomci3
+      ports:
+        - 8803:8803
+        - 58435:58435
+      environment:
+        GRPC_SERVER_NAME: obbaa-vomci3
+        LOCAL_GRPC_SERVER_PORT: 58435
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092 localhost:9092"
+        KAFKA_REQUEST_TOPICS: "vomci3-request"
+        KAFKA_RESPONSE_TOPICS: 'vomci3-response'
+        KAFKA_NOTIFICATION_TOPICS: "vomci3-notification"
+        KAFKA_TELEMETRY_TOPICS: "vomci3-telemetry"
+        VOMCI_KAFKA_SENDER_NAME: "vomci3"
+        VOMCI_KAFKA_VOLTMF_NAME: "vOLTMF"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.43
+      depends_on:
+        - zookeeper
+        - kafka  
+          
+    vproxy:
+      image: obbaa-vproxy:latest
+      hostname: obbaa-vproxy
+      container_name: obbaa-vproxy
+      ports:
+        - 8433:8433
+      environment:
+        GRPC_CLIENT_NAME: proxy-grpc-1
+        GRPC_SERVER_NAME: proxy-grpc-2
+        LOCAL_GRPC_SERVER_PORT: 8433
+        REMOTE_GRPC_SERVER_PORT: 58433
+        REMOTE_GRPC_SERVER_ADDR: obbaa-vomci
+        KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+        KAFKA_REQUEST_TOPICS: "vomci-proxy-request"
+        KAFKA_RESPONSE_TOPICS: 'vomci-proxy-response'
+        KAFKA_NOTIFICATION_TOPICS: "vomci-proxy-notification"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.40
+      depends_on:
+        - vomci
+   
+    polt-simulator:
+      image: broadbandforum/obbaa-polt-simulator:std-2.1_develop
+      stdin_open: true
+      tty: true
+      container_name: polt-simulator
+      entrypoint: tail
+      command: ["-f","/dev/null"]
+      hostname: polt-simulator
+      environment:
+        - PASSWD=root
+      ports:
+        - "10830:10830"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.51
+
+    polt-simulator2:
+      image: broadbandforum/obbaa-polt-simulator:std-2.1_develop
+      stdin_open: true
+      tty: true
+      container_name: polt-simulator2
+      entrypoint: tail
+      command: ["-f","/dev/null"]
+      hostname: polt-simulator2
+      environment:
+        - PASSWD=root
+      ports:
+        - "10831:10831"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.52
+
+    polt-simulator3:
+      image: broadbandforum/obbaa-polt-simulator:std-2.1_develop
+      stdin_open: true
+      tty: true
+      container_name: polt-simulator3
+      entrypoint: tail
+      command: ["-f","/dev/null"]
+      hostname: polt-simulator3
+      environment:
+        - PASSWD=root
+      ports:
+        - "10832:10832"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.53
+
+    polt-simulator4:
+      image: broadbandforum/obbaa-polt-simulator:std-2.1_develop
+      stdin_open: true
+      tty: true
+      container_name: polt-simulator4
+      entrypoint: tail
+      command: ["-f","/dev/null"]
+      hostname: polt-simulator4
+      environment:
+        - PASSWD=root
+      ports:
+        - "10833:10833"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.54
+
+    onu-simulator:
+      image: broadbandforum/obbaa-onu-simulator:latest
+      container_name: onu-simulator
+      stdin_open: true
+      tty: true
+      entrypoint: python3
+      command: ["/usr/local/bin/onusim.py", "-p", "50000","-n","CT_1","-i", "1", "-I", "2", "-l", "2" ]
+      hostname: onu-simulator
+      environment:
+        - http_port=3018
+        - PASSWD=root
+      ports:
+        - "50000:50000"
+        - "3018:3018"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.61
+
+    onu-simulator2:
+      image: broadbandforum/obbaa-onu-simulator:latest
+      container_name: onu-simulator2
+      stdin_open: true
+      tty: true
+      entrypoint: python3
+      command: ["/usr/local/bin/onusim.py", "-p", "50001","-n","CT_1","-i", "3", "-I", "4", "-l", "2" ]
+      hostname: onu-simulator2
+      environment:
+        - http_port=3019
+        - PASSWD=root
+      ports:
+        - "50001:50001"
+        - "3019:3019"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.62
+
+    onu-simulator3:
+      image: broadbandforum/obbaa-onu-simulator:latest
+      container_name: onu-simulator3
+      stdin_open: true
+      tty: true
+      entrypoint: python3
+      command: ["/usr/local/bin/onusim.py", "-p", "50002","-n","CT_1","-i", "5", "-I", "6", "-l", "2" ]
+      hostname: onu-simulator3
+      environment:
+        - http_port=3020
+        - PASSWD=root
+      ports:
+        - "50002:50002"
+        - "3020:3020"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.63
+  
+    onu-simulator4:
+      image: broadbandforum/obbaa-onu-simulator:latest
+      container_name: onu-simulator4
+      stdin_open: true
+      tty: true
+      entrypoint: python3
+      command: ["/usr/local/bin/onusim.py", "-p", "50003","-n","CT_1","-i", "7", "-I", "8", "-l", "2" ]
+      hostname: onu-simulator4
+      environment:
+        - http_port=3021
+        - PASSWD=root
+      ports:
+        - "50003:50003"
+        - "3021:3021"
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.64
+  
+    kakfa-gpb-tester:
+      image: kafka-gpb-tester:latest
+      container_name: kafka-gpb-tester     
+      ports:
+        - "3001:3001"
+      # volumes:
+      #   - ../../../kafka-gpb-tester:/kafka-gpb-tester
+      networks:
+        baadist_default:
+          ipv4_address: 172.16.0.7
+
+    # influxdb:
+    #     image: broadbandforum/influxdb:2.0.0-beta.2-3
+    #     container_name: obbaa-influxdb
+    #     command: --bolt-path /var/opt/influxdb/influxd.bolt --engine-path /var/opt/influxdb/engine --reporting-disabled
+    #     restart: on-failure
+    #     ports:
+    #         - "0.0.0.0:9999:9999"
+    #     environment:
+    #         - DEBUG=true
+    #         - INFLUX_USER=influxdb
+    #         - INFLUX_PW=influxdb
+    #         - INFLUX_ORG=broadband_forum
+    #         - INFLUX_BUCKET=pm-collection
+    #         - INFLUX_RETENTION=720
+    #         - INFLUX_PORT=9999
+    #         - INFLUX_ROOT=/var/opt/influxdb
+    #     volumes:
+    #         - /baa/stores/influxdb:/var/opt/influxdb
+    #     networks:
+    #       baadist_default:
+    #         ipv4_address: 172.16.0.8
+
+    # onu-pm-collector:
+    #     image: broadbandforum/onu-pm-collector:latest
+    #     container_name: onu-pm-collector
+    #     restart: always
+    #     ports:
+    #         - "9005:5005"
+    #         - "4495:4495"
+    #     environment:
+    #         - ONU_PM_COLLECTOR_PORT=4495
+    #         - IONU_PM_COLLECTOR_MAX_CONNECTION=10000
+    #         - DEBUG=true
+    #         - INFLUXDB_ORGANISATION=broadband_forum
+    #         - INFLUXDB_BUCKETID=pm-collection
+    #         - INFLUXDB_API_URL=http://obbaa-influxdb:9999
+    #         - INFLUXDB_TOKEN=_6Mb0Td0U5pbKecnJZ0ajSSw3uGJZggVpLmr9WDdAbXsTDImNZI3pO3zj5OgJtoiGXV6-1HGD5E8xi_4GwFw-g==
+    #         - PMD_MAX_BUFFERED_POINTS=5000
+    #         - PMD_MAX_BUFFERED_MEASUREMENTS=100
+    #         - PMD_TIMEOUT_BUFFERED_POINTS=60
+    #         - PMD_NBI_PORT=5051
+    #         - KAFKA_TELEMETRY_TOPICS=vomci3-telemetry
+    #     networks:
+    #       baadist_default:
+    #         ipv4_address: 172.16.0.9
+    #     depends_on:
+    #         - influxdb
+    #     tty: true
+    #     stdin_open: true

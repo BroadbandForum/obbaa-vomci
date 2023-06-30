@@ -1,0 +1,52 @@
+{
+    "ietf-hardware-state:hardware": {
+        "component": [
+            {
+                "name": "ONU5",
+                "model-name": "ONUSIM",
+                "mfg-name": "1094861636",
+                "serial-num": "abcd."
+            }
+        ]
+    },
+    "ietf-hardware:hardware": {
+        "component": [
+            {
+                "name": "ONU5-software",
+                "bbf-software-management:software": {
+                    "software": [
+                        {
+                            "name": "ONU5",
+                            "revisions": {
+                                "revision": [
+                                    {
+                                        "id": 0,
+                                        "alias": "ONU5-software-rev0",
+                                        "state": "in-use",
+                                        "version": "SW_VERSION_2",
+                                        "product-code": "",
+                                        "hash": "",
+                                        "is-committed": "true",
+                                        "is-active": "true",
+                                        "is-valid": "true"
+                                    },
+                                    {
+                                        "id": 1,
+                                        "alias": "ONU5-software-rev1",
+                                        "state": "in-use",
+                                        "version": "ONUSIM_V010001",
+                                        "product-code": "",
+                                        "hash": "",
+                                        "is-committed": "false",
+                                        "is-active": "false",
+                                        "is-valid": "true"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

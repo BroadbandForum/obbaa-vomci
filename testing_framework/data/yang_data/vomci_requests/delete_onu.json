@@ -1,0 +1,14 @@
+{
+  "bbf-vomci-function:vomci": {
+    "managed-onus": {
+      "managed-onu": [
+        {
+          "name": "$ONU_NAME$",
+          "delete-onu": {
+            "delete-state-data": true
+          }
+        }
+      ]
+    }
+  }
+}

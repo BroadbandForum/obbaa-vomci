@@ -1,0 +1,5 @@
+response {
+    replace_config_resp {
+        status_resp {}
+    }
+}

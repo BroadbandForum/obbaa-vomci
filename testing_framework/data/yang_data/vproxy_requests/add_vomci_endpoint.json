@@ -1,0 +1,34 @@
+{
+    "bbf-vomci-proxy:vomci": {
+        "remote-nf": {
+            "nf-client": {
+                "initiate": {
+                    "remote-server": [
+                        {
+                            "name": "vOMCI-grpc-2",
+                            "local-service-endpoint": "proxy-grpc-3",
+                            "nf-type": "bbf-network-function-types:vomci-function",
+                            "bbf-vomci-proxy-grpc-client:grpc-client": {
+                                "channel": {
+                                    "ping-interval": 300
+                                },
+                                "access-point": [
+                                    {
+                                        "name": "vOMCI-grpc-2",
+                                        "grpc-transport-parameters": {
+                                            "bbf-vomci-proxy-grpc-client-tcp:tcp-client-parameters": {
+                                                "remote-address": "obbaa-vomci2",
+                                                "remote-port": 58434
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "enabled": true
+            }
+        }
+    }
+}

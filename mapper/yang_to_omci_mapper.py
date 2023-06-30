@@ -257,10 +257,16 @@ def extractPayload(vomci : 'VOmci', onuname: str, oltname: PoltId, payload: dict
                                     if 'parent-rel-pos' in hwIter:
                                         logger.debug("found parent-rel-pos {} for uni_name:{}".format(hwIter['parent-rel-pos'], uni_name))
                                         uni_id = hwIter['parent-rel-pos']-1
-                                                    
-                        logger.info("uni_name:{}, uni_id:{}".format(uni_name, uni_id))
+                                        
+                        pm_enabled = False
+                        if 'bbf-interfaces-performance-management:performance' in interfaceIter:
+                            if 'enable' in interfaceIter['bbf-interfaces-performance-management:performance']:
+                                pm_enabled = interfaceIter['bbf-interfaces-performance-management:performance']['enable']
+
+                        logger.info("uni_name:{}, uni_id:{}, hw_component_name:{}, pm_enabled:{}".format(
+                            uni_name, uni_id, hw_component_name, pm_enabled))
                         handlers['uni'].append(UniSetHandler)
-                        handler_args['uni'].append((uni_name, uni_id, hw_component_name))
+                        handler_args['uni'].append((uni_name, uni_id, hw_component_name, pm_enabled))
                     
                         if 'ingress-qos-policy-profile' in interfaceIter:
                             profile_name = interfaceIter['ingress-qos-policy-profile']
@@ -513,6 +519,16 @@ def is_interface_name_config(currentConfig, intf_name):
 
     return False
 
+def get_xpath_handler(xpath):
+    if xpath == 'ietf-hardware:hardware-state':
+        return GetHardwareStateHandler
+    elif xpath == 'ietf-interfaces:interfaces-state':
+        return GetInterfacesStateHandler
+    else:
+        logger.info("xpath {} is not currently supported, and will be replaced by interfaces-states".format(xpath))
+        return GetInterfacesStateHandler
+
+
 class YangtoOmciMapperHandler:
     def __init__(self, vomci : 'VOmci', onu: 'OnuDriver'):
         """
@@ -527,6 +543,12 @@ class YangtoOmciMapperHandler:
         self._default_retries = 2
         self._handler_types = []
         self._handler_args = []
+        self._subscription_id = None
+        self._xpaths= []
+
+    def set_subscription_xpaths(self, subscription_id, xpaths):
+        self._subscription_id = subscription_id
+        self._xpaths = xpaths
 
     def add_handler(self, handler_type: OmhHandler, handler_args):
         self._handler_types.append(handler_type)
@@ -539,6 +561,10 @@ class YangtoOmciMapperHandler:
             super().__init__(name='OmhNbiHandler', onu=onu, description=' {}'.format(handler_type_list))
             self._handler_types = handler_types
             self._handler_args = handler_args
+
+        def set_subscription_xpaths(self, subscription_id, xpaths):
+            self._subscription_id = subscription_id
+            self._xpaths = xpaths
 
         def run_to_completion(self) -> OMHStatus:
             logger.info(self.info())
@@ -560,6 +586,7 @@ class YangtoOmciMapperHandler:
 
         self._onu.set_flow_control(self._default_retries, self._default_timeout)
         handler = YangtoOmciMapperHandler.OmhNbiHandler(self._onu, self._handler_types, self._handler_args)
+        handler.set_subscription_xpaths(self._subscription_id, self._xpaths)
         logger.info("YangtoOmciMapperHandler: starting execution in the background")
         handler.start(self._vomci.trigger_kafka_response)
 

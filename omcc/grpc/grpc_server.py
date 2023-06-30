@@ -53,8 +53,17 @@ class GrpcServerChannel(OltCommChannel):
     def get_olt_with_id(self, olt_id) -> bool:
         return self._olts.get(olt_id)
 
-    def olt_connection_exists(self, olt_id):
-        return self._olts.get(olt_id) is not None
+    def olt_connection_exists(self, olt_id, onu_id = None):
+        olt = self._olts.get(olt_id)
+        if (onu_id is not None) and (olt is not None):
+            logger.debug('checking onu_id {} on OLT {} on connection {}'.format(onu_id, olt_id, self.remote_endpoint_name))
+            onu = olt.OnuGet(onu_id=onu_id, log_error=False)
+            if onu is not None:
+                logger.info('Found onu_id {} on OLT {} on connection {}'.format(onu_id, olt_id, self.remote_endpoint_name))
+                return True
+            else:
+                return False
+        return olt is not None
 
     @property
     def remote_endpoint_name(self):
@@ -245,7 +254,7 @@ class GrpcServer:
         """
         channel = None
         for _peer, _conn in self._connections.items():
-            if _conn.name == remote_endpoint_name:
+            if _conn.remote_endpoint_name == remote_endpoint_name:
                 self.connection_delete(_peer)
                 channel = _conn
                 break

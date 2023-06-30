@@ -160,6 +160,22 @@ def create_ext_vlan_tag_oper_config_data(handler: OmhHandler, iface: ME, input_t
     iface.set_user_attr('ext_vlan_tag_op', inst)
     return OMHStatus.OK
 
+def create_eth_frame_pm(handler: OmhHandler, inst: int) -> OMHStatus:
+    """Create ETH FRAME UPSTREAM/DOWNSTREAM PM associated to a Bridge Port Config Data instance
+
+    Args:
+        handler: OMH handler that requested this service
+        inst: instance id. Must be equal to the instance of the associated MAC Bridge Port Config Data ME
+    Returns:
+        completion status
+    """
+    pm_up_me = eth_frame_upstream_pm_me(inst=inst, threshold_data=65535)
+    status = handler.transaction(CreateAction(handler, pm_up_me))
+    if status != OMHStatus.OK:
+        return status
+    pm_down_me = eth_frame_downstream_pm_me(inst=inst, threshold_data=65535)
+    return handler.transaction(CreateAction(handler, pm_down_me))
+
 def create_vlan_tagging_filter_data(handler: OmhHandler, inst: int, name: str,
                                     classifier: PacketClassifier, vlan_action: VlanAction)  -> OMHStatus:
     """ Create and configure VLAN Tagging Filter Data ME

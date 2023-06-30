@@ -2,6 +2,7 @@ from nbi import kafka_proto_interface as kafka_interface
 from db.db import DB
 from omci_logger import OmciLogger
 from database.onu_management_chain import ManagementChain
+from database.telemetry_subscription import Subscription
 import threading, json, time
 
 logger = OmciLogger.getLogger(__name__)
@@ -53,6 +54,7 @@ class VNF:
                 adress = "{}:{}".format(REMOTE_GRPC_SERVER_ADDR, REMOTE_GRPC_SERVER_PORT)
                 custom_state['grpc_upstream_connections'] = [{self._name:adress}]
             custom_state['onus'] = []
+            custom_state['telemetry_subscriptions'] = json.dumps({})
             self.setup_state(json.dumps(custom_state))
         
         # wait fot thread to finish
@@ -73,7 +75,9 @@ class VNF:
         state['grpc_upstream_connections'] = []
         for access_point in self._upstream_conn:
             state['grpc_upstream_connections'].append({access_point:self._upstream_conn[access_point]._adress})
-
+    
+        state['telemetry_subscriptions'] = Subscription.export_subscriptions()
+        
         state['onus'] = []
         onus = ManagementChain.GetManagedOnus()
         for onu in onus:
@@ -103,6 +107,7 @@ class VNF:
         grpc_servers = state['grpc_servers']
         grpc_upstream_connections = state['grpc_upstream_connections']
         onus = state['onus']
+        telemetry_subscriptions = state['telemetry_subscriptions']
 
         self._kafka_thread = threading.Thread(name='kafka_vomci_thread', target=self._kafka_if.start, args=myargs)
         for server in grpc_servers:
@@ -120,6 +125,7 @@ class VNF:
                 self.trigger_set_onu_communication(onu['olt_name'], onu['onu_name'],
                         onu['channel_termination'], onu['onu_tc_id'], onu['available'], 
                         onu['olt_endpoint_name'], onu['south_endpoint_name'], onu['sender_name'])
+        Subscription.import_subscriptions(telemetry_subscriptions)
         self._kafka_thread.start()
 
     def update_configuration_in_db(self):

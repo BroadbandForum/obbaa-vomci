@@ -48,6 +48,7 @@ class OnuMibDataSyncHandler(OmhHandler):
         """
         super().__init__(name='mib_sync_onu', onu = onu, description='mib_sync_onu: {}'.format(onu.onu_id))
         self.is_aligned = False
+        self.datastore_tag = ""
 
     def run_to_completion(self) -> OMHStatus:
         # Check if ONU is already in sync
@@ -60,7 +61,7 @@ class OnuMibDataSyncHandler(OmhHandler):
                 return status
             if action.me.mib_data_sync == onu_data.mib_data_sync and onu_data.mib_data_sync != 0:
                 logger.info('ONU {} is in sync. mib_data_sync={}'.format(self.onu.onu_id, onu_data.mib_data_sync))
-                self.is_aligned = True
+                self.is_aligned = True      
                 return OMHStatus.OK
             logger.info('ONU {} is not in sync. Expected mib_data_sync {} got {}'.format(
                 self.onu.onu_id, onu_data.mib_data_sync, action.me.mib_data_sync))

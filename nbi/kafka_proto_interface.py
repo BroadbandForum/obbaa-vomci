@@ -28,6 +28,7 @@ from mapper.yang_to_omci_mapper import extractPayload
 from mapper.get_yang_response import get_yang_response
 from omh_nbi.omh_handler import OMHStatus
 from database.onu_management_chain import ManagementChain
+from database.telemetry_subscription import Subscription
 import nbi.grpc.service_definition.tr451_vomci_nbi_message_pb2 as tr451_vomci_nbi_message_pb2
 
 
@@ -37,6 +38,10 @@ logger = OmciLogger.getLogger(__name__)
 DEFAULT_BOOTSTRAP_SERVERS = list(os.environ.get('KAFKA_BOOTSTRAP_SERVER', "kafka:9092 localhost:9092").split())
 DEFAULT_REQUEST_TOPICS = list(os.environ.get('KAFKA_REQUEST_TOPICS').split())
 DEFAULT_NOTIFICATION_TOPICS = list(os.environ.get('KAFKA_NOTIFICATION_TOPICS').split())
+if os.environ.get('KAFKA_TELEMETRY_TOPICS') is None:
+    DEFAULT_TELEMETRY_TOPICS = DEFAULT_NOTIFICATION_TOPICS
+else:
+    DEFAULT_TELEMETRY_TOPICS = list(os.environ.get('KAFKA_TELEMETRY_TOPICS').split())
 DEFAULT_KAFKA_PORT = 9092
 DEFAULT_GRPC_SERVER_PORT = 8443
 KAFKA_CONSUMER_PARTITIONS = 3
@@ -168,6 +173,7 @@ class VoltmfProtoProducer:
         if notification_topics is None:
             notification_topics = DEFAULT_NOTIFICATION_TOPICS
         self._notification_topics = notification_topics
+        self._telemetry_topics = DEFAULT_TELEMETRY_TOPICS
         if bootstrap_servers is None:
             bootstrap_servers = DEFAULT_BOOTSTRAP_SERVERS
         self._bootstrap_servers = bootstrap_servers
@@ -209,6 +215,15 @@ class VoltmfProtoProducer:
             logger.info("Sending notification on topic {}".format(topic))
             self._producer.send(topic, bytes(msg_str))
 
+    def send_proto_telemetry(self, message : tr451_vomci_nbi_message_pb2):
+        if self._telemetry_topics is None:
+            logger.warning("Failed to send message! No topic set..")
+            return
+        msg_str = message.SerializeToString()
+        for topic in self._telemetry_topics:
+            logger.info("Sending notification on topic {}".format(topic))
+            self._producer.send(topic, bytes(msg_str))
+        
     def set_topics(self, topics: list):
         self._topics = list(set(topics)) #using set to avoid duplicates
 
@@ -345,6 +360,16 @@ class KafkaProtoInterface:
                             return
                         logger.info('Jason Dict of received delta config replica:{}'.format(payload))
 
+                elif request.WhichOneof('req_type') == 'get_data':
+                    first_filter = request.get_data.filter[0].decode("utf-8")
+                    try:
+                        payload = json.loads(first_filter)
+                    except Exception as e:
+                        logger.error('Error {} Handling of input_data {}'.format(e,input_data))
+                        self.send_unsuccessful_response(None, proto, str(e))
+                        return
+                    logger.info('Json dict of get_data yang data:{}'.format(payload))
+
                 else:
                     logger.error('Error. type not Implemented yet:{}'.format(request.WhichOneof('req_type')))
                     return None
@@ -452,106 +477,145 @@ class KafkaProtoInterface:
                 er_string = "Can't decode the payload"
                 self.send_unsuccessful_response(None, proto, er_string)
                 return
+            
             logger.info('Extracted onu data:{}'.format(onudata))
 
-            if 'create-onu' in onudata:
-                data = onudata['create-onu']
-                onu_name = data["name"]
-                if onu_name is None:
-                    er_string = "onu_name is NONE"
-                    self.send_unsuccessful_response(None, proto, er_string)
-                    return
-                self.proto_resp[onu_name] = response
-                self._vomci.trigger_create_onu(onu_name)
-                self._vomci.update_configuration_in_db()
-            elif 'managed-onu' in onudata:
-                for data in onudata['managed-onu']:
-                    onu_name = None
-                    if 'name' in data:
-                        onu_name = data['name']
+            if 'managed-onus' in onudata: 
+                managed_onus = onudata['managed-onus'] 
+                if 'create-onu' in managed_onus:
+                    data = managed_onus['create-onu']
+                    onu_name = data["name"]
+                    xpon_onu_type = data["xpon-onu-type"]
                     if onu_name is None:
-                        er_string = "onu-name is NONE"
-                        logger.error(er_string)
+                        er_string = "onu_name is NONE"
                         self.send_unsuccessful_response(None, proto, er_string)
                         return
-
+                    if xpon_onu_type is None:
+                        er_string = "xpon_onu_type is NONE"
+                        self.send_unsuccessful_response(None, proto, er_string)
+                        return
                     self.proto_resp[onu_name] = response
-                    if 'delete-onu' in data:
-                        logger.info('Triggering ONU Delete for:{}'.format(onu_name))
-                        self._vomci.trigger_delete_onu(onu_name)
-                        self._vomci.update_configuration_in_db()
-                    elif 'set-onu-communication' in data:
-                        epdata = data.get('set-onu-communication')
-                        if epdata is None:
-                            er_string = "ONU header is missing in the payload for ONU {}".format(onu_name)
+                    self._vomci.trigger_create_onu(onu_name)
+                    self._vomci.update_configuration_in_db()
+                elif 'managed-onu' in managed_onus:
+                    for data in managed_onus['managed-onu']:
+                        onu_name = None
+                        if 'name' in data:
+                            onu_name = data['name']
+                        if onu_name is None:
+                            er_string = "onu-name is NONE"
                             logger.error(er_string)
                             self.send_unsuccessful_response(None, proto, er_string)
                             return
-                        onu_header = epdata['onu-attachment-point']
-                        olt_name = onu_header.get('olt-name')
-                        channel_termination = onu_header.get('channel-termination-name')
-                        onu_id = onu_header.get('onu-id')
-                        if onu_id is not None:
-                            try:
-                                onu_tc_id = int(onu_id)
-                            except:
-                                er_string = "ONU {}: Invalid TC ONU ID {}".format(onu_name, onu_id)
+                        self.proto_resp[onu_name] = response
+                        if 'delete-onu' in data:
+                            delete_data = data.get('delete-onu')
+                            delete_state_data = 'delete-state-data' in delete_data and \
+                                        delete_data['delete-state-data'] or False
+                            if delete_state_data is None:
+                                er_string = "delete-state-data is NONE"
                                 logger.error(er_string)
                                 self.send_unsuccessful_response(None, proto, er_string)
                                 return
-                        available = 'onu-communication-available' in epdata and \
-                                    epdata['onu-communication-available'] or False
-                        olt_endpoint_name = epdata.get('olt-remote-endpoint-name')
-                        if 'voltmf-remote-endpoint-name' in epdata:
-                            south_endpoint_name = epdata['voltmf-remote-endpoint-name']
-                        elif 'vomci-function-remote-endpoint-name' in epdata:
-                            south_endpoint_name = epdata['vomci-function-remote-endpoint-name']
-                        if available:
-                            if olt_endpoint_name is None:
-                                er_string = "ONU {}: olt-remote-endpoint-name must be set if onu-communication-available is True".format(
-                                    onu_name)
+                            logger.info('Triggering ONU Delete for:{}'.format(onu_name))
+                            Subscription.remove_all_subscriptions(onu_name)
+                            self._vomci.trigger_delete_onu(onu_name)
+                            self._vomci.update_configuration_in_db()
+                        elif 'set-onu-communication' in data:
+                            epdata = data.get('set-onu-communication')
+                            if epdata is None:
+                                er_string = "ONU header is missing in the payload for ONU {}".format(onu_name)
                                 logger.error(er_string)
                                 self.send_unsuccessful_response(None, proto, er_string)
                                 return
-                            if channel_termination is None:
-                                er_string = "ONU {}: channel-termination must be set if onu-communication-available is True".format(
-                                    onu_name)
-                                logger.error(er_string)
+                            onu_header = epdata['onu-attachment-point']
+                            olt_name = onu_header.get('olt-name')
+                            channel_termination = onu_header.get('channel-termination-name')
+                            onu_id = onu_header.get('onu-id')
+                            if onu_id is not None:
+                                try:
+                                    onu_tc_id = int(onu_id)
+                                except:
+                                    er_string = "ONU {}: Invalid TC ONU ID {}".format(onu_name, onu_id)
+                                    logger.error(er_string)
+                                    self.send_unsuccessful_response(None, proto, er_string)
+                                    return
+                            available = 'onu-communication-available' in epdata and \
+                                        epdata['onu-communication-available'] or False
+                            olt_endpoint_name = epdata.get('olt-remote-endpoint')
+                            if 'voltmf-remote-endpoint' in epdata:
+                                south_endpoint_name = epdata['voltmf-remote-endpoint']
+                            elif 'vomci-function-remote-endpoint' in epdata:
+                                south_endpoint_name = epdata['vomci-function-remote-endpoint']
+                            if available:
+                                if olt_endpoint_name is None:
+                                    er_string = "ONU {}: olt-remote-endpoint-name must be set if onu-communication-available is True".format(
+                                        onu_name)
+                                    logger.error(er_string)
+                                    self.send_unsuccessful_response(None, proto, er_string)
+                                    return
+                                if channel_termination is None:
+                                    er_string = "ONU {}: channel-termination must be set if onu-communication-available is True".format(
+                                        onu_name)
+                                    logger.error(er_string)
+                                    self.send_unsuccessful_response(None, proto, er_string)
+                                    return
+                                if onu_id is None:
+                                    er_string = "ONU {}: onu-id must be set if onu-communication-available is True".format(
+                                        onu_name)
+                                    logger.error(er_string)
+                                    self.send_unsuccessful_response(None, proto, er_string)
+                                    return
+                            xpon_onu_type = epdata['xpon-onu-type']
+                            if xpon_onu_type is None:
+                                er_string = "xpon_onu_type is NONE"
                                 self.send_unsuccessful_response(None, proto, er_string)
                                 return
-                            if onu_id is None:
-                                er_string = "ONU {}: onu-id must be set if onu-communication-available is True".format(
-                                    onu_name)
-                                logger.error(er_string)
-                                self.send_unsuccessful_response(None, proto, er_string)
-                                return
-
-                        # Handle set_onu_communication
-                        logger.info('Triggering set_onu_communication for onu_id:{} \
-                                    olt-name:{} olt_endpoint_name:{} \
-                                    south_endpoint_name:{}'.format(onu_id,olt_name,olt_endpoint_name,south_endpoint_name))
-                        self._vomci.trigger_set_onu_communication(olt_name, onu_name, channel_termination,
-                                                                  onu_tc_id, available, olt_endpoint_name,
-                                                                  south_endpoint_name, sender_name)
-                        self._vomci.update_configuration_in_db()
-                    else:
-                        er_string = "UNIMPLEMENTED Request"
-                        logger.error(er_string)
-                        self.send_unsuccessful_response(None, proto, er_string)
-                        return
-            elif 'remote-network-function' in onudata:
+                            # Handle set_onu_communication
+                            logger.info('Triggering set_onu_communication for onu_id:{} \
+                                        olt-name:{} olt_endpoint_name:{} \
+                                        south_endpoint_name:{}'.format(onu_id,olt_name,olt_endpoint_name,south_endpoint_name))
+                            self._vomci.trigger_set_onu_communication(olt_name, onu_name, channel_termination,
+                                                                    onu_tc_id, available, olt_endpoint_name,
+                                                                    south_endpoint_name, sender_name)
+                            self._vomci.update_configuration_in_db()
+                        elif 'bbf-obbaa-vomci-telemetry:established-subscriptions' in data:
+                            subscrciptions = Subscription.get_json_subscriptions(onu_name)
+                            logger.info("Subscriptions are retrieved")
+                            self.send_successful_response(onu_name, subscrciptions)
+                        elif 'bbf-obbaa-vomci-telemetry:establish-subscription' in data:
+                            if ManagementChain.GetOnu(onu_name) is None:
+                                self.send_unsuccessful_response(onu_name, proto, 'ONU does not exist')
+                            else:
+                                subscription_id = Subscription.add_json_subscription(data['bbf-obbaa-vomci-telemetry:establish-subscription'], onu_name)
+                                self._vomci.update_configuration_in_db()
+                                logger.info("Subscription {} for Onu {} was created in vOMCI".format(subscription_id, onu_name))
+                                data = {'bbf-obbaa-vomci-telemetry:subscription-id': subscription_id}
+                                self.send_successful_response(onu_name, json.dumps(data))
+                        elif 'bbf-obbaa-vomci-telemetry:remove-subscription' in data:
+                            subscription_id = data['bbf-obbaa-vomci-telemetry:remove-subscription']['subscription-id']
+                            Subscription.remove_subscription(subscription_id, onu_name)
+                            self._vomci.update_configuration_in_db()
+                            logger.info("Subscription {} for Onu {} was removed in vOMCI".format(subscription_id, onu_name))
+                            data = {'bbf-obbaa-vomci-telemetry:subscription-id': subscription_id}
+                            self.send_successful_response(onu_name, json.dumps(data))
+                        else:
+                            er_string = "UNIMPLEMENTED Request"
+                            logger.error(er_string)
+                            self.send_unsuccessful_response(None, proto, er_string)
+                            return
+            elif 'remote-nf' in onudata:
                 #handle nf-client
-                nf_client = onudata['remote-network-function']['nf-client']
+                nf_client = onudata['remote-nf']['nf-client']
                 if 'enabled' not in nf_client or nf_client['enabled']:
-                    remote_endpoints = nf_client['nf-initiate']['remote-endpoints']['remote-endpoint']
-                    for endpoint in remote_endpoints:
+                    remote_server = nf_client['initiate']['remote-server']
+                    for endpoint in remote_server:
                         remote_endpoint_name = endpoint['name']
-                        local_endpoint_name = endpoint['local-endpoint-name']
-                        access_points = endpoint['access-point']
                         nf_type = endpoint['nf-type']
+                        local_endpoint_name = endpoint['local-service-endpoint']
 
                         #kafka configuration
-                        if nf_type == 'bbf-network-function-types:voltmf-type':
+                        if nf_type == 'bbf-network-function-types:voltmf':
                             # a VNF can suppport only one kafka endpoint (with a VOLTMF). 
                             # The first kafka endpoint configured is assumed as the interface with the vOLTMF.
                             # If more kafka endpoints are present in the configuration sent to the vOMCI function/proxy, they will be ignored.
@@ -563,57 +627,92 @@ class KafkaProtoInterface:
                                 continue #skip it
 
                             #kafka bootstrap servers
-                            kafka_agent = endpoint['kafka-agent']['kafka-agent-parameters']
-                            client_id = kafka_agent['client-id']
-                            brokers = []
-                            for access_point in access_points:
-                                kafka_name = access_point['name']
-                                transport_parameters = access_point['kafka-agent']['kafka-agent-transport-parameters']
-                                kafka_server = transport_parameters['remote-address']
-                                if 'remote-port' in transport_parameters:
-                                    kafka_port = transport_parameters['remote-port']
+                            kafka_agent = None
+                            if 'bbf-vomci-function-kafka-agent:kafka-agent' in endpoint:
+                                kafka_agent = endpoint['bbf-vomci-function-kafka-agent:kafka-agent']
+                            elif 'bbf-vomci-proxy-kafka-agent:kafka-agent' in endpoint:
+                                kafka_agent = endpoint['bbf-vomci-proxy-kafka-agent:kafka-agent']
+                                
+                            if kafka_agent is not None:
+                                client_id = kafka_agent['client-id']
+                                #publication_parameters = kafka_agent['publication-parameters']
+                                access_points = kafka_agent['access-point']
+                                brokers = []
+                                for access_point in access_points:
+                                    kafka_name = access_point['name']
+                                    if 'bbf-vomci-function-kafka-agent-tcp:tcp-client-parameters' in access_point['kafka-agent-transport-parameters']:
+                                        tcp_client_parameters = access_point['kafka-agent-transport-parameters']['bbf-vomci-function-kafka-agent-tcp:tcp-client-parameters']
+                                    elif 'bbf-vomci-proxy-kafka-agent-tcp:tcp-client-parameters' in access_point['kafka-agent-transport-parameters']:
+                                        tcp_client_parameters = access_point['kafka-agent-transport-parameters']['bbf-vomci-proxy-kafka-agent-tcp:tcp-client-parameters']
+                                    else:
+                                        er_string = "Missing tcp-client-parameters on kafka endpoint"
+                                        self.send_unsuccessful_response(None, proto, er_string)
+                                        return
+                                                                            
+                                    kafka_server = tcp_client_parameters['remote-address']
+                                    if 'remote-port' in tcp_client_parameters:
+                                        kafka_port = tcp_client_parameters['remote-port']
+                                    else:
+                                        kafka_port = DEFAULT_KAFKA_PORT
+                                    kafka_broker = kafka_server+':'+str(kafka_port)
+    
+                                    brokers.append(kafka_broker)
+                                self._vomci._kafka_if.add_bootstrap_servers(brokers)
+    
+                                #producer
+                                if 'publication-parameters' in kafka_agent:
+                                    publication_topics = kafka_agent['publication-parameters']['topic']
                                 else:
-                                    kafka_port = DEFAULT_KAFKA_PORT
-                                kafka_broker = kafka_server+':'+str(kafka_port)
-
-                                brokers.append(kafka_broker)
-                            self._vomci._kafka_if.add_bootstrap_servers(brokers)
-
-                            #producer
-                            if 'publication-parameters' in kafka_agent:
-                                publication_topics = kafka_agent['publication-parameters']['topic']
+                                    publication_topics = []
+                                response_topics = []
+                                notification_topics = []
+                                for topic in publication_topics:
+                                    if topic['purpose'] == 'VOMCI_RESPONSE':
+                                        response_topics.append(topic['name'])
+                                    elif topic['purpose'] == 'VOMCI_NOTIFICATION':
+                                        notification_topics.append(topic['name'])
+                                self._producer.add_topics(response_topics)
+                                self._producer.add_notification_topics(notification_topics)
+    
+                                #consumer
+                                if kafka_agent['consumption-parameters']:
+                                    consumption_topics = kafka_agent['consumption-parameters']['topic']
+                                    group_id = kafka_agent['consumption-parameters']['group-id']
+                                else:
+                                    consumption_topics = []
+                                
+                                
+                                consumer_topics = []
+                                for topic in consumption_topics:
+                                    if topic['purpose'] == 'VOMCI_REQUEST':
+                                        consumer_topics.append(topic['name'])
+                                self._consumer.add_topics(consumer_topics)
                             else:
-                                publication_topics = []
-                            response_topics = []
-                            notification_topics = []
-                            for topic in publication_topics:
-                                if topic['purpose'] == 'VOMCI_RESPONSE':
-                                    response_topics.append(topic['name'])
-                                elif topic['purpose'] == 'VOMCI_NOTIFICATION':
-                                    notification_topics.append(topic['name'])
-                            self._producer.add_topics(response_topics)
-                            self._producer.add_notification_topics(notification_topics)
-
-                            #consumer
-                            if kafka_agent['consumption-parameters']:
-                                consumption_topics = kafka_agent['consumption-parameters']['topic']
-                            else:
-                                consumption_topics = []
-                            
-                            consumer_topics = []
-                            for topic in consumption_topics:
-                                if topic['purpose'] == 'VOMCI_REQUEST':
-                                    consumer_topics.append(topic['name'])
-                            self._consumer.add_topics(consumer_topics)
+                                logger.info('Found vOLTMF endpoint without kafka info.')
                         
                         #grpc client configuration
-                        elif nf_type == 'bbf-network-function-types:vomci-function-type':
-                            for access_point in access_points:
-                                point_name = access_point['name']
-                                params = access_point['grpc']['grpc-transport-parameters']
-                                adress = params['remote-address']
-                                port = params['remote-port']
-                                self._vomci.trigger_create_grpc_connection(adress, port)
+                        elif nf_type == 'bbf-network-function-types:vomci-function':
+                            grpc_client = None
+                            if 'bbf-vomci-function-grpc-client:grpc-client' in endpoint:
+                                grpc_client = endpoint['bbf-vomci-function-grpc-client:grpc-client']
+                            elif 'bbf-vomci-proxy-grpc-client:grpc-client' in endpoint:
+                                grpc_client = endpoint['bbf-vomci-proxy-grpc-client:grpc-client']
+                                
+                            if grpc_client is not None:
+                                access_points = grpc_client['access-point']
+                                for access_point in access_points:
+                                    point_name = access_point['name']
+                                    if 'bbf-vomci-function-grpc-client-tcp:tcp-client-parameters' in access_point['grpc-transport-parameters']:
+                                        params = access_point['grpc-transport-parameters']['bbf-vomci-function-grpc-client-tcp:tcp-client-parameters']
+                                    elif 'bbf-vomci-proxy-grpc-client-tcp:tcp-client-parameters' in access_point['grpc-transport-parameters']:
+                                        params = access_point['grpc-transport-parameters']['bbf-vomci-proxy-grpc-client-tcp:tcp-client-parameters']
+                                    else:
+                                        er_string = "Missing TCP parameters on gRPC client connection"
+                                        self.send_unsuccessful_response(None, proto, er_string)
+                                        return 
+                                    adress = params['remote-address']
+                                    port = params['remote-port']
+                                    self._vomci.trigger_create_grpc_connection(adress, port, local_endpoint_name)
                     self.send_successful_update_config_response(m)
                 else:
                     #handle enabled: false
@@ -621,24 +720,34 @@ class KafkaProtoInterface:
                     return
 
                 #nf-server
-                if 'nf-server' in onudata['remote-network-function']:
-                    nf_server = onudata['remote-network-function']['nf-server']
+                if 'nf-server' in onudata['remote-nf']:
+                    nf_server = onudata['remote-nf']['nf-server']
                     if 'enabled' not in nf_server or nf_server['enabled']:
                         listen_endpoints = nf_server['listen']['listen-endpoint']
                         for endpoint in listen_endpoints:
                             endpoint_name = endpoint['name']
-                            grpc_params = endpoint['grpc']['grpc-server-parameters']
+                            service_endpoint_name = endpoint['local-service-endpoint']
+                            
+                            if 'bbf-vomci-function-grpc-server:grpc-server' in endpoint:
+                                grpc_params = endpoint['bbf-vomci-function-grpc-server:grpc-server']['bbf-vomci-function-grpc-server-tcp:tcp-server-parameters']
+                            elif 'bbf-vomci-proxy-grpc-server:grpc-server' in endpoint:
+                                grpc_params = endpoint['bbf-vomci-proxy-grpc-server:grpc-server']['bbf-vomci-proxy-grpc-server-tcp:tcp-server-parameters']
+                            else:
+                                er_string = "Missing tcp-server-parameters on gRPC server endpoint"
+                                self.send_unsuccessful_response(None, proto, er_string)
+                                return
 
-                            name = grpc_params['local-endpoint-name']
+                            #name = grpc_params['local-endpoint-name']
                             adress = grpc_params['local-address']
                             if 'local-port' in grpc_params:
                                 port = grpc_params['local-port']
                             else:
                                 port = DEFAULT_GRPC_SERVER_PORT
-                            self._vomci.trigger_start_grpc_server(name, adress, port)
+                            self._vomci.trigger_start_grpc_server(service_endpoint_name, adress, port)
                     else:
                         #TODO handle enabled: false
-                        pass
+                        self._consumer.stop() 
+                        return
                     self._vomci.update_configuration_in_db()
             else:
                 if obj_type == 'ONU':
@@ -700,7 +809,7 @@ class KafkaProtoInterface:
         self.set_bootstrap_servers(myServers)
         logger.info('Added bootstrap servers {}'.format(servers))
 
-    def send_successful_response(self, onu):
+    def send_successful_response(self, onu, data=None):
         if isinstance(onu, str):
             onu_name = onu
         else:
@@ -721,7 +830,7 @@ class KafkaProtoInterface:
                 rsp.header.object_type = tr451_vomci_nbi_message_pb2.Header.OBJECT_TYPE.VOMCI_PROXY
             if ob_type == tr451_vomci_nbi_message_pb2.Header.OBJECT_TYPE.ONU:
                 rsp.header.object_type = tr451_vomci_nbi_message_pb2.Header.OBJECT_TYPE.ONU
-
+  
             tp = msg.body.request.WhichOneof('req_type')
             del self.proto_resp[onu_name]
             if tp == 'rpc':
@@ -729,14 +838,21 @@ class KafkaProtoInterface:
                 rsp.body.response.rpc_resp.status_resp.CopyFrom(stat)
             elif tp == 'action':
                 rsp.body.response.action_resp.status_resp.status_code = int()
-            if tp == 'update_config':
+                if data is not None:
+                    rsp.body.response.action_resp.output_data = bytes(data, "utf-8")
+            elif tp == 'update_config':
                 rsp.body.response.update_config_resp.status_resp.status_code = int()
             elif tp == 'replace_config':
                 rsp.body.response.replace_config_resp.status_resp.status_code = int()
-            elif tp == 'get_data':                
-                first_filter = msg.body.request.get_data.filter[0].decode("utf-8")
-                yang_response = bytes(get_yang_response(onu, first_filter),"utf-8")
-                rsp.body.response.get_resp.data = yang_response
+            elif tp == 'get_data':
+                rsp.body.response.replace_config_resp.status_resp.status_code = int()
+                if data is None:
+                    first_filter = msg.body.request.get_data.filter[0].decode("utf-8")
+                    yang_res = get_yang_response(onu, first_filter)
+                    yang_res = json.dumps(yang_res).replace('\\u0000', '').replace('\\u0016', '')
+                    rsp.body.response.get_resp.data = bytes(yang_res, "utf-8")
+                else:
+                    rsp.body.response.get_resp.data = bytes(data, "utf-8")
             else:
                 logger.error('Unknown request type:{}'.format(tp))
             logger.info('sending the SUCCESS protobuf response to VOLTMF:{}'.format(rsp))
@@ -881,26 +997,61 @@ class KafkaProtoInterface:
         logger.info('GPB Processing failed,sending Unsuccessful response to VOLTMF:{}'.format(rsp))
         self._producer.send_proto_response(rsp)
 
-    def send_alignment_notification(self, onu_name: str, is_aligned: bool):
-        notification_gpb = self.make_alignment_notification(onu_name, is_aligned)
+    def send_alignment_notification(self, onu_name: str, is_aligned: bool, datastore_tag: str = ""):
+        notification_gpb = self.make_alignment_notification(onu_name, is_aligned, datastore_tag)
         self._producer.send_proto_notification(notification_gpb)
 
-    def make_alignment_notification(self, onu_name: str, is_aligned: bool):
+    def make_alignment_notification(self, onu_name: str, is_aligned: bool, datastore_tag: str):
         notif = tr451_vomci_nbi_message_pb2.Msg()
         notif.header.msg_id = "1"
         notif.header.sender_name = self._vomci.name
         managed_onu = ManagementChain.GetOnu(onu_name)
         notif.header.recipient_name = managed_onu.voltmf_name
         notif.header.object_name = onu_name
-        header = '{"bbf-vomci-function:onu-alignment-status":{'
-        iso_time = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc, microsecond=0).isoformat()
-        event_time = '"event-time" : "'+iso_time+'"'
+        notif.body.request.action.datastore_tag = datastore_tag
+        header = '{"bbf-vomci-function:onu-alignment-result":{'   
         onu = '"onu-name":"'+onu_name+'"'
+        datastore = '"datastore-tag":"'+datastore_tag+'"'
         if is_aligned:
-            alignment_status = '"alignment-status": "aligned"'
+            alignment_status = '"alignment-state": "aligned"'
         else:
-            alignment_status = '"alignment-status": "unaligned"'
-        data_str = header + event_time + ',' + onu + ',' + alignment_status + '}}'
+            alignment_status = '"alignment-state": "unaligned"'
+        data_str = header + onu + ',' + datastore + ',' + alignment_status + '}}'
         notif.body.notification.data = bytes(data_str, 'utf-8')
         return notif
 
+    def send_telemetry_notification(self, onu, xpaths, subscription_id):
+        managed_onu = ManagementChain.GetOnu(onu.onu_name)
+        if managed_onu is None:
+            logger.error('Onu {} does not exist'.format(onu.onu_name))
+            return
+        notification_message = KafkaProtoInterface.make_telemetry_notification(onu, xpaths, subscription_id)
+        notif = tr451_vomci_nbi_message_pb2.Msg()
+        notif.header.msg_id = '1'
+        notif.header.recipient_name = managed_onu.voltmf_name
+        notif.header.sender_name = self._vomci.name
+        notif.header.object_name = self._vomci.name
+        notif.header.object_type = tr451_vomci_nbi_message_pb2.Header.OBJECT_TYPE.VOMCI_FUNCTION
+        notif.body.response.update_config_resp.status_resp.status_code = int()
+        notif.body.notification.data = notification_message
+        logger.info('Sending telemetry notification :{}'.format(notif))
+        if self._producer is None:
+            logger.error('Kafka producer is not available')
+            return
+        self._producer.send_proto_telemetry(notif)
+
+    @staticmethod
+    def make_telemetry_notification(onu, xpaths, subscription_id):
+        update_message = get_yang_response(onu, xpaths)
+        now = datetime.datetime.now()
+        notification = {
+            "bbf-obbaa-vomci-telemetry:telemetry-data": {
+                "subscription-id": str(subscription_id),
+                "onu-name": onu.onu_name,
+                "collection-time": str(now),
+                "last-message": "true",
+                "values": update_message
+            }
+        }
+        notification = json.dumps(notification).replace('\\u0000', '').replace('\\u0016', '')
+        return bytes(notification, "utf-8")

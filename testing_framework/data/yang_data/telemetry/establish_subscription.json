@@ -1,0 +1,24 @@
+{
+    "bbf-vomci-function:vomci": {
+        "managed-onus": {
+            "managed-onu": [
+                {
+                    "name": "$ONU_NAME$",
+                    "bbf-obbaa-vomci-telemetry:establish-subscription": {
+                        "updates": [
+                            {
+                                "name": "pm1",
+                                "xpaths": [
+                                    "ietf-interfaces:interfaces-state"
+                                ],
+                                "mode": "periodic",
+                                "interval": 8,
+                                "start-random-offset": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

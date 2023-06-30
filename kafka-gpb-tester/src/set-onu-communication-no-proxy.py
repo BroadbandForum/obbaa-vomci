@@ -20,6 +20,7 @@ import sys
 from tr451_vomci_nbi_message_pb2 import Msg
 from tr451_vomci_nbi_message_pb2 import Error
 from confluent_kafka import Producer
+from configurations import util
 import global_params as GLB
 
 
@@ -56,14 +57,9 @@ vomci_msg.header.recipient_name=GLB.VOMCI_NAME
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_FUNCTION
 vomci_msg.header.object_name=GLB.VOMCI_NAME
 
-vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"managed-onu\":[{\"name\":\"" + GLB.ONU_NAME +
-                                            "\",\"set-onu-communication\":{\"onu-attachment-point\":{\"olt-name\":\"" + OLT_NAME +
-                                            "\",\"channel-termination-name\":\"" + GLB.CT_NAME +
-                                             "\",\"onu-id\":" + GLB.ONU_ID + 
-                                             "},\"voltmf-remote-endpoint-name\":\"vOLTMF_Kafka_1\",\"onu-communication-available\":" + COMMUNICATION_AVAILABLE_VALUE + "," +
-                                             "  \"olt-remote-endpoint-name\":\"" +  OLT_ENDPOINT_NAME + "\"}}]}}","utf-8")
+set_onu_communication_no_proxy = util.read_configuration('configurations/vomci-set-onu-communication-no-proxy.json')
 
-
+vomci_msg.body.request.action.input_data = bytes(set_onu_communication_no_proxy,"utf-8")
 
 producer.produce(GLB.VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()

@@ -1,0 +1,14 @@
+{
+    "bbf-vomci-function:vomci": {
+        "managed-onus": {
+            "managed-onu": [
+                {
+                    "name": "$ONU_NAME$",
+                    "bbf-obbaa-vomci-telemetry:remove-subscription": {
+                        "subscription-id": $SUBSCRIPTION_ID$
+                    }
+                }
+            ]
+        }
+    }
+}

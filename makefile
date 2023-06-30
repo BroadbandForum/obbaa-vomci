@@ -32,6 +32,7 @@ DOCKER-RUNOPTS = -p 12345:12345/udp \
 docker-build:
 	docker image build $(DOCKER-BUILDOPTS) --tag=$(DOCKER-NAME) .
 	docker image build -f proxy/Dockerfile $(DOCKER-BUILDOPTS) --tag=obbaa-vproxy:latest .
+	docker image build -f kafka-gpb-tester/Dockerfile $(DOCKER-BUILDOPTS) --tag=kafka-gpb-tester:latest .
 
 bamboo-docker-build:
 	docker image build $(DOCKER-BUILDOPTS) --tag=$(DOCKER-NAME) .
@@ -61,6 +62,20 @@ test-kafka:
 	docker image build -f test/test_olt/Dockerfile $(DOCKER-BUILDOPTS) --tag=test-olt:latest .
 	docker-compose -f test/docker-compose-proxy.yml up -d
 	docker-compose -f test/docker-compose.yml up
+
+unit-test:
+	python3.10 -m unittest database/telemetry_subscription.py
+
+test-features:
+	# ========== Starting Tests =============================================
+	python3.10 -m unittest testing_framework/test_cases/add_onu.py || exit 1
+	python3.10 -m unittest testing_framework/test_cases/get_data.py || exit 1
+	python3.10 -m unittest testing_framework/test_cases/uni_config.py || exit 1
+	python3.10 -m unittest testing_framework/test_cases/telemetry.py || exit 1
+	python3.10 -m unittest testing_framework/test_cases/restart.py || exit 1
+	# ========== Stoping Containers ========================================
+	docker-compose -f ./testing_framework/data/compose_data/docker-compose.yaml down
+	# ========== Success =====================================================
 
 # sphinx-build handles remaining targets; make help to get a list
 %:

@@ -19,7 +19,9 @@
 from tr451_vomci_nbi_message_pb2 import Msg
 from tr451_vomci_nbi_message_pb2 import Error
 from confluent_kafka import Producer
+from configurations import util
 import global_params as GLB
+
 
 
 producer = Producer(GLB.conf)
@@ -42,7 +44,9 @@ vomci_msg.header.recipient_name=GLB.VOMCI_NAME
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_FUNCTION
 vomci_msg.header.object_name=GLB.VOMCI_NAME
 
-vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"create-onu\":{\"name\":\""  + GLB.ONU_NAME + "\"}}}","utf-8")
+vomci_create_onu = util.read_configuration('configurations/vomci-create-onu.json')
+
+vomci_msg.body.request.action.input_data = bytes(vomci_create_onu,"utf-8")
 
 producer.produce(GLB.VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()
@@ -55,7 +59,7 @@ vomci_msg.header.recipient_name=GLB.VPROXY_NAME
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_PROXY
 vomci_msg.header.object_name=GLB.VPROXY_NAME
 
-vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"create-onu\":{\"name\":\""  + GLB.ONU_NAME + "\"}}}","utf-8")
+vomci_msg.body.request.action.input_data = bytes(vomci_create_onu,"utf-8")
 
 producer.produce(GLB.VPROXY_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()

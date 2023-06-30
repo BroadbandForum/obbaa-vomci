@@ -36,13 +36,13 @@ from encode_decode.omci_action_create import CreateAction
 from omh_nbi.onu_driver import OnuDriver
 from omh_nbi.omh_handler import OmhHandler, OMHStatus
 from omci_logger import OmciLogger
-from .omh_handler_utils import get_uni, create_mac_bridge_port, create_ext_vlan_tag_oper_config_data
+from .omh_handler_utils import get_uni, create_mac_bridge_port, create_ext_vlan_tag_oper_config_data, create_eth_frame_pm
 import copy
 
 logger = OmciLogger.getLogger(__name__)
 
 class UniSetHandler(OmhHandler):
-    def __init__(self, onu: 'OnuDriver', uni_name: str, uni_id: int, hd_name: str):
+    def __init__(self, onu: 'OnuDriver', uni_name: str, uni_id: int, hd_name: str, pm_enabled: bool):
         """ Set UNI port.
 
         Args:
@@ -58,6 +58,7 @@ class UniSetHandler(OmhHandler):
         self._uni_name = uni_name
         self._uni_id = uni_id
         self._hd_name = hd_name
+        self._pm_enabled = pm_enabled
 
     def _enable_uni(self, uni: ME) -> OMHStatus:
         """Enable UNI"""
@@ -95,12 +96,20 @@ class UniSetHandler(OmhHandler):
         status = create_mac_bridge_port(self, uni_me)
         if status != OMHStatus.OK:
             return status
+        mac_bridge_port_me = self.last_action.me
 
         # 4. Create EXT_VLAN_TAG_OPER_CFG
         logger.info('{} - Create EXT VLAN Tagging Oper Config Data'.format(self.info()))
         status = create_ext_vlan_tag_oper_config_data(self, uni_me)
         if status != OMHStatus.OK:
             return status
+
+        # 5. Enable PM, if required, by creating ETH FRAME UPSTREAM PM and ETH FRAME DOWNSTREAM PM
+        if self._pm_enabled:
+            logger.info('{} - Create ETH FRAME PM'.format(self.info()))
+            status = create_eth_frame_pm(self,  mac_bridge_port_me.inst)
+            if status != OMHStatus.OK:
+                return status
 
         uni_me.user_name = self._uni_name
         uni_me.hd_name = self.hd_name

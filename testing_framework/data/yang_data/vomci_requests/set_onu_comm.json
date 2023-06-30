@@ -1,0 +1,22 @@
+{
+    "bbf-vomci-function:vomci": {
+        "managed-onus": {
+            "managed-onu": [
+                {
+                    "name": "$ONU_NAME$",
+                    "set-onu-communication": {
+                        "onu-attachment-point": {
+                            "olt-name": "$OLT_NAME$",
+                            "channel-termination-name": "CT_1",
+                            "onu-id": "$ONU_ID$"
+                        },
+                        "xpon-onu-type": "bbf-vomci-types:gpon",
+                        "voltmf-remote-endpoint": "vOLTMF_Kafka_1",
+                        "onu-communication-available": "true",
+                        "olt-remote-endpoint": "$OLT_CONNECTION$"
+                    }
+                }
+            ]
+        }
+    }
+}

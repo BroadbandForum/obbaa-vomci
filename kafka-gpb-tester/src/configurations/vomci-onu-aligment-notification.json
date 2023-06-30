@@ -1,0 +1,7 @@
+{
+  "bbf-vomci-function:onu-alignment-result": {
+    "onu-name": "ont1",
+    "datastore-tag": "1",
+    "alignment-state": "unaligned"
+  }
+}

@@ -15,16 +15,16 @@ def getSampleProtoVomci(key):
         ret.body.request.hello.service_endpoint_name = "volmf-endpoint"
     elif key == 'create':
         ret.header.msg_id = "3"
-        ret.body.request.action.input_data = b'{"bbf-vomci-function:managed-onus":{"create-onu":{"name":"ont1"}}}'
+        ret.body.request.action.input_data = b'{"bbf-vomci-function:vomci":{"managed-onus":{"create-onu":{"name":"ont1","xpon-onu-type":"bbf-vomci-types:gpon"}}}}'
     elif key == 'set':
         ret.header.msg_id = "5"
-        ret.body.request.action.input_data = b'{"bbf-vomci-function:managed-onus":{"managed-onu":[{"name":"ont1","set-onu-communication":{"onu-attachment-point":{"olt-name":"OLT1","channel-termination-name":"CT_1","onu-id":1},"voltmf-remote-endpoint-name":"vOLTMF_Kafka","onu-communication-available":true,"olt-remote-endpoint-name":"obbaa-vproxy-grpc-client-1"}}]}}'
+        ret.body.request.action.input_data = b'{"bbf-vomci-function:vomci":{"managed-onus":{"managed-onu":[{"name":"ont1","set-onu-communication":{"onu-communication-available":true,"olt-remote-endpoint":"olt-grpc-2","voltmf-remote-endpoint":"vOLTMF_Kafka_1","xpon-onu-type":"bbf-vomci-types:gpon","onu-attachment-point":{"olt-name":"olt-grpc-2","channel-termination-name":"CT_1","onu-id":1}}}]}}}'
     elif key == 'update_config':
         ret.header.msg_id = "7"
-        ret.body.request.update_config.update_config_replica.delta_config = b'{"bbf-vomci-function:vomci":{"remote-network-function":{"nf-client":{"enabled":true,"nf-initiate":{"remote-endpoints":{"remote-endpoint":[{"name":"obbaa-vomci","nf-type":"bbf-network-function-types:voltmf-type","local-endpoint-name":"vOMCI-kfk-1","kafka-agent":{"kafka-agent-parameters":{"client-id":"client-id2","publication-parameters":{"topic":[{"name":"vomci1-response","purpose":"VOMCI_RESPONSE"},{"name":"vomci1-notification","purpose":"VOMCI_NOTIFICATION"}]},"consumption-parameters":{"topic":[{"name":"vomci1-request","purpose":"VOMCI_REQUEST"}]}}},"access-point":[{"name":"obbaa-vomci","kafka-agent":{"kafka-agent-transport-parameters":{"remote-address":"kafka-host"}}}]}]}}},"nf-server":{"enabled":true,"listen":{"listen-endpoint":[{"name":"vOMCI-grpc-1","grpc":{"grpc-server-parameters":{"local-endpoint-name":"vOMCI-grpc-1","local-address":"::","local-port":8100}}}]}}}}}'
+        ret.body.request.update_config.update_config_replica.delta_config = b'{"bbf-vomci-function:vomci":{"remote-nf":{"nf-client":{"enabled": true,"initiate":{"remote-server":[{"name":"vOLTMF_Kafka_1","nf-type":"bbf-network-function-types:voltmf","local-service-endpoint":"vOMCI-kfk-1","bbf-vomci-function-kafka-agent:kafka-agent":{"client-id":"client-id2","publication-parameters":{"topic":[{"name":"vomci1-response","purpose":"VOMCI_RESPONSE"},{"name":"vomci1-notification","purpose":"VOMCI_NOTIFICATION"}]},"consumption-parameters":{"group-id":"group2","topic":[{"name":"vomci1-request","purpose":"VOMCI_REQUEST"}]},"access-point":[{"name":"vOLTMF_Kafka_1","kafka-agent-transport-parameters":{"bbf-vomci-function-kafka-agent-tcp:tcp-client-parameters":{"remote-address":"kafka-host","remote-port":9092}}}]}}]}},"nf-server":{"enabled":true,"listen":{"listen-endpoint":[{"name":"proxy-grpc-1","local-service-endpoint":"vOMCI-grpc-1","bbf-vomci-function-grpc-server:grpc-server":{"bbf-vomci-function-grpc-server-tcp:tcp-server-parameters":{"local-address":"::","local-port":8100}}}]}}}}}'
     elif key == 'disable':
         ret.header.msg_id = "9"
-        ret.body.request.update_config.update_config_replica.delta_config = b'{"bbf-vomci-function:vomci":{"remote-network-function":{"nf-client":{"enabled":false}}}}'
+        ret.body.request.update_config.update_config_replica.delta_config = b'{"bbf-vomci-function:vomci":{"remote-nf":{"nf-client":{"enabled":false}}}}'
     else:
         ret = None
     return ret

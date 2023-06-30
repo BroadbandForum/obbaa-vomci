@@ -1,4 +1,19 @@
-import json
+# Copyright 2022 Broadband Forum
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Created by Jafar Hamin (Nokia) in Fubruady 2023
+
 from database.omci_me import ME
 from database.omci_me_types import omci_me_class
 import datetime
@@ -56,7 +71,7 @@ def get_yang_hardware_state(onu):
                 {
                     "name": onu_name,
                     "model-name": onu2_g[0].equipment_id.decode("utf-8"),
-                    "mfg-name": onu_g[0].vendor_id.decode("utf-8"),
+                    "mfg-name": str(onu_g[0].vendor_id),
                     "serial-num": onu_g[0].serial_number.decode("utf-8")
                 }
             ]
@@ -96,6 +111,54 @@ def generate_ani_name(onu_name, me_inst, configured_names):
     name = "ani" + str(me_inst) + "_" + onu_name
     return generate_unique_name(name, me_inst, configured_names)
 
+def get_pm_uni_interface(onu):
+    unis_pm_down_me = {}
+    unis_pm_up_me = {}
+    unis = onu.get_all_instances(omci_me_class['PPTP_ETH_UNI'])
+    mbpcds = onu.get_all_instances(omci_me_class['MAC_BRIDGE_PORT_CONFIG_DATA'])
+    pm_ups = onu.get_all_instances(omci_me_class['ETH_FRAME_UPSTREAM_PM'])
+    pm_downs = onu.get_all_instances(omci_me_class['ETH_FRAME_DOWNSTREAM_PM'])
+    for mbpcd in mbpcds:
+        if str(mbpcd.tp_type) == 'PHY_PATH_TP_ETH_UNI':
+            uni_inst = mbpcd.tp_ptr
+            mbpcd_inst = mbpcd.me_inst
+            for pm_down in pm_downs:
+                if pm_down.me_inst == mbpcd_inst:
+                    unis_pm_down_me[uni_inst] = pm_down
+                    break
+            for pm_up in pm_ups:
+                if pm_up.me_inst == mbpcd_inst:
+                    unis_pm_up_me[uni_inst] = pm_up
+                    break
+
+    unis_pm = {}
+    for uni in unis:
+        uni_inst = uni.me_inst
+        unis_pm[uni_inst] = {}
+        if uni_inst not in unis_pm_down_me or uni_inst not in unis_pm_up_me:
+            continue
+        pm_down = unis_pm_down_me[uni_inst]
+        pm_up = unis_pm_up_me[uni_inst]
+        unis_pm[uni_inst] = {
+              "intervals-15min":{
+                "history":[
+                  {
+                    "interval-number": 1,
+                    "invalid-data-flag": "false",
+                    "measured-time": 900,
+                    "in-broadcast-pkts": pm_up.up_broadcast_packets,
+                    "in-multicast-pkts": pm_up.up_multicast_packets,
+                    "in-octets": pm_up.up_octets,
+                    "out-broadcast-pkts": pm_down.dn_broadcast_packets,
+                    "out-multicast-pkts": pm_down.dn_multicast_packets,
+                    "out-octets": pm_down.dn_octets,
+                    "time-stamp": str(datetime.datetime.now())
+                  }
+                ]
+              }
+        }
+    return unis_pm
+
 def get_uni_interfaces(onu):
     unis = onu.get_all_instances(omci_me_class['PPTP_ETH_UNI'])
     result = []
@@ -104,6 +167,7 @@ def get_uni_interfaces(onu):
         uni_name = uni.user_name
         if uni_name is not None:
             configured_names.add(uni_name)
+    unis_pm = get_pm_uni_interface(onu)
     for uni in unis:
         uni_name = uni.user_name
         if uni_name is None:
@@ -118,6 +182,8 @@ def get_uni_interfaces(onu):
             "admin-status": me_to_yang_value[uni.admin_state],
             "oper-status": me_to_yang_value[uni.oper_state]
         }
+        if uni.me_inst in unis_pm:
+            interface["bbf-interfaces-performance-management:performance"] = unis_pm[uni.me_inst]
         result.append(interface)
     return result 
 
@@ -225,4 +291,4 @@ def get_yang_response(onu, filter):
     if 'ietf-alarms:alarms' in filter:
         alarms_state = get_all_alarms_state(onu)
         result.update(alarms_state)
-    return json.dumps(result).replace('\\u0000', '').replace('\\u0016', '')
+    return result

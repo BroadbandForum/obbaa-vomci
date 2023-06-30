@@ -1,0 +1,6 @@
+response {
+    action_resp {
+        status_resp {}
+        output_data: "{\"bbf-obbaa-vomci-telemetry:subscription-id\": $SUBSCRIPTION_ID$}"
+    }
+}

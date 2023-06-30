@@ -16,18 +16,18 @@ def getSampleProtoProxy(key):
         ret.body.request.hello.service_endpoint_name = "volmf-endpoint"
     elif key == 'create':
         ret.header.msg_id = "4"
-        ret.body.request.action.input_data = b'{"bbf-vomci-proxy:managed-onus":{"create-onu":{"name":"ont1"}}}'
+        ret.body.request.action.input_data = b'{"bbf-vomci-proxy:vomci":{"managed-onus":{"create-onu":{"name":"ont1","xpon-onu-type":"bbf-vomci-types:gpon"}}}}'
     elif key == 'set':
         ret.header.msg_id = "6"
-        ret.body.request.action.input_data = b'{"bbf-vomci-proxy:managed-onus":{"managed-onu":[{"name":"ont1","set-onu-communication":{"onu-attachment-point":{"olt-name":"OLT1","channel-termination-name":"CT_1","onu-id":1},"vomci-function-remote-endpoint-name":"vomci1","onu-communication-available":true,"olt-remote-endpoint-name":"proxy-grpc-1"}}]}}'
+        ret.body.request.action.input_data = b'{"bbf-vomci-proxy:vomci":{"managed-onus":{"managed-onu":[{"name":"ont1","set-onu-communication":{"onu-communication-available":true,"olt-remote-endpoint":"olt-grpc-2","voltmf-remote-endpoint":"vOLTMF_Kafka_1","xpon-onu-type":"bbf-vomci-types:gpon","onu-attachment-point":{"olt-name":"olt-grpc-2","channel-termination-name":"CT_1","onu-id":1}}}]}}}'
     elif key == 'update_config':
         ret.header.msg_id = "8"
-        mystr = '{"bbf-vomci-proxy:vomci":{"remote-network-function":{"nf-client":{"enabled":true,"nf-initiate":{"remote-endpoints":{"remote-endpoint":[{"name":"obbaa-vproxy","nf-type":"bbf-network-function-types:voltmf-type","local-endpoint-name":"proxy-kfk-1","kafka-agent":{"kafka-agent-parameters":{"client-id":"client-id3","publication-parameters":{"topic":[{"name":"vomci-proxy-response","purpose":"VOMCI_RESPONSE"},{"name":"vomci-proxy-notification","purpose":"VOMCI_NOTIFICATION"}]},"consumption-parameters":{"topic":[{"name":"vomci-proxy-request","purpose":"VOMCI_REQUEST"}]}}},"access-point":[{"name":"obbaa-vproxy","kafka-agent":{"kafka-agent-transport-parameters":{"remote-address":"kafka-host","remote-port":9092}}}]},{"name":"vOMCI-grpc-1","nf-type":"bbf-network-function-types:vomci-function-type","local-endpoint-name":"proxy-grpc-2","access-point":[{"name":"vOMCI-grpc-1","grpc":{"grpc-transport-parameters":{"remote-address":"obbaa-vomci","remote-port":8100}}}]}]}}},"nf-server":{"enabled":true,"listen":{"listen-endpoint":[{"name":"proxy-grpc-2","grpc":{"grpc-server-parameters":{"local-endpoint-name":"proxy-grpc-2","local-address":"::","local-port":8433}}}]}}}}}'
+        mystr = b'{"bbf-vomci-proxy:vomci":{"remote-nf":{"nf-client":{"enabled": true,"initiate":{"remote-server":[{"name":"vOLTMF_Kafka_1","nf-type":"bbf-network-function-types:voltmf","local-service-endpoint":"vOMCI-kfk-1","bbf-vomci-function-kafka-agent:kafka-agent":{"client-id":"client-id2","publication-parameters":{"topic":[{"name":"vomci1-response","purpose":"VOMCI_RESPONSE"},{"name":"vomci1-notification","purpose":"VOMCI_NOTIFICATION"}]},"consumption-parameters":{"group-id":"group2","topic":[{"name":"vomci1-request","purpose":"VOMCI_REQUEST"}]},"access-point":[{"name":"vOLTMF_Kafka_1","kafka-agent-transport-parameters":{"bbf-vomci-function-kafka-agent-tcp:tcp-client-parameters":{"remote-address":"kafka-host","remote-port":9092}}}]}}]}},"nf-server":{"enabled":true,"listen":{"listen-endpoint":[{"name":"proxy-grpc-1","local-service-endpoint":"vOMCI-grpc-1","bbf-vomci-function-grpc-server:grpc-server":{"bbf-vomci-function-grpc-server-tcp:tcp-server-parameters":{"local-address":"::","local-port":8100}}}]}}}}}'
         encoded = bytes(mystr, 'utf-8')
         ret.body.request.update_config.update_config_replica.delta_config = encoded
     elif key == 'disable':
         ret.header.msg_id = "10"
-        ret.body.request.update_config.update_config_replica.delta_config = b'{"bbf-vomci-function:vomci":{"remote-network-function":{"nf-client":{"enabled":false}}}}'
+        ret.body.request.update_config.update_config_replica.delta_config = b'{"bbf-vomci-function:vomci":{"remote-nf":{"nf-client":{"enabled":false}}}}'
     else:
         ret = None
     return ret

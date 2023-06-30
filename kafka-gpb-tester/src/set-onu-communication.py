@@ -20,6 +20,7 @@ import sys
 from tr451_vomci_nbi_message_pb2 import Msg
 from tr451_vomci_nbi_message_pb2 import Error
 from confluent_kafka import Producer
+from configurations import util
 import global_params as GLB
 
 
@@ -52,13 +53,9 @@ vomci_msg.header.recipient_name=GLB.VOMCI_NAME
 vomci_msg.header.object_type=vomci_msg.header.VOMCI_FUNCTION
 vomci_msg.header.object_name=GLB.VOMCI_NAME
 
-vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-function:managed-onus\":{\"managed-onu\":[{\"name\":\"" + GLB.ONU_NAME +
-                                            "\",\"set-onu-communication\":{\"onu-attachment-point\":{\"olt-name\":\"" + GLB.OLT_NAME +
-                                            "\",\"channel-termination-name\":\"" + GLB.CT_NAME +
-                                             "\",\"onu-id\":" + GLB.ONU_ID + 
-                                             "},\"voltmf-remote-endpoint-name\":\"vOLTMF_Kafka_1\",\"onu-communication-available\":" + COMMUNICATION_AVAILABLE_VALUE + "," +
-                                             "  \"olt-remote-endpoint-name\":\"" + GLB.VOMCI_REMOTE_ENDPOINT + "\"}}]}}","utf-8")
+vomci_set_onu_communication = util.read_configuration('configurations/vomci-set-onu-communication.json')
 
+vomci_msg.body.request.action.input_data = bytes(vomci_set_onu_communication,"utf-8")
 
 producer.produce(GLB.VOMCI_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()
@@ -78,6 +75,9 @@ vomci_msg.body.request.action.input_data = bytes("{\"bbf-vomci-proxy:managed-onu
                                              "},\"vomci-function-remote-endpoint-name\":\"" + GLB.VPROXY_VOLTMF_ENDPOINT +"\",\"onu-communication-available\":" + COMMUNICATION_AVAILABLE_VALUE + "," +
                                              "  \"olt-remote-endpoint-name\":\"" + GLB.VPROXY_OLT_ENDPOINT + "\"}}]}}","utf-8")
 
+vproxy_set_onu_communication = util.read_configuration('configurations/vproxy-set-onu-communication.json')
+
+vomci_msg.body.request.action.input_data = bytes(vproxy_set_onu_communication,"utf-8")
 
 producer.produce(GLB.VPROXY_TOPIC_NAME, key="key", value=bytes(vomci_msg.SerializeToString()), callback=acked)
 producer.flush()
